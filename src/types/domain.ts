@@ -297,9 +297,7 @@ export type NavTabId =
   | "pos"
   | "orders"
   | "clients"
-  | "inventory-menu"
-  | "inventory-ingredients"
-  | "inventory-restock"
+  | "inventory"
   | "inventory-closing-count"
   | "inventory-reconciliation"
   | "recipes"
@@ -312,9 +310,7 @@ export type NavTabId =
 // ---------- Derived / computed values (utils) ----------
 /** Tabs rendered by the inventory feature view. */
 export type InventoryTabId =
-  | "inventory-menu"
-  | "inventory-ingredients"
-  | "inventory-restock"
+  | "inventory"
   | "inventory-closing-count"
   | "inventory-reconciliation";
 
