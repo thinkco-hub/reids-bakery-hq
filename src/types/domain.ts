@@ -19,6 +19,7 @@ export type InventoryCountId = string;
 export type SaleId = string;
 export type ExpenseId = string;
 export type DayClosingId = string;
+export type UserId = string;
 
 // ---------- Dates & quantities ----------
 /** Calendar date in "YYYY-MM-DD" form. */
@@ -289,6 +290,25 @@ export interface DayClosing {
 
 /** Payload of the close-day action (EndOfDayClosing). */
 export type DayClosingData = Omit<DayClosing, "id" | "closedAt">;
+
+// ---------- Users / Auth ----------
+export type UserRole = "admin" | "staff";
+
+export interface User {
+  id: UserId;
+  name: string;
+  email: string;
+  passwordHash: string;
+  role: UserRole;
+  active: boolean;
+  createdAt: ISODateTime;
+}
+
+/** Payload of the login form (LoginPage). */
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
 
 // ---------- Navigation ----------
 /** Fixed tab identifiers used by the sidebar and feature views. */
