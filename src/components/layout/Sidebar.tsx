@@ -17,6 +17,8 @@ interface SidebarProps {
   setIsReportsExpanded: Dispatch<SetStateAction<boolean>>;
   onNavClick: (tab: NavTabId) => void;
   onSwitchView: (view: AppView) => void;
+  /** Whether the signed-in user is an admin (admin UX is TBD). */
+  isAdmin: boolean;
 }
 
 /** Width (px) of the collapsed sidebar rail = desktop hover zone (Tailwind w-20). */
@@ -37,6 +39,7 @@ export default function Sidebar({
   setIsReportsExpanded,
   onNavClick,
   onSwitchView,
+  isAdmin,
 }: SidebarProps) {
   // --- SIDEBAR RESPONSIVE HELPERS ---
   // "Tablet" = md..lg range (768px - 1023px), same cutoff the POS cart width uses.
@@ -245,12 +248,17 @@ export default function Sidebar({
           <div className="flex flex-col">
             <button
               onClick={() => {
-                setIsInventoryExpanded(!isInventoryExpanded);
-                // First tap on the collapsed tablet rail expands it so the submenu is visible
-                if (isTablet && !sidebarExpanded) setIsTabletSidebarOpen(true);
+                if (isAdmin) {
+                  // Admins: first click expands the submenu (Reconciliation);
+                  // the main view stays reachable via the item itself below.
+                  setIsInventoryExpanded(!isInventoryExpanded);
+                  // First tap on the collapsed tablet rail expands it so the submenu is visible
+                  if (isTablet && !sidebarExpanded) setIsTabletSidebarOpen(true);
+                }
+                onNavClick("inventory");
               }}
               className={`w-full flex justify-between items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-                activeTab.startsWith("inventory")
+                activeTab === "inventory" || activeTab === "inventory-closing-count" || activeTab === "inventory-reconciliation"
                   ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
                   : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
               }`}
@@ -269,69 +277,36 @@ export default function Sidebar({
                   Inventory
                 </span>
               </div>
-              <svg
-                className={`w-4 h-4 ml-2 transition-transform duration-200 ${
-                  isInventoryExpanded ? "rotate-180" : ""
-                } ${sidebarLabelCls}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+              {isAdmin && (
+                <svg
+                  onClick={(e) => {
+                    // Chevron tap toggles the submenu without navigating
+                    e.stopPropagation();
+                    setIsInventoryExpanded(!isInventoryExpanded);
+                  }}
+                  className={`w-4 h-4 ml-2 transition-transform duration-200 ${
+                    isInventoryExpanded ? "rotate-180" : ""
+                  } ${sidebarLabelCls}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              )}
             </button>
 
-            {isInventoryExpanded && (
+            {isAdmin && isInventoryExpanded && (
               <div
                 className={`mt-1 space-y-1 bg-[#4a2605] rounded-lg overflow-hidden transition-all shadow-inner ${
                   sidebarExpanded ? "md:block" : "md:hidden"
                 } ${desktopRailExpanded ? "lg:block" : "lg:hidden"}`}
               >
-                <button
-                  onClick={() => onNavClick("inventory-menu")}
-                  className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
-                    activeTab === "inventory-menu"
-                      ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
-                      : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
-                  }`}
-                >
-                  Menu Items
-                </button>
-                <button
-                  onClick={() => onNavClick("inventory-ingredients")}
-                  className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
-                    activeTab === "inventory-ingredients"
-                      ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
-                      : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
-                  }`}
-                >
-                  Raw Materials
-                </button>
-                <button
-                  onClick={() => onNavClick("inventory-restock")}
-                  className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
-                    activeTab === "inventory-restock"
-                      ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
-                      : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
-                  }`}
-                >
-                  Restock Reminders
-                </button>
-                <button
-                  onClick={() => onNavClick("inventory-closing-count")}
-                  className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
-                    activeTab === "inventory-closing-count"
-                      ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
-                      : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
-                  }`}
-                >
-                  Closing Count
-                </button>
                 <button
                   onClick={() => onNavClick("inventory-reconciliation")}
                   className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${

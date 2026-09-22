@@ -48,6 +48,9 @@ export default function BakeryCommandCenter() {
     windowWidth,
   } = useNavigation();
 
+  // --- ROLE (TBD: real auth/session; placeholder so admin-only UI can render) ---
+  const [isAdmin] = React.useState(true);
+
   // --- INVENTORY (src/hooks/useInventory.ts) ---
   const inventory = useInventory();
   const {
@@ -262,6 +265,7 @@ export default function BakeryCommandCenter() {
         setIsInventoryExpanded={setIsInventoryExpanded}
         isReportsExpanded={isReportsExpanded}
         setIsReportsExpanded={setIsReportsExpanded}
+        isAdmin={isAdmin}
         onNavClick={handleNavClick}
         onSwitchView={() => setActiveView("chams")}
       />
@@ -354,9 +358,7 @@ export default function BakeryCommandCenter() {
             VIEW: INVENTORY
         ========================================= */}
         {(
-          activeTab === "inventory-menu" ||
-          activeTab === "inventory-ingredients" ||
-          activeTab === "inventory-restock" ||
+          activeTab === "inventory" ||
           activeTab === "inventory-closing-count" ||
           activeTab === "inventory-reconciliation"
         ) && (
@@ -366,6 +368,7 @@ export default function BakeryCommandCenter() {
             ingredients={ingredients}
             restockReminders={restockReminders}
             inventoryCounts={inventoryCounts}
+            onNavClick={handleNavClick}
             onRestockToProduction={goToProductionRuns}
             onOpenRestock={openRestock}
             onAddIngredient={addIngredient}
