@@ -29,7 +29,7 @@ import type { NavTabId, Order } from "./types/domain";
 
 export default function BakeryCommandCenter() {
   // --- AUTH (src/hooks/useAuth.ts) ---
-  const { currentUser, login, logout } = useAuth();
+  const { currentUser, login, logout, getLockedUntil } = useAuth();
 
   // --- NAVIGATION (src/hooks/useNavigation.ts) ---
   const {
@@ -192,7 +192,7 @@ export default function BakeryCommandCenter() {
   };
 
   if (!currentUser) {
-    return <LoginPage onLogin={login} />;
+    return <LoginPage onLogin={login} getLockedUntil={getLockedUntil} />;
   }
 
   return (

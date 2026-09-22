@@ -23,15 +23,14 @@ function loadAttempts(): AttemptsByEmail {
   }
 }
 
-export type LoginResult =
-  | { ok: true }
-  | { ok: false; error: string; lockedForSeconds?: number };
+export type LoginResult = { ok: true } | { ok: false; error: string };
 
 /**
  * Owns login/logout and per-email rate limiting. There is no persisted
  * session — currentUser always starts null, so a page refresh returns to
- * the login page. The rate-limit record is persisted so a refresh can't be
- * used to reset a lockout.
+ * the login page. The rate-limit record IS persisted (localStorage), and
+ * exposed live via getLockedUntil so the UI reflects an in-progress
+ * lockout immediately after a refresh, not just after the next submit.
  */
 export function useAuth() {
   const [users] = useState<User[]>(initialUsers);
@@ -46,18 +45,19 @@ export function useAuth() {
     }
   }, [attempts]);
 
+  /** Timestamp (ms) the given email is locked out until, or null if not locked. */
+  const getLockedUntil = (email: string): number | null => {
+    const key = email.trim().toLowerCase();
+    return attempts[key]?.lockedUntil ?? null;
+  };
+
   const login = async ({ email, password }: LoginCredentials): Promise<LoginResult> => {
     const key = email.trim().toLowerCase();
     const now = Date.now();
     const record = attempts[key];
 
     if (record?.lockedUntil && record.lockedUntil > now) {
-      const secondsLeft = Math.ceil((record.lockedUntil - now) / 1000);
-      return {
-        ok: false,
-        error: `Too many failed attempts. Try again in ${secondsLeft}s.`,
-        lockedForSeconds: secondsLeft,
-      };
+      return { ok: false, error: "Too many failed attempts. Please wait for the lockout to expire." };
     }
 
     const user = users.find((u) => u.email.toLowerCase() === key && u.active);
@@ -72,22 +72,18 @@ export function useAuth() {
       return { ok: true };
     }
 
-    const prevRecord = attempts[key] ?? { failedAttempts: 0, lockedUntil: null };
+    const existingRecord = attempts[key];
+    const lockoutExpired = !!existingRecord?.lockedUntil && existingRecord.lockedUntil <= now;
+    const prevRecord =
+      existingRecord && !lockoutExpired ? existingRecord : { failedAttempts: 0, lockedUntil: null };
     const failedAttempts = prevRecord.failedAttempts + 1;
     const lockedUntil = failedAttempts >= MAX_ATTEMPTS ? now + LOCKOUT_MS : null;
     setAttempts((prev) => ({ ...prev, [key]: { failedAttempts, lockedUntil } }));
 
-    if (lockedUntil) {
-      return {
-        ok: false,
-        error: `Too many failed attempts. Try again in ${LOCKOUT_MS / 1000}s.`,
-        lockedForSeconds: LOCKOUT_MS / 1000,
-      };
-    }
     return { ok: false, error: "Invalid email or password." };
   };
 
   const logout = () => setCurrentUser(null);
 
-  return { currentUser, login, logout };
+  return { currentUser, login, logout, getLockedUntil };
 }

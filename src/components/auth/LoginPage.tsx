@@ -3,38 +3,57 @@ import type { FormEvent } from "react";
 import type { LoginCredentials } from "../../types/domain";
 import type { LoginResult } from "../../hooks/useAuth";
 
-interface LoginPageProps {
-  onLogin: (credentials: LoginCredentials) => Promise<LoginResult>;
+const LAST_EMAIL_KEY = "bakery.lastLoginEmail";
+
+function loadLastEmail(): string {
+  try {
+    return localStorage.getItem(LAST_EMAIL_KEY) ?? "";
+  } catch {
+    return "";
+  }
 }
 
-export default function LoginPage({ onLogin }: LoginPageProps) {
-  const [email, setEmail] = useState("");
+interface LoginPageProps {
+  onLogin: (credentials: LoginCredentials) => Promise<LoginResult>;
+  getLockedUntil: (email: string) => number | null;
+}
+
+export default function LoginPage({ onLogin, getLockedUntil }: LoginPageProps) {
+  // Seeded from localStorage (not the password) so a lockout is visible
+  // immediately on reload, without retyping the email first.
+  const [email, setEmail] = useState(loadLastEmail);
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [lockedForSeconds, setLockedForSeconds] = useState<number | null>(null);
+  const [now, setNow] = useState(Date.now());
+
+  // Ticks every second so an in-progress lockout (persisted in localStorage,
+  // read live below) keeps counting down correctly even right after a
+  // page refresh — not just after the next submit attempt.
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
-    if (lockedForSeconds === null || lockedForSeconds <= 0) return;
-    const timer = setTimeout(() => {
-      setLockedForSeconds((s) => (s !== null ? s - 1 : null));
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [lockedForSeconds]);
+    try {
+      if (email) localStorage.setItem(LAST_EMAIL_KEY, email);
+      else localStorage.removeItem(LAST_EMAIL_KEY);
+    } catch {
+      // ignore storage errors (e.g. private browsing)
+    }
+  }, [email]);
 
-  const isLocked = lockedForSeconds !== null && lockedForSeconds > 0;
+  const lockedUntil = getLockedUntil(email);
+  const secondsLeft = lockedUntil ? Math.max(0, Math.ceil((lockedUntil - now) / 1000)) : 0;
+  const isLocked = secondsLeft > 0;
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     const result = await onLogin({ email, password });
     setSubmitting(false);
-    if (!result.ok) {
-      setError(result.error);
-      setLockedForSeconds(result.lockedForSeconds ?? null);
-    } else {
-      setError(null);
-    }
+    setError(result.ok ? null : result.error);
   };
 
   return (
@@ -73,11 +92,9 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           </div>
         </div>
 
-        {error && (
+        {(isLocked || error) && (
           <p className="mt-4 text-sm font-semibold text-red-600">
-            {isLocked
-              ? `Too many failed attempts. Try again in ${lockedForSeconds}s.`
-              : error}
+            {isLocked ? `Too many failed attempts. Try again in ${secondsLeft}s.` : error}
           </p>
         )}
 
