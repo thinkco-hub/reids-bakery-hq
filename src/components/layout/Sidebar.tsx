@@ -1,9 +1,11 @@
 import { useState } from "react";
-import type { AppView, NavTabId } from "../../types/domain";
+import type { AppView, NavTabId, User } from "../../types/domain";
 import type { Dispatch, SetStateAction } from "react";
 
 interface SidebarProps {
   activeTab: NavTabId;
+  currentUser: User;
+  onLogout: () => void;
   windowWidth: number;
   isMobileOpen: boolean;
   isTabletSidebarOpen: boolean;
@@ -22,6 +24,8 @@ const COLLAPSED_RAIL_PX = 80;
 
 export default function Sidebar({
   activeTab,
+  currentUser,
+  onLogout,
   windowWidth,
   isMobileOpen,
   isTabletSidebarOpen,
@@ -489,7 +493,16 @@ export default function Sidebar({
 
         {/* Bottom Logout Area */}
         <div className="p-3 mb-4 mt-auto border-t border-[#F3B978]/20 pt-4">
-          <button className="w-full flex items-center p-3 rounded-lg font-bold text-[#FDF9F3]/60 hover:text-white hover:bg-[#F3B978]/10 transition-colors whitespace-nowrap overflow-hidden">
+          <div
+            className={`px-3 mb-2 overflow-hidden whitespace-nowrap ${sidebarLabelCls} transition-opacity duration-300`}
+          >
+            <p className="text-sm font-bold text-white truncate">{currentUser.name}</p>
+            <p className="text-xs text-[#FDF9F3]/50 truncate">{currentUser.email}</p>
+          </div>
+          <button
+            onClick={onLogout}
+            className="w-full flex items-center p-3 rounded-lg font-bold text-[#FDF9F3]/60 hover:text-white hover:bg-[#F3B978]/10 transition-colors whitespace-nowrap overflow-hidden"
+          >
             <div className="flex items-center justify-center w-8 flex-shrink-0">
               <svg
                 className="w-6 h-6"
