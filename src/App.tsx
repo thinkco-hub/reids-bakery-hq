@@ -31,6 +31,9 @@ export default function BakeryCommandCenter() {
   // --- AUTH (src/hooks/useAuth.ts) ---
   const { currentUser, login, logout, getLockedUntil } = useAuth();
 
+  // --- ROLE (derived from the authenticated user) ---
+  const isAdmin = currentUser?.role === "admin";
+
   // --- NAVIGATION (src/hooks/useNavigation.ts) ---
   const {
     activeView,
@@ -47,9 +50,6 @@ export default function BakeryCommandCenter() {
     setIsReportsExpanded,
     windowWidth,
   } = useNavigation();
-
-  // --- ROLE (TBD: real auth/session; placeholder so admin-only UI can render) ---
-  const [isAdmin] = React.useState(true);
 
   // --- INVENTORY (src/hooks/useInventory.ts) ---
   const inventory = useInventory();
