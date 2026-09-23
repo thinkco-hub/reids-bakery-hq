@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { initialOrders } from "../data/initialOrders";
+import { recordAuditEvent } from "../utils/auditLog";
 import type {
   ClientId,
   CreateOrderData,
@@ -10,6 +11,7 @@ import type {
   OrderPaymentInput,
   OrderStatus,
   Sale,
+  User,
 } from "../types/domain";
 
 // Monotonic order-number counter. Seeds past the highest seeded order so new
@@ -46,6 +48,7 @@ interface UseOrdersOptions {
    * the app shell so stock updates stay owned by useInventory.
    */
   deductOrderLines: (lines: OrderItem[]) => void;
+  currentUser: User | null;
 }
 
 /**
@@ -53,12 +56,35 @@ interface UseOrdersOptions {
  * (viewingOrder), including payment recording, status changes, scheduling
  * and delivery.
  */
-export function useOrders({ deductOrderLines }: UseOrdersOptions) {
+export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
 
+  const logOrderEvent = (
+    action: "order.created" | "order.payment_recorded" | "order.status_advanced" | "order.delivery_scheduled" | "order.delivered",
+    orderId: OrderId,
+    details: string
+  ) => {
+    if (!currentUser) return;
+    recordAuditEvent({
+      userId: currentUser.id,
+      userName: currentUser.name,
+      userRole: currentUser.role,
+      action,
+      entityType: "Order",
+      entityId: orderId,
+      details,
+    });
+  };
+
   const createOrder = (data: CreateOrderData) => {
-    setOrders((prev) => [buildOrder(nextOrderId(), data), ...prev]);
+    const order = buildOrder(nextOrderId(), data);
+    setOrders((prev) => [order, ...prev]);
+    logOrderEvent(
+      "order.created",
+      order.id,
+      `Created order ${order.id}${order.customerName ? ` for ${order.customerName}` : ""}`
+    );
   };
 
   const createOrderFromSale = (sale: Sale) => {
@@ -77,15 +103,18 @@ export function useOrders({ deductOrderLines }: UseOrdersOptions) {
         ? `Placed via POS Pre-Order — ${sale.notes}`
         : "Placed via POS Pre-Order",
     });
-    setOrders((prev) => [
-      {
-        ...order,
-        deliveryDate: sale.deliveryDate,
-        paymentMethod: sale.paymentMethod,
-        amountPaid: sale.total,
-      },
-      ...prev,
-    ]);
+    const finalOrder: Order = {
+      ...order,
+      deliveryDate: sale.deliveryDate,
+      paymentMethod: sale.paymentMethod,
+      amountPaid: sale.total,
+    };
+    setOrders((prev) => [finalOrder, ...prev]);
+    logOrderEvent(
+      "order.created",
+      finalOrder.id,
+      `Created order ${finalOrder.id} via POS${finalOrder.customerName ? ` for ${finalOrder.customerName}` : ""}`
+    );
   };
 
   /**
@@ -110,11 +139,13 @@ export function useOrders({ deductOrderLines }: UseOrdersOptions) {
       paymentMethod: method,
       amountPaid: (o.amountPaid || 0) + amount,
     }));
+    logOrderEvent("order.payment_recorded", id, `Recorded payment of ${amount} (${method}) on order ${id}`);
   };
 
   const advanceOrderStatus = (id: OrderId, status: OrderStatus | null) => {
     if (!status) return;
     patchOrder(id, { status });
+    logOrderEvent("order.status_advanced", id, `Advanced order ${id} to ${status}`);
   };
 
   const scheduleOrderDelivery = (
@@ -122,6 +153,7 @@ export function useOrders({ deductOrderLines }: UseOrdersOptions) {
     { deliveryDate, assignedTo }: OrderDeliveryInput
   ) => {
     patchOrder(id, { deliveryDate, assignedTo });
+    logOrderEvent("order.delivery_scheduled", id, `Scheduled delivery for order ${id} on ${deliveryDate}`);
   };
 
   const markOrderDelivered = (id: OrderId) => {
@@ -133,6 +165,7 @@ export function useOrders({ deductOrderLines }: UseOrdersOptions) {
     deductOrderLines(order.items);
 
     patchOrder(id, { status: "Delivered", deliveredAt });
+    logOrderEvent("order.delivered", id, `Marked order ${id} delivered`);
   };
 
   const clearViewingOrder = () => setViewingOrder(null);

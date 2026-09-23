@@ -4,6 +4,7 @@ import {
   initialRestockReminders,
 } from "../data/initialInventory";
 import { initialRecipes } from "../data/initialRecipes";
+import { recordAuditEvent } from "../utils/auditLog";
 import type {
   IngredientFormData,
   IngredientId,
@@ -21,6 +22,7 @@ import type {
   RestockReminderData,
   RestockReminderId,
   StockItem,
+  User,
 } from "../types/domain";
 
 const EMPTY_RESTOCK_MODAL: RestockModalState = {
@@ -40,17 +42,41 @@ let nextReminderSeq = initialRestockReminders.length + 1;
 const nextReminderId = (): RestockReminderId =>
   `RR-${String(nextReminderSeq++).padStart(3, "0")}`;
 
+interface UseInventoryOptions {
+  currentUser: User | null;
+}
+
 /**
  * Owns the inventory feature: menu item stock, raw ingredient stock, restock
  * reminders and the restock modal. All stock movements (order delivery,
  * production completion, reconciliation, restocking) flow through the
  * stock-movement actions below so the stock collections have a single owner.
  */
-export function useInventory() {
+export function useInventory({ currentUser }: UseInventoryOptions) {
   const [menuInventory, setMenuInventory] = useState<MenuItemStock[]>(initialRecipes);
   const [ingredients, setIngredients] = useState<IngredientStock[]>(initialIngredients);
   const [restockReminders, setRestockReminders] = useState<RestockReminder[]>(initialRestockReminders);
   const [restockModal, setRestockModal] = useState<RestockModalState>(EMPTY_RESTOCK_MODAL);
+
+  // deductOrderLines/deductRecipeLines/addMenuStock/applyCountedQty/applyPendingCounts
+  // are internal side effects invoked by useOrders/useProduction/useClosing, which
+  // already log the user-facing action they originate from — not logged again here.
+  const logInventoryEvent = (
+    action: "inventory.ingredient_added" | "inventory.ingredient_updated" | "inventory.restocked",
+    entityId: string,
+    details: string
+  ) => {
+    if (!currentUser) return;
+    recordAuditEvent({
+      userId: currentUser.id,
+      userName: currentUser.name,
+      userRole: currentUser.role,
+      action,
+      entityType: "Inventory",
+      entityId,
+      details,
+    });
+  };
 
   // --- STOCK MOVEMENTS (consumed by orders, production and closing) ---
 
@@ -133,6 +159,11 @@ export function useInventory() {
     if (isNaN(amount) || amount <= 0) return;
 
     setQtyById(restockModal.category, restockModal.selectedItemId, (qty) => qty + amount);
+    logInventoryEvent(
+      "inventory.restocked",
+      restockModal.selectedItemId,
+      `Restocked ${restockModal.selectedItemId} (${restockModal.category}) by ${amount}`
+    );
 
     setRestockModal(EMPTY_RESTOCK_MODAL);
   };
@@ -150,16 +181,16 @@ export function useInventory() {
 
   // --- INGREDIENTS & RESTOCK REMINDERS (FR-1.2) ---
   const addIngredient = (data: IngredientFormData) => {
-    setIngredients((prev) => [
-      ...prev,
-      { id: nextIngredientId(), type: "Ingredient", ...data },
-    ]);
+    const id = nextIngredientId();
+    setIngredients((prev) => [...prev, { id, type: "Ingredient", ...data }]);
+    logInventoryEvent("inventory.ingredient_added", id, `Added ingredient ${id} (${data.name})`);
   };
 
   const updateIngredient = (id: string, data: Partial<IngredientStock>) => {
     setIngredients((prev) =>
       prev.map((item) => (item.id === id ? { ...item, ...data } : item))
     );
+    logInventoryEvent("inventory.ingredient_updated", id, `Updated ingredient ${id}`);
   };
 
   const addRestockReminder = (data: RestockReminderData) => {

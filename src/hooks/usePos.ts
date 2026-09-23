@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
+import { recordAuditEvent } from "../utils/auditLog";
 import type {
   CartItem,
   ConfirmModalState,
@@ -8,6 +9,7 @@ import type {
   PosCategory,
   PosProduct,
   Sale,
+  User,
 } from "../types/domain";
 
 const EMPTY_CONFIRM_MODAL: ConfirmModalState = {
@@ -31,6 +33,7 @@ interface UsePosOptions {
    * Injected by the app shell so stock updates stay owned by useInventory.
    */
   deductOrderLines: (lines: OrderItem[]) => void;
+  currentUser: User | null;
 }
 
 /**
@@ -41,6 +44,7 @@ export function usePos({
   posProducts,
   createOrderFromSale,
   deductOrderLines,
+  currentUser,
 }: UsePosOptions) {
   const [posCategory, setPosCategory] = useState<PosCategory>("All");
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -143,6 +147,17 @@ export function usePos({
       createdAt: new Date().toISOString(),
     };
     setSales((prev) => [sale, ...prev]);
+    if (currentUser) {
+      recordAuditEvent({
+        userId: currentUser.id,
+        userName: currentUser.name,
+        userRole: currentUser.role,
+        action: "sale.completed",
+        entityType: "Sale",
+        entityId: sale.id,
+        details: `${sale.type} sale ${sale.id} completed (${sale.items.length} line${sale.items.length === 1 ? "" : "s"}, ₱${sale.total.toFixed(2)}, ${sale.paymentMethod})`,
+      });
+    }
     if (sale.type === "Pre-Order") {
       // Stock for a pre-order is deducted when the order is delivered
       // (markOrderDelivered -> deductOrderLines), not at placement.
