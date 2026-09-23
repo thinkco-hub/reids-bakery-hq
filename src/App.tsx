@@ -91,7 +91,7 @@ export default function BakeryCommandCenter() {
     saveRecipe,
     cancelRecipeEdit,
     updatePricingRule,
-  } = useRecipes();
+  } = useRecipes({ currentUser });
 
   // --- PRODUCTION RUNS (src/hooks/useProduction.ts) ---
   const {
