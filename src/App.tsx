@@ -79,7 +79,7 @@ export default function BakeryCommandCenter() {
     addClient,
     updateClient,
     clearViewingClient,
-  } = useClients();
+  } = useClients({ currentUser });
   // --- RECIPES / BOM (src/hooks/useRecipes.ts) ---
   const {
     recipes,
