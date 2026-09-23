@@ -134,6 +134,7 @@ export default function BakeryCommandCenter() {
   } = useClosing({
     applyCountedQty: inventory.applyCountedQty,
     applyPendingCounts: inventory.applyPendingCounts,
+    currentUser,
   });
 
   // --- POS (src/hooks/usePos.ts) ---
