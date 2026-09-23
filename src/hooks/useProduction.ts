@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { initialProductionRuns } from "../data/initialProductionRuns";
 import { computeBatches } from "../utils/production";
+import { recordAuditEvent } from "../utils/auditLog";
 import type {
   MenuItemId,
   ProductionRun,
@@ -8,6 +9,7 @@ import type {
   Recipe,
   RecipeIngredientLine,
   ScheduleRunData,
+  User,
 } from "../types/domain";
 
 interface UseProductionOptions {
@@ -20,6 +22,7 @@ interface UseProductionOptions {
   deductRecipeLines: (lines: RecipeIngredientLine[], batches: number) => void;
   /** Inventory-owned stock increase for the produced menu item. */
   addMenuStock: (menuItemId: MenuItemId, amount: number) => void;
+  currentUser: User | null;
 }
 
 /**
@@ -29,14 +32,33 @@ export function useProduction({
   recipes,
   deductRecipeLines,
   addMenuStock,
+  currentUser,
 }: UseProductionOptions) {
   const [productionRuns, setProductionRuns] = useState<ProductionRun[]>(initialProductionRuns);
 
+  const logProductionEvent = (
+    action: "production.run_scheduled" | "production.run_completed" | "production.run_deleted",
+    runId: ProductionRunId,
+    details: string
+  ) => {
+    if (!currentUser) return;
+    recordAuditEvent({
+      userId: currentUser.id,
+      userName: currentUser.name,
+      userRole: currentUser.role,
+      action,
+      entityType: "ProductionRun",
+      entityId: runId,
+      details,
+    });
+  };
+
   const scheduleProductionRun = (data: ScheduleRunData) => {
+    const id: ProductionRunId = `PR-${String(productionRuns.length + 1).padStart(3, "0")}`;
     setProductionRuns((prev) => [
       ...prev,
       {
-        id: `PR-${String(prev.length + 1).padStart(3, "0")}`,
+        id,
         recipeId: data.recipeId,
         plannedQty: data.plannedQty,
         plannedDate: data.plannedDate,
@@ -45,6 +67,11 @@ export function useProduction({
         completedDate: null,
       },
     ]);
+    logProductionEvent(
+      "production.run_scheduled",
+      id,
+      `Scheduled production run ${id} (${data.plannedQty} units on ${data.plannedDate})`
+    );
   };
 
   const completeProductionRun = (id: ProductionRunId) => {
@@ -71,12 +98,19 @@ export function useProduction({
           : r
       )
     );
+    logProductionEvent(
+      "production.run_completed",
+      id,
+      `Completed production run ${id} (${batches} batches, yield ${actualYield})`
+    );
   };
 
   const deleteProductionRun = (id: ProductionRunId) => {
-    setProductionRuns((prev) =>
-      prev.filter((r) => r.id !== id || r.status === "completed")
-    );
+    const run = productionRuns.find((r) => r.id === id);
+    if (!run || run.status === "completed") return;
+
+    setProductionRuns((prev) => prev.filter((r) => r.id !== id));
+    logProductionEvent("production.run_deleted", id, `Deleted production run ${id}`);
   };
 
   return {

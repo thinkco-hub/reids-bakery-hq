@@ -103,6 +103,7 @@ export default function BakeryCommandCenter() {
     recipes,
     deductRecipeLines: inventory.deductRecipeLines,
     addMenuStock: inventory.addMenuStock,
+    currentUser,
   });
 
   // --- ORDERS (src/hooks/useOrders.ts) ---
