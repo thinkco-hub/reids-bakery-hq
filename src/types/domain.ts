@@ -310,6 +310,52 @@ export interface LoginCredentials {
   password: string;
 }
 
+// ---------- Audit log ----------
+export type AuditLogId = string;
+
+/** Discrete action types the app instruments. Extend as new mutating actions are added. */
+export type AuditActionType =
+  | "auth.login.success"
+  | "auth.login.failure"
+  | "auth.login.lockout"
+  | "auth.logout"
+  | "order.created"
+  | "order.payment_recorded"
+  | "order.status_advanced"
+  | "order.delivery_scheduled"
+  | "order.delivered"
+  | "inventory.ingredient_added"
+  | "inventory.ingredient_updated"
+  | "inventory.restocked"
+  | "inventory.count_submitted"
+  | "inventory.count_resolved"
+  | "inventory.reconciliation_applied"
+  | "production.run_scheduled"
+  | "production.run_completed"
+  | "production.run_deleted"
+  | "client.created"
+  | "client.updated"
+  | "recipe.saved"
+  | "recipe.pricing_rule_updated"
+  | "closing.day_closed"
+  | "closing.expense_added"
+  | "closing.expense_deleted";
+
+export interface AuditLogEntry {
+  id: AuditLogId;
+  timestamp: ISODateTime;
+  /** null for pre-auth events where no valid account was matched (e.g. failed login on unknown email). */
+  userId: UserId | null;
+  /** Display name, or the raw attempted email for failed logins. */
+  userName: string;
+  userRole: UserRole | null;
+  action: AuditActionType;
+  entityType?: string;
+  entityId?: string;
+  /** Short human-readable summary shown in the Audit Logs table. */
+  details?: string;
+}
+
 // ---------- Navigation ----------
 /** Fixed tab identifiers used by the sidebar and feature views. */
 export type NavTabId =
@@ -325,7 +371,8 @@ export type NavTabId =
   | "calendar"
   | "reports-dashboard"
   | "reports-closing"
-  | "reports-inventory";
+  | "reports-inventory"
+  | "audit-logs";
 
 // ---------- Derived / computed values (utils) ----------
 /** Tabs rendered by the inventory feature view. */
