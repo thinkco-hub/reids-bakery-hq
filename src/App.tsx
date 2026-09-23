@@ -52,7 +52,7 @@ export default function BakeryCommandCenter() {
   } = useNavigation();
 
   // --- INVENTORY (src/hooks/useInventory.ts) ---
-  const inventory = useInventory();
+  const inventory = useInventory({ currentUser });
   const {
     menuInventory,
     ingredients,
