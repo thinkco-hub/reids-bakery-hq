@@ -8,6 +8,7 @@ const ACTION_LABELS: Record<AuditActionType, string> = {
   "auth.login.failure": "Failed login",
   "auth.login.lockout": "Login lockout",
   "auth.logout": "Logout",
+  "sale.completed": "POS sale completed",
   "order.created": "Order created",
   "order.payment_recorded": "Order payment recorded",
   "order.status_advanced": "Order status changed",

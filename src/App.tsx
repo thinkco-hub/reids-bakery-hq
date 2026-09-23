@@ -140,7 +140,7 @@ export default function BakeryCommandCenter() {
   });
 
   // --- POS (src/hooks/usePos.ts) ---
-  const pos = usePos({ posProducts: initialPosProducts, createOrderFromSale });
+  const pos = usePos({ posProducts: initialPosProducts, createOrderFromSale, currentUser });
   const {
     posCategory,
     setPosCategory,

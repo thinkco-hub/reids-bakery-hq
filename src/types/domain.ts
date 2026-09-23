@@ -319,6 +319,7 @@ export type AuditActionType =
   | "auth.login.failure"
   | "auth.login.lockout"
   | "auth.logout"
+  | "sale.completed"
   | "order.created"
   | "order.payment_recorded"
   | "order.status_advanced"
