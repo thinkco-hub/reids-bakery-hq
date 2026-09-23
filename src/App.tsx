@@ -15,6 +15,7 @@ import RecipesView from "./components/views/RecipesView";
 import ProductionView from "./components/views/ProductionView";
 import CalendarView from "./components/views/CalendarView";
 import ReportsView from "./components/views/ReportsView";
+import AuditLogsView from "./components/views/AuditLogsView";
 import { initialPosProducts } from "./data/initialProducts";
 import { useNavigation } from "./hooks/useNavigation";
 import { useClients } from "./hooks/useClients";
@@ -444,6 +445,11 @@ export default function BakeryCommandCenter() {
             inventoryCounts={inventoryCounts}
           />
         )}
+
+        {/* =========================================
+            VIEW: AUDIT LOGS (admin only)
+        ========================================= */}
+        {activeTab === "audit-logs" && isAdmin && <AuditLogsView />}
       </main>
         </>
       )}
