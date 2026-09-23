@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+/* Hides the scrollbar while keeping the element scrollable (wheel, touch,
+   keyboard all still work). Used wherever a visible scrollbar would clutter
+   the UI, e.g. the sidebar nav (Sidebar.tsx) and the POS category chips
+   (PosView.tsx). scrollbar-width covers Firefox; ::-webkit-scrollbar covers
+   Chromium/WebKit (Chrome, Edge, Safari). */
+@utility hide-scrollbar {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+
 /* Restores the fade-in entrance animation that was lost when the project
    migrated to Tailwind CSS v4 (animate-fadeIn is used across the app).
    Keyframes live inside @theme so Tailwind emits them with the utility.
