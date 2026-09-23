@@ -3,6 +3,7 @@ import type { MouseEvent as ReactMouseEvent } from "react";
 import type {
   CartItem,
   ConfirmModalState,
+  OrderItem,
   PaymentMethod,
   PosCategory,
   PosProduct,
@@ -25,13 +26,22 @@ interface UsePosOptions {
    * Injected by the app shell so order state stays owned by useOrders.
    */
   createOrderFromSale: (sale: Sale) => void;
+  /**
+   * Inventory-owned deduction for finished goods leaving stock at checkout.
+   * Injected by the app shell so stock updates stay owned by useInventory.
+   */
+  deductOrderLines: (lines: OrderItem[]) => void;
 }
 
 /**
  * Owns the POS feature: product category filter, cart, checkout confirmation
  * modal, completed sales, receipts and the resizable ticket panel.
  */
-export function usePos({ posProducts, createOrderFromSale }: UsePosOptions) {
+export function usePos({
+  posProducts,
+  createOrderFromSale,
+  deductOrderLines,
+}: UsePosOptions) {
   const [posCategory, setPosCategory] = useState<PosCategory>("All");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [confirmModal, setConfirmModal] = useState<ConfirmModalState>(EMPTY_CONFIRM_MODAL);
@@ -113,7 +123,7 @@ export function usePos({ posProducts, createOrderFromSale }: UsePosOptions) {
     });
   };
 
-  // --- CHECKOUT (FR-5) ---
+  // --- CHECKOUT (FR-5, FR-8) ---
   const completeSale = () => {
     // Orders scheduled for delivery on a later date are tracked in the Orders view
     const isPreOrder = confirmModal.deliveryDate > todayISO;
@@ -134,7 +144,19 @@ export function usePos({ posProducts, createOrderFromSale }: UsePosOptions) {
     };
     setSales((prev) => [sale, ...prev]);
     if (sale.type === "Pre-Order") {
+      // Stock for a pre-order is deducted when the order is delivered
+      // (markOrderDelivered -> deductOrderLines), not at placement.
       createOrderFromSale(sale);
+    } else {
+      // Walk-in goods leave stock immediately at checkout (FR-8).
+      deductOrderLines(
+        sale.items.map((item) => ({
+          menuItemId: item.id,
+          name: item.name,
+          qty: item.qty,
+          unitPrice: item.price,
+        }))
+      );
     }
     setCart([]);
     setConfirmModal(EMPTY_CONFIRM_MODAL);
