@@ -106,7 +106,7 @@ export default function BakeryCommandCenter() {
   });
 
   // --- ORDERS (src/hooks/useOrders.ts) ---
-  const ordersState = useOrders({ deductOrderLines: inventory.deductOrderLines });
+  const ordersState = useOrders({ deductOrderLines: inventory.deductOrderLines, currentUser });
   const {
     orders,
     viewingOrder,
