@@ -15,6 +15,7 @@ import RecipesView from "./components/views/RecipesView";
 import ProductionView from "./components/views/ProductionView";
 import CalendarView from "./components/views/CalendarView";
 import ReportsView from "./components/views/ReportsView";
+import AuditLogsView from "./components/views/AuditLogsView";
 import { initialPosProducts } from "./data/initialProducts";
 import { useNavigation } from "./hooks/useNavigation";
 import { useClients } from "./hooks/useClients";
@@ -30,6 +31,9 @@ import type { NavTabId, Order } from "./types/domain";
 export default function BakeryCommandCenter() {
   // --- AUTH (src/hooks/useAuth.ts) ---
   const { currentUser, login, logout, getLockedUntil } = useAuth();
+
+  // --- ROLE (derived from the authenticated user) ---
+  const isAdmin = currentUser?.role === "admin";
 
   // --- NAVIGATION (src/hooks/useNavigation.ts) ---
   const {
@@ -48,11 +52,8 @@ export default function BakeryCommandCenter() {
     windowWidth,
   } = useNavigation();
 
-  // --- ROLE (TBD: real auth/session; placeholder so admin-only UI can render) ---
-  const [isAdmin] = React.useState(true);
-
   // --- INVENTORY (src/hooks/useInventory.ts) ---
-  const inventory = useInventory();
+  const inventory = useInventory({ currentUser });
   const {
     menuInventory,
     ingredients,
@@ -79,7 +80,7 @@ export default function BakeryCommandCenter() {
     addClient,
     updateClient,
     clearViewingClient,
-  } = useClients();
+  } = useClients({ currentUser });
   // --- RECIPES / BOM (src/hooks/useRecipes.ts) ---
   const {
     recipes,
@@ -91,7 +92,7 @@ export default function BakeryCommandCenter() {
     saveRecipe,
     cancelRecipeEdit,
     updatePricingRule,
-  } = useRecipes();
+  } = useRecipes({ currentUser });
 
   // --- PRODUCTION RUNS (src/hooks/useProduction.ts) ---
   const {
@@ -103,10 +104,11 @@ export default function BakeryCommandCenter() {
     recipes,
     deductRecipeLines: inventory.deductRecipeLines,
     addMenuStock: inventory.addMenuStock,
+    currentUser,
   });
 
   // --- ORDERS (src/hooks/useOrders.ts) ---
-  const ordersState = useOrders({ deductOrderLines: inventory.deductOrderLines });
+  const ordersState = useOrders({ deductOrderLines: inventory.deductOrderLines, currentUser });
   const {
     orders,
     viewingOrder,
@@ -134,10 +136,11 @@ export default function BakeryCommandCenter() {
   } = useClosing({
     applyCountedQty: inventory.applyCountedQty,
     applyPendingCounts: inventory.applyPendingCounts,
+    currentUser,
   });
 
   // --- POS (src/hooks/usePos.ts) ---
-  const pos = usePos({ posProducts: initialPosProducts, createOrderFromSale });
+  const pos = usePos({ posProducts: initialPosProducts, createOrderFromSale, currentUser });
   const {
     posCategory,
     setPosCategory,
@@ -442,6 +445,11 @@ export default function BakeryCommandCenter() {
             inventoryCounts={inventoryCounts}
           />
         )}
+
+        {/* =========================================
+            VIEW: AUDIT LOGS (admin only)
+        ========================================= */}
+        {activeTab === "audit-logs" && isAdmin && <AuditLogsView />}
       </main>
         </>
       )}

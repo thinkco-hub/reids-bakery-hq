@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { initialUsers } from "../data/initialUsers";
 import { verifyPassword } from "../utils/auth";
+import { recordAuditEvent } from "../utils/auditLog";
 import type { LoginCredentials, User } from "../types/domain";
 
 const ATTEMPTS_STORAGE_KEY = "bakery.loginAttempts";
@@ -69,6 +70,13 @@ export function useAuth() {
         return rest;
       });
       setCurrentUser(user);
+      recordAuditEvent({
+        userId: user.id,
+        userName: user.name,
+        userRole: user.role,
+        action: "auth.login.success",
+        details: `${user.email} logged in`,
+      });
       return { ok: true };
     }
 
@@ -80,10 +88,31 @@ export function useAuth() {
     const lockedUntil = failedAttempts >= MAX_ATTEMPTS ? now + LOCKOUT_MS : null;
     setAttempts((prev) => ({ ...prev, [key]: { failedAttempts, lockedUntil } }));
 
+    recordAuditEvent({
+      userId: null,
+      userName: email.trim(),
+      userRole: null,
+      action: lockedUntil ? "auth.login.lockout" : "auth.login.failure",
+      details: lockedUntil
+        ? `Locked out for 60s after ${failedAttempts} failed attempts`
+        : `Failed login attempt (${failedAttempts}/${MAX_ATTEMPTS})`,
+    });
+
     return { ok: false, error: "Invalid email or password." };
   };
 
-  const logout = () => setCurrentUser(null);
+  const logout = () => {
+    if (currentUser) {
+      recordAuditEvent({
+        userId: currentUser.id,
+        userName: currentUser.name,
+        userRole: currentUser.role,
+        action: "auth.logout",
+        details: `${currentUser.email} logged out`,
+      });
+    }
+    setCurrentUser(null);
+  };
 
   return { currentUser, login, logout, getLockedUntil };
 }

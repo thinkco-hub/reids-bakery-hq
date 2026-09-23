@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
+import { recordAuditEvent } from "../utils/auditLog";
 import type {
   CartItem,
   ConfirmModalState,
@@ -7,6 +8,7 @@ import type {
   PosCategory,
   PosProduct,
   Sale,
+  User,
 } from "../types/domain";
 
 const EMPTY_CONFIRM_MODAL: ConfirmModalState = {
@@ -25,13 +27,14 @@ interface UsePosOptions {
    * Injected by the app shell so order state stays owned by useOrders.
    */
   createOrderFromSale: (sale: Sale) => void;
+  currentUser: User | null;
 }
 
 /**
  * Owns the POS feature: product category filter, cart, checkout confirmation
  * modal, completed sales, receipts and the resizable ticket panel.
  */
-export function usePos({ posProducts, createOrderFromSale }: UsePosOptions) {
+export function usePos({ posProducts, createOrderFromSale, currentUser }: UsePosOptions) {
   const [posCategory, setPosCategory] = useState<PosCategory>("All");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [confirmModal, setConfirmModal] = useState<ConfirmModalState>(EMPTY_CONFIRM_MODAL);
@@ -133,6 +136,17 @@ export function usePos({ posProducts, createOrderFromSale }: UsePosOptions) {
       createdAt: new Date().toISOString(),
     };
     setSales((prev) => [sale, ...prev]);
+    if (currentUser) {
+      recordAuditEvent({
+        userId: currentUser.id,
+        userName: currentUser.name,
+        userRole: currentUser.role,
+        action: "sale.completed",
+        entityType: "Sale",
+        entityId: sale.id,
+        details: `${sale.type} sale ${sale.id} completed (${sale.items.length} line${sale.items.length === 1 ? "" : "s"}, ₱${sale.total.toFixed(2)}, ${sale.paymentMethod})`,
+      });
+    }
     if (sale.type === "Pre-Order") {
       createOrderFromSale(sale);
     }
