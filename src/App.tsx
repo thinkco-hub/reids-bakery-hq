@@ -189,7 +189,6 @@ export default function BakeryCommandCenter() {
     setViewingRecipe(null);
     setIsCreatingRecipe(false);
     setIsMobileOpen(false);
-    setIsTabletSidebarOpen(false);
   };
 
   const handleViewOrder = (order: Order) => {
