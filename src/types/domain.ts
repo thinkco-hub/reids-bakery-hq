@@ -292,7 +292,13 @@ export interface DayClosing {
 export type DayClosingData = Omit<DayClosing, "id" | "closedAt">;
 
 // ---------- Users / Auth ----------
-export type UserRole = "admin" | "staff";
+export type UserRole =
+  | "cashier"
+  | "sales_marketing"
+  | "research_development"
+  | "kitchen"
+  | "admin"
+  | "super_admin";
 
 export interface User {
   id: UserId;
@@ -319,6 +325,7 @@ export type AuditActionType =
   | "auth.login.failure"
   | "auth.login.lockout"
   | "auth.logout"
+  | "user.role_changed"
   | "sale.completed"
   | "order.created"
   | "order.payment_recorded"
@@ -373,7 +380,8 @@ export type NavTabId =
   | "reports-dashboard"
   | "reports-closing"
   | "reports-inventory"
-  | "audit-logs";
+  | "audit-logs"
+  | "user-management";
 
 // ---------- Derived / computed values (utils) ----------
 /** Tabs rendered by the inventory feature view. */
