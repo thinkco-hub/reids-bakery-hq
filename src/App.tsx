@@ -16,6 +16,7 @@ import ProductionView from "./components/views/ProductionView";
 import CalendarView from "./components/views/CalendarView";
 import ReportsView from "./components/views/ReportsView";
 import AuditLogsView from "./components/views/AuditLogsView";
+import UserManagementView from "./components/views/UserManagementView";
 import { initialPosProducts } from "./data/initialProducts";
 import { useNavigation } from "./hooks/useNavigation";
 import { useClients } from "./hooks/useClients";
@@ -37,7 +38,7 @@ import type { NavTabId, Order } from "./types/domain";
 
 export default function BakeryCommandCenter() {
   // --- AUTH (src/hooks/useAuth.ts) ---
-  const { currentUser, login, logout, getLockedUntil } = useAuth();
+  const { users, currentUser, login, logout, getLockedUntil, updateUserRole } = useAuth();
 
   // --- ROLE PERMISSIONS (src/utils/permissions.ts) ---
   const role = currentUser?.role;
@@ -474,6 +475,17 @@ export default function BakeryCommandCenter() {
             VIEW: AUDIT LOGS (admin tier only, via permissions.ts)
         ========================================= */}
         {activeTab === "audit-logs" && <AuditLogsView />}
+
+        {/* =========================================
+            VIEW: ROLES (admin tier only, via permissions.ts)
+        ========================================= */}
+        {activeTab === "user-management" && (
+          <UserManagementView
+            users={users}
+            currentUser={currentUser}
+            onChangeRole={updateUserRole}
+          />
+        )}
         </>
         )}
       </main>
