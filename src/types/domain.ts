@@ -41,7 +41,7 @@ export type InventoryItemCategory = "menu" | "ingredient";
 export type RestockCategory = InventoryItemCategory;
 /** Display type stored on stock item records. */
 export type StockItemType = "Menu Item" | "Ingredient";
-export type SaleType = "Walk-in" | "Pre-Order";
+export type SaleType = "Walk-in" | "Order";
 export type ProductionRunStatus = "scheduled" | "completed";
 export type CountStatus = "pending" | "resolved";
 export type CountResolution = "match" | "applied" | "dismissed";
@@ -187,6 +187,8 @@ export interface Sale {
 /** State of the order confirmation modal (OrderConfirmationModal). */
 export interface ConfirmModalState {
   isOpen: boolean;
+  /** Walk-in completes at the counter; Order is tracked in Orders with a delivery date. */
+  saleType: SaleType;
   paymentMethod: PaymentMethodInput;
   customerName: string;
   customerContact: string;

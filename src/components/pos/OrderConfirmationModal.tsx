@@ -1,6 +1,8 @@
 import React from "react";
 import { PAYMENT_METHODS } from "../../utils/orders";
-import type { CartItem, ConfirmModalState, ISODate } from "../../types/domain";
+import type { CartItem, ConfirmModalState, ISODate, SaleType } from "../../types/domain";
+
+const SALE_TYPES: SaleType[] = ["Walk-in", "Order"];
 
 interface OrderConfirmationModalProps {
   modal: ConfirmModalState;
@@ -8,9 +10,10 @@ interface OrderConfirmationModalProps {
   cartTotal: number;
   todayISO: ISODate;
   onFieldChange: (
-    field: Exclude<keyof ConfirmModalState, "isOpen">,
+    field: Exclude<keyof ConfirmModalState, "isOpen" | "saleType">,
     value: string
   ) => void;
+  onSaleTypeChange: (saleType: SaleType) => void;
   onClose: () => void;
   onConfirm: () => void;
   disabled: boolean;
@@ -22,10 +25,16 @@ export default function OrderConfirmationModal({
   cartTotal,
   todayISO,
   onFieldChange,
+  onSaleTypeChange,
   onClose,
   onConfirm,
   disabled,
 }: OrderConfirmationModalProps) {
+  // An Order must be delivered after today, so the earliest pickable date is tomorrow.
+  const tomorrowISO = new Date(Date.parse(todayISO) + 24 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 10);
+
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
@@ -84,6 +93,26 @@ export default function OrderConfirmationModal({
           <span className="text-[#F17D0C]">₱{cartTotal.toFixed(2)}</span>
         </div>
 
+        <div className="mb-6">
+          <p className="text-sm font-semibold text-gray-700 mb-2">Sale Type</p>
+          <div className="grid grid-cols-2 gap-2">
+            {SALE_TYPES.map((type) => (
+              <button
+                key={type}
+                type="button"
+                onClick={() => onSaleTypeChange(type)}
+                className={`py-2.5 rounded-lg border text-sm font-semibold transition-colors ${
+                  modal.saleType === type
+                    ? "border-[#F17D0C] bg-orange-50 text-[#F17D0C]"
+                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -111,23 +140,25 @@ export default function OrderConfirmationModal({
           </div>
         </div>
 
-        <div className="mb-6">
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Delivery Date
-          </label>
-          <input
-            type="date"
-            min={todayISO}
-            value={modal.deliveryDate}
-            onChange={(e) => onFieldChange("deliveryDate", e.target.value)}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
-          />
-          <p className="text-xs text-gray-400 mt-1.5">
-            {modal.deliveryDate > todayISO
-              ? "This order will be tracked in Orders (production & delivery)."
-              : "Set a later date to track this order in Orders."}
-          </p>
-        </div>
+        {modal.saleType === "Order" && (
+          <div className="mb-6">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Delivery Date
+            </label>
+            <input
+              type="date"
+              min={tomorrowISO}
+              value={modal.deliveryDate}
+              onChange={(e) => onFieldChange("deliveryDate", e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+            />
+            <p className="text-xs text-gray-400 mt-1.5">
+              {modal.deliveryDate > todayISO
+                ? "This order will be tracked in Orders (production & delivery)."
+                : "Pick a delivery date after today to place this order."}
+            </p>
+          </div>
+        )}
 
         <div className="mb-8">
           <p className="text-sm font-semibold text-gray-700 mb-2">Payment Method</p>

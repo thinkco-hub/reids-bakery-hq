@@ -9,11 +9,13 @@ import type {
   PosCategory,
   PosProduct,
   Sale,
+  SaleType,
   User,
 } from "../types/domain";
 
 const EMPTY_CONFIRM_MODAL: ConfirmModalState = {
   isOpen: false,
+  saleType: "Walk-in",
   paymentMethod: "",
   customerName: "",
   customerContact: "",
@@ -129,11 +131,12 @@ export function usePos({
 
   // --- CHECKOUT (FR-5, FR-8) ---
   const completeSale = () => {
-    // Orders scheduled for delivery on a later date are tracked in the Orders view
-    const isPreOrder = confirmModal.deliveryDate > todayISO;
+    // Orders (chosen explicitly in the modal) are tracked in the Orders view;
+    // walk-ins only appear in Sales.
+    const isOrder = confirmModal.saleType === "Order";
     const sale: Sale = {
       id: `SALE-${String(sales.length + 1).padStart(4, "0")}`,
-      type: isPreOrder ? "Pre-Order" : "Walk-in",
+      type: confirmModal.saleType,
       customerName: confirmModal.customerName.trim(),
       customerContact: confirmModal.customerContact.trim(),
       // Confirm is disabled until a payment method is chosen (isConfirmOrderDisabled).
@@ -142,7 +145,8 @@ export function usePos({
       subtotal: cartSubtotal,
       tax: cartTax,
       total: cartTotal,
-      deliveryDate: confirmModal.deliveryDate || todayISO,
+      // Only Orders carry a delivery date; walk-ins are handed over today.
+      deliveryDate: isOrder && confirmModal.deliveryDate ? confirmModal.deliveryDate : todayISO,
       notes: confirmModal.notes.trim(),
       createdAt: new Date().toISOString(),
     };
@@ -158,8 +162,8 @@ export function usePos({
         details: `${sale.type} sale ${sale.id} completed (${sale.items.length} line${sale.items.length === 1 ? "" : "s"}, ₱${sale.total.toFixed(2)}, ${sale.paymentMethod})`,
       });
     }
-    if (sale.type === "Pre-Order") {
-      // Stock for a pre-order is deducted when the order is delivered
+    if (isOrder) {
+      // Stock for an order is deducted when the order is delivered
       // (markOrderDelivered -> deductOrderLines), not at placement.
       createOrderFromSale(sale);
     } else {
@@ -179,18 +183,30 @@ export function usePos({
   };
 
   const updateConfirmField = (
-    field: Exclude<keyof ConfirmModalState, "isOpen">,
+    field: Exclude<keyof ConfirmModalState, "isOpen" | "saleType">,
     value: string
   ) => {
     setConfirmModal((prev) => ({ ...prev, [field]: value }));
+  };
+
+  /** Switches between Walk-in and Order; a walk-in has no delivery date. */
+  const setSaleType = (saleType: SaleType) => {
+    setConfirmModal((prev) => ({
+      ...prev,
+      saleType,
+      deliveryDate: saleType === "Walk-in" ? "" : prev.deliveryDate,
+    }));
   };
 
   const closeConfirmModal = () => {
     setConfirmModal(EMPTY_CONFIRM_MODAL);
   };
 
+  // An Order needs a delivery date after today; a walk-in needs none.
   const isConfirmOrderDisabled =
-    !confirmModal.paymentMethod || !confirmModal.customerName.trim();
+    !confirmModal.paymentMethod ||
+    !confirmModal.customerName.trim() ||
+    (confirmModal.saleType === "Order" && !(confirmModal.deliveryDate > todayISO));
 
   return {
     posCategory,
@@ -206,6 +222,7 @@ export function usePos({
     confirmModal,
     setConfirmModal,
     updateConfirmField,
+    setSaleType,
     closeConfirmModal,
     completeSale,
     sales,

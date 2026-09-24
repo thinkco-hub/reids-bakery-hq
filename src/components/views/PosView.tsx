@@ -4,7 +4,6 @@ import { SearchIcon } from "../icons";
 import type {
   CartItem,
   ConfirmModalState,
-  ISODate,
   PosCategory,
   PosProduct,
 } from "../../types/domain";
@@ -21,7 +20,6 @@ interface PosViewProps {
   cartTax: number;
   cartTotal: number;
   setConfirmModal: (modal: ConfirmModalState) => void;
-  todayISO: ISODate;
   windowWidth: number;
   cartWidth: number;
   startResizing: (e: ReactMouseEvent) => void;
@@ -39,7 +37,6 @@ export default function PosView({
   cartTax,
   cartTotal,
   setConfirmModal,
-  todayISO,
   windowWidth,
   cartWidth,
   startResizing,
@@ -255,10 +252,11 @@ export default function PosView({
             onClick={() =>
               setConfirmModal({
                 isOpen: true,
+                saleType: "Walk-in",
                 paymentMethod: "",
                 customerName: "",
                 customerContact: "",
-                deliveryDate: todayISO,
+                deliveryDate: "",
                 notes: "",
               })
             }
