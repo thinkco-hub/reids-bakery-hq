@@ -186,18 +186,25 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
   const [movements, setMovements] = useState(seed.movements);
   const [counts, setCounts] = useState(seed.counts);
 
-  // "Tablet" = md..lg range (768px - 1023px). Touch can't hover, so the rail
-  // expands/collapses on click; labels stay visible while it is expanded.
-  const isTablet = windowWidth >= 768 && windowWidth < 1024;
+  // Touch devices use click-to-expand behavior even when iPadOS reports a
+  // desktop-sized viewport in landscape mode.
+  const isTouchDevice =
+    typeof navigator !== "undefined" && navigator.maxTouchPoints > 0;
+  const isTablet =
+    windowWidth >= 768 && (windowWidth < 1024 || isTouchDevice);
   const sidebarExpanded = isTablet && isTabletSidebarOpen;
   const sidebarLabelCls = sidebarExpanded
     ? "opacity-100"
     : "opacity-100 md:opacity-0 lg:group-hover:opacity-100";
 
   const handleNavClick = (tab: ChamsTabId) => {
+    if (isTablet && !sidebarExpanded) {
+      setIsTabletSidebarOpen(true);
+      return;
+    }
+
     setActiveChamsTab(tab);
     setIsMobileOpen(false);
-    setIsTabletSidebarOpen(false);
   };
 
   const upsertBeginning = (data: Omit<ChamsBeginning, "id">) => {
@@ -274,12 +281,6 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
 
       {/* SIDEBAR */}
       <aside
-        onClick={(e) => {
-          if (!isTablet) return;
-          // When expanded, only bare spots toggle the rail — button taps keep working
-          if (sidebarExpanded && (e.target as HTMLElement).closest("button")) return;
-          setIsTabletSidebarOpen((prev) => !prev);
-        }}
         className={`
         fixed md:relative inset-y-0 left-0 z-50
         transform ${isMobileOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0
@@ -289,7 +290,18 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
       `}
       >
         <div className="p-5 border-b border-[#3B5BA5]/20 flex justify-between items-center whitespace-nowrap md:h-[76px]">
-          <button onClick={onSwitchView} className="flex items-center" title="Switch to Reid's Bakery HQ">
+          <button
+            onClick={() => {
+              if (isTablet && !sidebarExpanded) {
+                setIsTabletSidebarOpen(true);
+                return;
+              }
+
+              onSwitchView();
+            }}
+            className="flex items-center"
+            title="Switch to Reid's Bakery HQ"
+          >
             <div className="w-10 h-10 bg-white rounded-full flex flex-shrink-0 items-center justify-center mr-4 p-1 shadow-inner">
               <span className="text-[#1B2A4A] font-bold text-xs text-center leading-tight">
                 CH
@@ -340,7 +352,14 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
 
         <div className="p-3 border-t border-[#3B5BA5]/20">
           <button
-            onClick={onSwitchView}
+            onClick={() => {
+              if (isTablet && !sidebarExpanded) {
+                setIsTabletSidebarOpen(true);
+                return;
+              }
+
+              onSwitchView();
+            }}
             className="w-full flex items-center p-3 rounded-lg font-bold text-[#EAF0FB]/60 hover:bg-[#3B5BA5]/10 hover:text-white transition-colors whitespace-nowrap overflow-hidden"
           >
             <div className="flex items-center justify-center w-8 flex-shrink-0">
