@@ -3,11 +3,14 @@ import React from "react";
 interface MobileTopBarProps {
   onOpenMobileNav: () => void;
   onSwitchView: () => void;
+  /** Whether the signed-in role may open the Chams ledger. */
+  canSwitchToChams: boolean;
 }
 
 export default function MobileTopBar({
   onOpenMobileNav,
   onSwitchView,
+  canSwitchToChams,
 }: MobileTopBarProps) {
   return (
     <div className="md:hidden bg-[#562D07] text-[#FDF9F3] p-4 flex justify-between items-center shadow-md z-30">
@@ -31,8 +34,9 @@ export default function MobileTopBar({
       </button>
       <button
         onClick={onSwitchView}
-        className="flex items-center"
-        title="Switch to Chams Branch Stock Ledger"
+        disabled={!canSwitchToChams}
+        className={`flex items-center ${canSwitchToChams ? "" : "cursor-default"}`}
+        title={canSwitchToChams ? "Switch to Chams Branch Stock Ledger" : undefined}
       >
         <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2 p-1">
           <span className="text-[#562D07] font-bold text-xs">RBC</span>
