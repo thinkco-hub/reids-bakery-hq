@@ -158,7 +158,8 @@ export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
 
   const markOrderDelivered = (id: OrderId) => {
     const order = orders.find((o) => o.id === id);
-    if (!order) return;
+    // Guard against re-delivering: deduction must run only once per order.
+    if (!order || order.status === "Delivered") return;
     const deliveredAt = new Date().toISOString().slice(0, 10);
 
     deductOrderLines(order.items);

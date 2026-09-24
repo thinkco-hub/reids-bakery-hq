@@ -158,7 +158,12 @@ export default function BakeryCommandCenter() {
   });
 
   // --- POS (src/hooks/usePos.ts) ---
-  const pos = usePos({ posProducts: initialPosProducts, createOrderFromSale, currentUser });
+  const pos = usePos({
+    posProducts: initialPosProducts,
+    createOrderFromSale,
+    currentUser,
+    deductOrderLines: inventory.deductOrderLines,
+  });
   const {
     posCategory,
     setPosCategory,
@@ -203,7 +208,6 @@ export default function BakeryCommandCenter() {
     setViewingRecipe(null);
     setIsCreatingRecipe(false);
     setIsMobileOpen(false);
-    setIsTabletSidebarOpen(false);
   };
 
   const handleViewOrder = (order: Order) => {

@@ -49,18 +49,30 @@ export default function Sidebar({
   const canSwitchToChams = canAccessChams(role);
 
   // --- SIDEBAR RESPONSIVE HELPERS ---
-  // "Tablet" = md..lg range (768px - 1023px), same cutoff the POS cart width uses.
-  // Touch devices can't hover, so the sidebar rail toggles on click instead.
-  const isTablet = windowWidth >= 768 && windowWidth < 1024;
+  // Touch devices use click-to-expand behavior even when iPadOS reports a
+  // desktop-sized viewport in landscape mode.
+  const isTouchDevice =
+    typeof navigator !== "undefined" && navigator.maxTouchPoints > 0;
+  const isTablet =
+    windowWidth >= 768 && (windowWidth < 1024 || isTouchDevice);
   const sidebarExpanded = isTablet && isTabletSidebarOpen;
 
   // Desktop (lg+): expand ONLY while the cursor is within the collapsed rail's
   // 80px width. Hovering the expanded part of the rail collapses it again, so
   // the rail can never "trap" the cursor and cover content sitting right next
   // to it (e.g. the POS category chips near the left edge).
-  const isDesktop = windowWidth >= 1024;
+  const isDesktop = windowWidth >= 1024 && !isTouchDevice;
   const [isDesktopRailHovered, setIsDesktopRailHovered] = useState(false);
   const desktopRailExpanded = isDesktop && isDesktopRailHovered;
+
+  const handleNavItemClick = (tab: NavTabId) => {
+    if (isTablet && !sidebarExpanded) {
+      setIsTabletSidebarOpen(true);
+      return;
+    }
+
+    onNavClick(tab);
+  };
 
   // Shared class for sidebar labels/chevrons: visible while the tablet rail is
   // expanded (click), while the desktop rail is hover-expanded, or on desktop
@@ -99,12 +111,6 @@ export default function Sidebar({
         onMouseLeave={() => {
           if (isDesktop) setIsDesktopRailHovered(false);
         }}
-        onClick={(e) => {
-          if (!isTablet) return;
-          // When expanded, only bare spots toggle the rail — button taps keep working
-          if (sidebarExpanded && (e.target as HTMLElement).closest("button")) return;
-          setIsTabletSidebarOpen((prev) => !prev);
-        }}
         className={`
         fixed md:relative inset-y-0 left-0 z-50
         transform ${
@@ -114,10 +120,12 @@ export default function Sidebar({
           desktopRailExpanded
             ? // Expanded = overlay so content never shifts; smooth 300ms growth
               "lg:w-64 lg:absolute"
-            : // Collapsed = quick 150ms ease-back so the rail doesn't linger
+            : isDesktop
+              ? // Collapsed = quick 150ms ease-back so the rail doesn't linger
               // over the POS chips after the cursor crosses the 80px line,
               // while still animating smoothly instead of snapping shut
-              "lg:w-20 lg:duration-150"
+                "lg:w-20 lg:duration-150"
+              : ""
         }
         transition-all duration-300 ease-in-out
         bg-[#562D07] text-[#FDF9F3] flex flex-col shadow-2xl
@@ -126,7 +134,14 @@ export default function Sidebar({
         {/* Brand Area */}
         <div className="p-5 border-b border-[#F3B978]/20 flex justify-between items-center whitespace-nowrap md:h-[76px] overflow-hidden">
           <button
-            onClick={() => onSwitchView("chams")}
+            onClick={() => {
+              if (isTablet && !sidebarExpanded) {
+                setIsTabletSidebarOpen(true);
+                return;
+              }
+
+              onSwitchView("chams");
+            }}
             disabled={!canSwitchToChams}
             className={`flex items-center ${canSwitchToChams ? "" : "cursor-default"}`}
             title={canSwitchToChams ? "Switch to Chams Branch Stock Ledger" : undefined}
@@ -168,7 +183,7 @@ export default function Sidebar({
         <nav className="flex-1 p-3 space-y-3 mt-4 overflow-y-auto hide-scrollbar">
           {canAccessTab(role, "dashboard") && (
             <button
-              onClick={() => onNavClick("dashboard")}
+              onClick={() => handleNavItemClick("dashboard")}
               className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
                 activeTab === "dashboard"
                   ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
@@ -198,7 +213,7 @@ export default function Sidebar({
 
           {canAccessTab(role, "pos") && (
             <button
-              onClick={() => onNavClick("pos")}
+              onClick={() => handleNavItemClick("pos")}
               className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
                 activeTab === "pos"
                   ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
@@ -218,7 +233,7 @@ export default function Sidebar({
 
           {canAccessTab(role, "orders") && (
             <button
-              onClick={() => onNavClick("orders")}
+              onClick={() => handleNavItemClick("orders")}
               className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
                 activeTab === "orders"
                   ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
@@ -238,7 +253,7 @@ export default function Sidebar({
 
           {canAccessTab(role, "clients") && (
             <button
-              onClick={() => onNavClick("clients")}
+              onClick={() => handleNavItemClick("clients")}
               className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
                 activeTab === "clients"
                   ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
@@ -265,12 +280,14 @@ export default function Sidebar({
             <div className="flex flex-col">
               <button
                 onClick={() => {
+                  if (isTablet && !sidebarExpanded) {
+                    setIsTabletSidebarOpen(true);
+                    return;
+                  }
                   if (canReconcile) {
                     // Reconciliation roles: first click expands the submenu;
                     // the main view stays reachable via the item itself below.
                     setIsInventoryExpanded(!isInventoryExpanded);
-                    // First tap on the collapsed tablet rail expands it so the submenu is visible
-                    if (isTablet && !sidebarExpanded) setIsTabletSidebarOpen(true);
                   }
                   onNavClick("inventory");
                 }}
@@ -325,7 +342,7 @@ export default function Sidebar({
                   } ${desktopRailExpanded ? "lg:block" : "lg:hidden"}`}
                 >
                   <button
-                    onClick={() => onNavClick("inventory-reconciliation")}
+                    onClick={() => handleNavItemClick("inventory-reconciliation")}
                     className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
                       activeTab === "inventory-reconciliation"
                         ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
@@ -341,7 +358,7 @@ export default function Sidebar({
 
           {canAccessTab(role, "recipes") && (
             <button
-              onClick={() => onNavClick("recipes")}
+              onClick={() => handleNavItemClick("recipes")}
               className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
                 activeTab === "recipes"
                   ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
@@ -366,7 +383,7 @@ export default function Sidebar({
 
           {canAccessTab(role, "production-runs") && (
             <button
-              onClick={() => onNavClick("production-runs")}
+              onClick={() => handleNavItemClick("production-runs")}
               className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
                 activeTab === "production-runs"
                   ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
@@ -391,7 +408,7 @@ export default function Sidebar({
 
           {canAccessTab(role, "calendar") && (
             <button
-              onClick={() => onNavClick("calendar")}
+              onClick={() => handleNavItemClick("calendar")}
               className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
                 activeTab === "calendar"
                   ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
@@ -413,9 +430,11 @@ export default function Sidebar({
             <div className="flex flex-col">
               <button
                 onClick={() => {
+                  if (isTablet && !sidebarExpanded) {
+                    setIsTabletSidebarOpen(true);
+                    return;
+                  }
                   setIsReportsExpanded(!isReportsExpanded);
-                  // First tap on the collapsed tablet rail expands it so the submenu is visible
-                  if (isTablet && !sidebarExpanded) setIsTabletSidebarOpen(true);
                 }}
                 className={`w-full flex justify-between items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
                   activeTab.startsWith("reports")
@@ -457,7 +476,7 @@ export default function Sidebar({
                   } ${desktopRailExpanded ? "lg:block" : "lg:hidden"}`}
                 >
                   <button
-                    onClick={() => onNavClick("reports-dashboard")}
+                    onClick={() => handleNavItemClick("reports-dashboard")}
                     className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
                       activeTab === "reports-dashboard"
                         ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
@@ -467,7 +486,7 @@ export default function Sidebar({
                     Sales Dashboard
                   </button>
                   <button
-                    onClick={() => onNavClick("reports-closing")}
+                    onClick={() => handleNavItemClick("reports-closing")}
                     className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
                       activeTab === "reports-closing"
                         ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
@@ -477,7 +496,7 @@ export default function Sidebar({
                     End-of-Day Closing
                   </button>
                   <button
-                    onClick={() => onNavClick("reports-inventory")}
+                    onClick={() => handleNavItemClick("reports-inventory")}
                     className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
                       activeTab === "reports-inventory"
                         ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
@@ -493,7 +512,7 @@ export default function Sidebar({
 
           {canAccessTab(role, "audit-logs") && (
             <button
-              onClick={() => onNavClick("audit-logs")}
+              onClick={() => handleNavItemClick("audit-logs")}
               className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
                 activeTab === "audit-logs"
                   ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
@@ -518,7 +537,7 @@ export default function Sidebar({
 
           {canAccessTab(role, "user-management") && (
             <button
-              onClick={() => onNavClick("user-management")}
+              onClick={() => handleNavItemClick("user-management")}
               className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
                 activeTab === "user-management"
                   ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
