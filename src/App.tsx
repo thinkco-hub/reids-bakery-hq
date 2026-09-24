@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ChamsStockLedger from "./components/chams/ChamsStockLedger";
 import LoginPage from "./components/auth/LoginPage";
 import Sidebar from "./components/layout/Sidebar";
@@ -16,6 +16,7 @@ import ProductionView from "./components/views/ProductionView";
 import CalendarView from "./components/views/CalendarView";
 import ReportsView from "./components/views/ReportsView";
 import AuditLogsView from "./components/views/AuditLogsView";
+import UserManagementView from "./components/views/UserManagementView";
 import { initialPosProducts } from "./data/initialProducts";
 import { useNavigation } from "./hooks/useNavigation";
 import { useClients } from "./hooks/useClients";
@@ -26,14 +27,23 @@ import { useOrders } from "./hooks/useOrders";
 import { useClosing } from "./hooks/useClosing";
 import { usePos } from "./hooks/usePos";
 import { useAuth } from "./hooks/useAuth";
+import {
+  DEFAULT_TAB,
+  canAccessChams,
+  canAccessIngredients,
+  canAccessReconciliation,
+  canAccessTab,
+} from "./utils/permissions";
 import type { NavTabId, Order } from "./types/domain";
 
 export default function BakeryCommandCenter() {
   // --- AUTH (src/hooks/useAuth.ts) ---
-  const { currentUser, login, logout, getLockedUntil } = useAuth();
+  const { users, currentUser, login, logout, getLockedUntil, updateUserRole } = useAuth();
 
-  // --- ROLE (derived from the authenticated user) ---
-  const isAdmin = currentUser?.role === "admin";
+  // --- ROLE PERMISSIONS (src/utils/permissions.ts) ---
+  const role = currentUser?.role;
+  const canView = (tab: NavTabId) => !!role && canAccessTab(role, tab);
+  const canViewChams = !!role && canAccessChams(role);
 
   // --- NAVIGATION (src/hooks/useNavigation.ts) ---
   const {
@@ -51,6 +61,14 @@ export default function BakeryCommandCenter() {
     setIsReportsExpanded,
     windowWidth,
   } = useNavigation();
+
+  // Send the user somewhere they can access when their role no longer allows the
+  // current view (role changed live, or a different user signed in on a stale tab).
+  useEffect(() => {
+    if (!role) return;
+    if (!canAccessTab(role, activeTab)) setActiveTab(DEFAULT_TAB);
+    if (activeView === "chams" && !canAccessChams(role)) setActiveView("reids");
+  }, [role, activeTab, activeView, setActiveTab, setActiveView]);
 
   // --- INVENTORY (src/hooks/useInventory.ts) ---
   const inventory = useInventory({ currentUser });
@@ -183,6 +201,7 @@ export default function BakeryCommandCenter() {
 
   // --- NAVIGATION HANDLERS (compose navigation + feature-owned resets) ---
   const handleNavClick = (tab: NavTabId) => {
+    if (!canView(tab)) return;
     setActiveTab(tab);
     clearViewingOrder();
     clearViewingClient();
@@ -197,6 +216,7 @@ export default function BakeryCommandCenter() {
   };
 
   const goToProductionRuns = () => {
+    if (!canView("production-runs")) return;
     setActiveTab("production-runs");
     clearViewingOrder();
   };
@@ -211,7 +231,7 @@ export default function BakeryCommandCenter() {
         isResizing ? "cursor-col-resize select-none" : ""
       }`}
     >
-      {activeView === "chams" ? (
+      {activeView === "chams" && canViewChams ? (
         <ChamsStockLedger onSwitchView={() => setActiveView("reids")} />
       ) : (
         <>
@@ -256,6 +276,7 @@ export default function BakeryCommandCenter() {
       <MobileTopBar
         onOpenMobileNav={() => setIsMobileOpen(true)}
         onSwitchView={() => setActiveView("chams")}
+        canSwitchToChams={canViewChams}
       />
 
       {/* SIDEBAR (extracted to src/components/layout/Sidebar.tsx) */}
@@ -272,7 +293,6 @@ export default function BakeryCommandCenter() {
         setIsInventoryExpanded={setIsInventoryExpanded}
         isReportsExpanded={isReportsExpanded}
         setIsReportsExpanded={setIsReportsExpanded}
-        isAdmin={isAdmin}
         onNavClick={handleNavClick}
         onSwitchView={() => setActiveView("chams")}
       />
@@ -285,6 +305,9 @@ export default function BakeryCommandCenter() {
             : "p-4 md:p-8 overflow-y-auto"
         }`}
       >
+        {/* Views render only when the signed-in role may open the active tab. */}
+        {canView(activeTab) && (
+        <>
         {/* =========================================
             VIEW: DASHBOARD
         ========================================= */}
@@ -375,6 +398,8 @@ export default function BakeryCommandCenter() {
             ingredients={ingredients}
             restockReminders={restockReminders}
             inventoryCounts={inventoryCounts}
+            canViewIngredients={!!role && canAccessIngredients(role)}
+            canReconcile={!!role && canAccessReconciliation(role)}
             onNavClick={handleNavClick}
             onRestockToProduction={goToProductionRuns}
             onOpenRestock={openRestock}
@@ -451,9 +476,22 @@ export default function BakeryCommandCenter() {
         )}
 
         {/* =========================================
-            VIEW: AUDIT LOGS (admin only)
+            VIEW: AUDIT LOGS (admin tier only, via permissions.ts)
         ========================================= */}
-        {activeTab === "audit-logs" && isAdmin && <AuditLogsView />}
+        {activeTab === "audit-logs" && <AuditLogsView />}
+
+        {/* =========================================
+            VIEW: ROLES (admin tier only, via permissions.ts)
+        ========================================= */}
+        {activeTab === "user-management" && (
+          <UserManagementView
+            users={users}
+            currentUser={currentUser}
+            onChangeRole={updateUserRole}
+          />
+        )}
+        </>
+        )}
       </main>
         </>
       )}

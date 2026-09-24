@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { SearchIcon } from "../icons";
 import { getAuditLog } from "../../utils/auditLog";
+import { roleLabel } from "../../utils/permissions";
 import type { AuditActionType, AuditLogEntry } from "../../types/domain";
 
 const ACTION_LABELS: Record<AuditActionType, string> = {
@@ -8,6 +9,7 @@ const ACTION_LABELS: Record<AuditActionType, string> = {
   "auth.login.failure": "Failed login",
   "auth.login.lockout": "Login lockout",
   "auth.logout": "Logout",
+  "user.role_changed": "User role changed",
   "sale.completed": "POS sale completed",
   "order.created": "Order created",
   "order.payment_recorded": "Order payment recorded",
@@ -145,7 +147,7 @@ export default function AuditLogsView() {
                     <td className="px-6 py-4">
                       <div className="font-medium text-gray-900">{entry.userName}</div>
                       {entry.userRole && (
-                        <div className="text-xs text-gray-500 capitalize">{entry.userRole}</div>
+                        <div className="text-xs text-gray-500">{roleLabel(entry.userRole)}</div>
                       )}
                     </td>
                     <td className="px-6 py-4">

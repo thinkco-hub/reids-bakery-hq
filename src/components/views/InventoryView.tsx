@@ -25,6 +25,10 @@ interface InventoryViewProps {
   ingredients: IngredientStock[];
   restockReminders: RestockReminder[];
   inventoryCounts: InventoryCount[];
+  /** Whether the signed-in role may see the Raw Materials (Ingredients) table. */
+  canViewIngredients: boolean;
+  /** Whether the signed-in role may open Reconciliation. */
+  canReconcile: boolean;
   onNavClick: (tab: NavTabId) => void;
   onRestockToProduction: () => void;
   onOpenRestock: (category: RestockCategory, itemId?: string) => void;
@@ -46,6 +50,8 @@ export default function InventoryView({
   ingredients,
   restockReminders,
   inventoryCounts,
+  canViewIngredients,
+  canReconcile,
   onNavClick,
   onRestockToProduction,
   onOpenRestock,
@@ -59,6 +65,8 @@ export default function InventoryView({
 }: InventoryViewProps) {
   // Menu Items / Raw Materials toggle (combined main Inventory view)
   const [stockView, setStockView] = useState<StockView>("menu");
+  // Roles without Ingredients access are pinned to Menu Items.
+  const visibleStockView: StockView = canViewIngredients ? stockView : "menu";
 
   // =========================================================
   //     VIEW: INVENTORY - CLOSING COUNT (reached via button)
@@ -75,9 +83,9 @@ export default function InventoryView({
   }
 
   // =========================================================
-  //     VIEW: INVENTORY - RECONCILIATION (admin-only)
+  //     VIEW: INVENTORY - RECONCILIATION (admin tier only)
   // =========================================================
-  if (activeTab === "inventory-reconciliation") {
+  if (activeTab === "inventory-reconciliation" && canReconcile) {
     return (
       <ReconciliationReview
         counts={inventoryCounts}
@@ -100,23 +108,25 @@ export default function InventoryView({
           <button
             onClick={() => setStockView("menu")}
             className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${
-              stockView === "menu"
+              visibleStockView === "menu"
                 ? "bg-[#F17D0C] text-white shadow-md"
                 : "text-[#FDF9F3]/70 hover:text-white"
             }`}
           >
             Menu Items
           </button>
-          <button
-            onClick={() => setStockView("raw")}
-            className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${
-              stockView === "raw"
-                ? "bg-[#F17D0C] text-white shadow-md"
-                : "text-[#FDF9F3]/70 hover:text-white"
-            }`}
-          >
-            Raw Materials
-          </button>
+          {canViewIngredients && (
+            <button
+              onClick={() => setStockView("raw")}
+              className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${
+                visibleStockView === "raw"
+                  ? "bg-[#F17D0C] text-white shadow-md"
+                  : "text-[#FDF9F3]/70 hover:text-white"
+              }`}
+            >
+              Raw Materials
+            </button>
+          )}
         </div>
 
         <button
@@ -128,7 +138,7 @@ export default function InventoryView({
       </div>
 
       {/* Combined stock tables — Menu Items and Raw Materials are toggleable */}
-      {stockView === "menu" ? (
+      {visibleStockView === "menu" ? (
         <FinishedGoodsTable
           menuInventory={menuInventory}
           // Restock routes to Production Runs — replenish finished goods by scheduling a run

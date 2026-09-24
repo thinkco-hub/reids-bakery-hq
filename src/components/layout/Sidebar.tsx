@@ -1,6 +1,11 @@
 import { useState } from "react";
 import type { AppView, NavTabId, User } from "../../types/domain";
 import type { Dispatch, SetStateAction } from "react";
+import {
+  canAccessChams,
+  canAccessReconciliation,
+  canAccessTab,
+} from "../../utils/permissions";
 
 interface SidebarProps {
   activeTab: NavTabId;
@@ -17,8 +22,6 @@ interface SidebarProps {
   setIsReportsExpanded: Dispatch<SetStateAction<boolean>>;
   onNavClick: (tab: NavTabId) => void;
   onSwitchView: (view: AppView) => void;
-  /** Whether the signed-in user is an admin (admin UX is TBD). */
-  isAdmin: boolean;
 }
 
 /** Width (px) of the collapsed sidebar rail = desktop hover zone (Tailwind w-20). */
@@ -39,8 +42,12 @@ export default function Sidebar({
   setIsReportsExpanded,
   onNavClick,
   onSwitchView,
-  isAdmin,
 }: SidebarProps) {
+  // --- ROLE-BASED VISIBILITY (src/utils/permissions.ts) ---
+  const role = currentUser.role;
+  const canReconcile = canAccessReconciliation(role);
+  const canSwitchToChams = canAccessChams(role);
+
   // --- SIDEBAR RESPONSIVE HELPERS ---
   // Touch devices use click-to-expand behavior even when iPadOS reports a
   // desktop-sized viewport in landscape mode.
@@ -135,8 +142,9 @@ export default function Sidebar({
 
               onSwitchView("chams");
             }}
-            className="flex items-center"
-            title="Switch to Chams Branch Stock Ledger"
+            disabled={!canSwitchToChams}
+            className={`flex items-center ${canSwitchToChams ? "" : "cursor-default"}`}
+            title={canSwitchToChams ? "Switch to Chams Branch Stock Ledger" : undefined}
           >
             <div className="w-10 h-10 bg-white rounded-full flex flex-shrink-0 items-center justify-center mr-4 p-1 shadow-inner">
               <span className="text-[#562D07] font-bold text-xs text-center leading-tight">
@@ -173,137 +181,18 @@ export default function Sidebar({
 
         {/* Navigation Menu */}
         <nav className="flex-1 p-3 space-y-3 mt-4 overflow-y-auto hide-scrollbar">
-          <button
-            onClick={() => handleNavItemClick("dashboard")}
-            className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-              activeTab === "dashboard"
-                ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-            }`}
-          >
-            <div className="flex items-center justify-center w-8 flex-shrink-0">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                />
-              </svg>
-            </div>
-            <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
-              Dashboard
-            </span>
-          </button>
-
-          <button
-            onClick={() => handleNavItemClick("pos")}
-            className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-              activeTab === "pos"
-                ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-            }`}
-          >
-            <div className="flex items-center justify-center w-8 flex-shrink-0">
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
-              </svg>
-            </div>
-            <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
-              Point of Sale
-            </span>
-          </button>
-
-          <button
-            onClick={() => handleNavItemClick("orders")}
-            className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-              activeTab === "orders"
-                ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-            }`}
-          >
-            <div className="flex items-center justify-center w-8 flex-shrink-0">
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M19 6h-2c0-2.8-2.2-5-5-5S7 3.2 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.7 0 3 1.3 3 3H9c0-1.7 1.3-3 3-3zm7 17H5V8h14v12zm-7-8c-1.7 0-3-1.3-3-3H7c0 2.8 2.2 5 5 5s5-2.2 5-5h-2c0 1.7-1.3 3-3 3z" />
-              </svg>
-            </div>
-            <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
-              Orders
-            </span>
-          </button>
-
-          <button
-            onClick={() => handleNavItemClick("clients")}
-            className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-              activeTab === "clients"
-                ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-            }`}
-          >
-            <div className="flex items-center justify-center w-8 flex-shrink-0">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-5.13a4 4 0 10-8 0 4 4 0 008 0zm6 3a4 4 0 10-8 0 4 4 0 008 0z"
-                />
-              </svg>
-            </div>
-            <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
-              Clients
-            </span>
-          </button>
-
-          <div className="flex flex-col">
+          {canAccessTab(role, "dashboard") && (
             <button
-              onClick={() => {
-                if (isTablet && !sidebarExpanded) {
-                  setIsTabletSidebarOpen(true);
-                  return;
-                }
-                if (isAdmin) {
-                  // Admins: first click expands the submenu (Reconciliation);
-                  // the main view stays reachable via the item itself below.
-                  setIsInventoryExpanded(!isInventoryExpanded);
-                }
-                onNavClick("inventory");
-              }}
-              className={`w-full flex justify-between items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-                activeTab === "inventory" || activeTab === "inventory-closing-count" || activeTab === "inventory-reconciliation"
+              onClick={() => handleNavItemClick("dashboard")}
+              className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
+                activeTab === "dashboard"
                   ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
                   : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
               }`}
             >
-              <div className="flex items-center">
-                <div className="flex items-center justify-center w-8 flex-shrink-0">
-                  <svg
-                    className="w-6 h-6"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18-.21 0-.41-.06-.57-.18l-7.9-4.44A.991.991 0 013 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18.21 0 .41.06.57.18l7.9 4.44c.32.17.53.5.53.88v9zM12 4.15L6.04 7.5 12 10.85l5.96-3.35L12 4.15zM5 15.91l6 3.38v-6.71L5 9.21v6.7zM19 15.91v-6.7l-6 3.37v6.71l6-3.38z" />
-                  </svg>
-                </div>
-                <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
-                  Inventory
-                </span>
-              </div>
-              {isAdmin && (
+              <div className="flex items-center justify-center w-8 flex-shrink-0">
                 <svg
-                  onClick={(e) => {
-                    // Chevron tap toggles the submenu without navigating
-                    e.stopPropagation();
-                    setIsInventoryExpanded(!isInventoryExpanded);
-                  }}
-                  className={`w-4 h-4 ml-2 transition-transform duration-200 ${
-                    isInventoryExpanded ? "rotate-180" : ""
-                  } ${sidebarLabelCls}`}
+                  className="w-6 h-6"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -312,179 +201,316 @@ export default function Sidebar({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
+                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
                   />
                 </svg>
-              )}
-            </button>
-
-            {isAdmin && isInventoryExpanded && (
-              <div
-                className={`mt-1 space-y-1 bg-[#4a2605] rounded-lg overflow-hidden transition-all shadow-inner ${
-                  sidebarExpanded ? "md:block" : "md:hidden"
-                } ${desktopRailExpanded ? "lg:block" : "lg:hidden"}`}
-              >
-                <button
-                  onClick={() => handleNavItemClick("inventory-reconciliation")}
-                  className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
-                    activeTab === "inventory-reconciliation"
-                      ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
-                      : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
-                  }`}
-                >
-                  Reconciliation
-                </button>
               </div>
-            )}
-          </div>
+              <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
+                Dashboard
+              </span>
+            </button>
+          )}
 
-          <button
-            onClick={() => handleNavItemClick("recipes")}
-            className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-              activeTab === "recipes"
-                ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-            }`}
-          >
-            <div className="flex items-center justify-center w-8 flex-shrink-0">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </div>
-            <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
-              Recipes
-            </span>
-          </button>
-
-          <button
-            onClick={() => handleNavItemClick("production-runs")}
-            className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-              activeTab === "production-runs"
-                ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-            }`}
-          >
-            <div className="flex items-center justify-center w-8 flex-shrink-0">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 3v2m6-2v2M4 8h16M5 6h14a1 1 0 011 1v12a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1zm3 8l2.5 2.5L15 12"
-                />
-              </svg>
-            </div>
-            <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
-              Production Runs
-            </span>
-          </button>
-
-          <button
-            onClick={() => handleNavItemClick("calendar")}
-            className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-              activeTab === "calendar"
-                ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-            }`}
-          >
-            <div className="flex items-center justify-center w-8 flex-shrink-0">
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7v-5z" />
-              </svg>
-            </div>
-            <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
-              Calendar
-            </span>
-          </button>
-
-          <div className="flex flex-col">
+          {canAccessTab(role, "pos") && (
             <button
-              onClick={() => {
-                if (isTablet && !sidebarExpanded) {
-                  setIsTabletSidebarOpen(true);
-                  return;
-                }
-                setIsReportsExpanded(!isReportsExpanded);
-              }}
-              className={`w-full flex justify-between items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-                activeTab.startsWith("reports")
+              onClick={() => handleNavItemClick("pos")}
+              className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
+                activeTab === "pos"
                   ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
                   : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
               }`}
             >
-              <div className="flex items-center">
-                <div className="flex items-center justify-center w-8 flex-shrink-0">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-center justify-center w-8 flex-shrink-0">
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
+                </svg>
+              </div>
+              <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
+                Point of Sale
+              </span>
+            </button>
+          )}
+
+          {canAccessTab(role, "orders") && (
+            <button
+              onClick={() => handleNavItemClick("orders")}
+              className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
+                activeTab === "orders"
+                  ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
+                  : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
+              }`}
+            >
+              <div className="flex items-center justify-center w-8 flex-shrink-0">
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19 6h-2c0-2.8-2.2-5-5-5S7 3.2 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.7 0 3 1.3 3 3H9c0-1.7 1.3-3 3-3zm7 17H5V8h14v12zm-7-8c-1.7 0-3-1.3-3-3H7c0 2.8 2.2 5 5 5s5-2.2 5-5h-2c0 1.7-1.3 3-3 3z" />
+                </svg>
+              </div>
+              <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
+                Orders
+              </span>
+            </button>
+          )}
+
+          {canAccessTab(role, "clients") && (
+            <button
+              onClick={() => handleNavItemClick("clients")}
+              className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
+                activeTab === "clients"
+                  ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
+                  : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
+              }`}
+            >
+              <div className="flex items-center justify-center w-8 flex-shrink-0">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-5.13a4 4 0 10-8 0 4 4 0 008 0zm6 3a4 4 0 10-8 0 4 4 0 008 0z"
+                  />
+                </svg>
+              </div>
+              <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
+                Clients
+              </span>
+            </button>
+          )}
+
+          {canAccessTab(role, "inventory") && (
+            <div className="flex flex-col">
+              <button
+                onClick={() => {
+                  if (isTablet && !sidebarExpanded) {
+                    setIsTabletSidebarOpen(true);
+                    return;
+                  }
+                  if (canReconcile) {
+                    // Reconciliation roles: first click expands the submenu;
+                    // the main view stays reachable via the item itself below.
+                    setIsInventoryExpanded(!isInventoryExpanded);
+                  }
+                  onNavClick("inventory");
+                }}
+                className={`w-full flex justify-between items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
+                  activeTab === "inventory" || activeTab === "inventory-closing-count" || activeTab === "inventory-reconciliation"
+                    ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
+                    : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
+                }`}
+              >
+                <div className="flex items-center">
+                  <div className="flex items-center justify-center w-8 flex-shrink-0">
+                    <svg
+                      className="w-6 h-6"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18-.21 0-.41-.06-.57-.18l-7.9-4.44A.991.991 0 013 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18.21 0 .41.06.57.18l7.9 4.44c.32.17.53.5.53.88v9zM12 4.15L6.04 7.5 12 10.85l5.96-3.35L12 4.15zM5 15.91l6 3.38v-6.71L5 9.21v6.7zM19 15.91v-6.7l-6 3.37v6.71l6-3.38z" />
+                    </svg>
+                  </div>
+                  <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
+                    Inventory
+                  </span>
+                </div>
+                {canReconcile && (
+                  <svg
+                    onClick={(e) => {
+                      // Chevron tap toggles the submenu without navigating
+                      e.stopPropagation();
+                      setIsInventoryExpanded(!isInventoryExpanded);
+                    }}
+                    className={`w-4 h-4 ml-2 transition-transform duration-200 ${
+                      isInventoryExpanded ? "rotate-180" : ""
+                    } ${sidebarLabelCls}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                      d="M19 9l-7 7-7-7"
                     />
                   </svg>
+                )}
+              </button>
+
+              {canReconcile && isInventoryExpanded && (
+                <div
+                  className={`mt-1 space-y-1 bg-[#4a2605] rounded-lg overflow-hidden transition-all shadow-inner ${
+                    sidebarExpanded ? "md:block" : "md:hidden"
+                  } ${desktopRailExpanded ? "lg:block" : "lg:hidden"}`}
+                >
+                  <button
+                    onClick={() => handleNavItemClick("inventory-reconciliation")}
+                    className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
+                      activeTab === "inventory-reconciliation"
+                        ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
+                        : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
+                    }`}
+                  >
+                    Reconciliation
+                  </button>
                 </div>
-                <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
-                  Reports
-                </span>
+              )}
+            </div>
+          )}
+
+          {canAccessTab(role, "recipes") && (
+            <button
+              onClick={() => handleNavItemClick("recipes")}
+              className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
+                activeTab === "recipes"
+                  ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
+                  : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
+              }`}
+            >
+              <div className="flex items-center justify-center w-8 flex-shrink-0">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
               </div>
-              <svg
-                className={`w-4 h-4 ml-2 transition-transform duration-200 ${
-                  isReportsExpanded ? "rotate-180" : ""
-                } ${sidebarLabelCls}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
+                Recipes
+              </span>
             </button>
+          )}
 
-            {isReportsExpanded && (
-              <div
-                className={`mt-1 space-y-1 bg-[#4a2605] rounded-lg overflow-hidden transition-all shadow-inner ${
-                  sidebarExpanded ? "md:block" : "md:hidden"
-                } ${desktopRailExpanded ? "lg:block" : "lg:hidden"}`}
-              >
-                <button
-                  onClick={() => handleNavItemClick("reports-dashboard")}
-                  className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
-                    activeTab === "reports-dashboard"
-                      ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
-                      : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
-                  }`}
-                >
-                  Sales Dashboard
-                </button>
-                <button
-                  onClick={() => handleNavItemClick("reports-closing")}
-                  className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
-                    activeTab === "reports-closing"
-                      ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
-                      : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
-                  }`}
-                >
-                  End-of-Day Closing
-                </button>
-                <button
-                  onClick={() => handleNavItemClick("reports-inventory")}
-                  className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
-                    activeTab === "reports-inventory"
-                      ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
-                      : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
-                  }`}
-                >
-                  Closing Inventory
-                </button>
+          {canAccessTab(role, "production-runs") && (
+            <button
+              onClick={() => handleNavItemClick("production-runs")}
+              className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
+                activeTab === "production-runs"
+                  ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
+                  : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
+              }`}
+            >
+              <div className="flex items-center justify-center w-8 flex-shrink-0">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 3v2m6-2v2M4 8h16M5 6h14a1 1 0 011 1v12a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1zm3 8l2.5 2.5L15 12"
+                  />
+                </svg>
               </div>
-            )}
-          </div>
+              <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
+                Production Runs
+              </span>
+            </button>
+          )}
 
-          {isAdmin && (
+          {canAccessTab(role, "calendar") && (
+            <button
+              onClick={() => handleNavItemClick("calendar")}
+              className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
+                activeTab === "calendar"
+                  ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
+                  : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
+              }`}
+            >
+              <div className="flex items-center justify-center w-8 flex-shrink-0">
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7v-5z" />
+                </svg>
+              </div>
+              <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
+                Calendar
+              </span>
+            </button>
+          )}
+
+          {canAccessTab(role, "reports-dashboard") && (
+            <div className="flex flex-col">
+              <button
+                onClick={() => {
+                  if (isTablet && !sidebarExpanded) {
+                    setIsTabletSidebarOpen(true);
+                    return;
+                  }
+                  setIsReportsExpanded(!isReportsExpanded);
+                }}
+                className={`w-full flex justify-between items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
+                  activeTab.startsWith("reports")
+                    ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
+                    : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
+                }`}
+              >
+                <div className="flex items-center">
+                  <div className="flex items-center justify-center w-8 flex-shrink-0">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                      />
+                    </svg>
+                  </div>
+                  <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
+                    Reports
+                  </span>
+                </div>
+                <svg
+                  className={`w-4 h-4 ml-2 transition-transform duration-200 ${
+                    isReportsExpanded ? "rotate-180" : ""
+                  } ${sidebarLabelCls}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {isReportsExpanded && (
+                <div
+                  className={`mt-1 space-y-1 bg-[#4a2605] rounded-lg overflow-hidden transition-all shadow-inner ${
+                    sidebarExpanded ? "md:block" : "md:hidden"
+                  } ${desktopRailExpanded ? "lg:block" : "lg:hidden"}`}
+                >
+                  <button
+                    onClick={() => handleNavItemClick("reports-dashboard")}
+                    className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
+                      activeTab === "reports-dashboard"
+                        ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
+                        : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
+                    }`}
+                  >
+                    Sales Dashboard
+                  </button>
+                  <button
+                    onClick={() => handleNavItemClick("reports-closing")}
+                    className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
+                      activeTab === "reports-closing"
+                        ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
+                        : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
+                    }`}
+                  >
+                    End-of-Day Closing
+                  </button>
+                  <button
+                    onClick={() => handleNavItemClick("reports-inventory")}
+                    className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
+                      activeTab === "reports-inventory"
+                        ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
+                        : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
+                    }`}
+                  >
+                    Closing Inventory
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {canAccessTab(role, "audit-logs") && (
             <button
               onClick={() => handleNavItemClick("audit-logs")}
               className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
@@ -505,6 +531,31 @@ export default function Sidebar({
               </div>
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Audit Logs
+              </span>
+            </button>
+          )}
+
+          {canAccessTab(role, "user-management") && (
+            <button
+              onClick={() => handleNavItemClick("user-management")}
+              className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
+                activeTab === "user-management"
+                  ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
+                  : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
+              }`}
+            >
+              <div className="flex items-center justify-center w-8 flex-shrink-0">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  />
+                </svg>
+              </div>
+              <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
+                Roles
               </span>
             </button>
           )}
