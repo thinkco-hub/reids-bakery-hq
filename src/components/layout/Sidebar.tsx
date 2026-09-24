@@ -42,16 +42,19 @@ export default function Sidebar({
   isAdmin,
 }: SidebarProps) {
   // --- SIDEBAR RESPONSIVE HELPERS ---
-  // "Tablet" = md..lg range (768px - 1023px), same cutoff the POS cart width uses.
-  // Touch devices can't hover, so the sidebar rail toggles on click instead.
-  const isTablet = windowWidth >= 768 && windowWidth < 1024;
+  // Touch devices use click-to-expand behavior even when iPadOS reports a
+  // desktop-sized viewport in landscape mode.
+  const isTouchDevice =
+    typeof navigator !== "undefined" && navigator.maxTouchPoints > 0;
+  const isTablet =
+    windowWidth >= 768 && (windowWidth < 1024 || isTouchDevice);
   const sidebarExpanded = isTablet && isTabletSidebarOpen;
 
   // Desktop (lg+): expand ONLY while the cursor is within the collapsed rail's
   // 80px width. Hovering the expanded part of the rail collapses it again, so
   // the rail can never "trap" the cursor and cover content sitting right next
   // to it (e.g. the POS category chips near the left edge).
-  const isDesktop = windowWidth >= 1024;
+  const isDesktop = windowWidth >= 1024 && !isTouchDevice;
   const [isDesktopRailHovered, setIsDesktopRailHovered] = useState(false);
   const desktopRailExpanded = isDesktop && isDesktopRailHovered;
 
