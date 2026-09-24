@@ -1,16 +1,20 @@
 import type { PosProduct } from "../types/domain";
 
-// POS product catalog (static seed for the POS grid; cart state lives in usePos)
+// POS product catalog (static seed for the POS grid; cart state lives in usePos).
+// Product ids mirror the recipe/menu-inventory ids (B-101, …) for goods that are
+// stocked, so POS walk-in sales and pre-order deliveries deduct the matching
+// finished-goods stock (FR-8). POS-only products without tracked stock keep
+// placeholder ids and don't affect inventory.
 export const initialPosProducts: PosProduct[] = [
   {
-    id: "p1",
+    id: "B-101",
     name: "Butter Croissant",
     price: 120,
     category: "Pastries",
     color: "bg-amber-400",
   },
   {
-    id: "p2",
+    id: "B-102",
     name: "Almond Croissant",
     price: 150,
     category: "Pastries",
@@ -24,7 +28,7 @@ export const initialPosProducts: PosProduct[] = [
     color: "bg-orange-400",
   },
   {
-    id: "p4",
+    id: "L-044",
     name: "Sourdough Loaf",
     price: 200,
     category: "Bread",
@@ -38,7 +42,7 @@ export const initialPosProducts: PosProduct[] = [
     color: "bg-stone-300",
   },
   {
-    id: "p6",
+    id: "M-201",
     name: "Blueberry Muffin",
     price: 95,
     category: "Pastries",
