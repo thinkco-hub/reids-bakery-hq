@@ -1,5 +1,4 @@
 import React from "react";
-import type { MouseEvent as ReactMouseEvent } from "react";
 import { SearchIcon } from "../icons";
 import type {
   CartItem,
@@ -20,9 +19,6 @@ interface PosViewProps {
   cartTax: number;
   cartTotal: number;
   setConfirmModal: (modal: ConfirmModalState) => void;
-  windowWidth: number;
-  cartWidth: number;
-  startResizing: (e: ReactMouseEvent) => void;
 }
 
 export default function PosView({
@@ -37,9 +33,6 @@ export default function PosView({
   cartTax,
   cartTotal,
   setConfirmModal,
-  windowWidth,
-  cartWidth,
-  startResizing,
 }: PosViewProps) {
   return (
     <div className="flex flex-col-reverse md:flex-row h-full w-full animate-fadeIn">
@@ -93,22 +86,7 @@ export default function PosView({
       </div>
 
       {/* RIGHT: Current Ticket / Cart */}
-      <div
-        className="w-full bg-white border-b md:border-b-0 md:border-l border-gray-200 shadow-md md:shadow-xl flex flex-col max-h-[45vh] md:max-h-none md:h-full flex-shrink-0 z-20 relative"
-        style={{
-          width:
-            windowWidth < 768
-              ? "100%"
-              : windowWidth < 1024
-              ? 260
-              : cartWidth,
-        }}
-      >
-        <div
-          className="hidden md:block absolute left-0 top-0 w-1.5 h-full cursor-col-resize hover:bg-[#F17D0C] active:bg-[#F17D0C] transition-colors z-50"
-          onMouseDown={startResizing}
-          title="Drag to resize cart"
-        />
+      <div className="w-full max-h-[45vh] md:max-h-none md:h-full md:w-[clamp(300px,28vw,800px)] bg-white border-b md:border-b-0 md:border-l border-gray-200 shadow-md md:shadow-xl flex flex-col flex-shrink-0 z-20 relative">
 
         <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 flex-shrink-0">
           <div className="flex items-center gap-2 text-[#562D07]">
