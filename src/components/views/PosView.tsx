@@ -86,12 +86,14 @@ export default function PosView({
       </div>
 
       {/* RIGHT: Current Ticket / Cart */}
-      <div className="@container w-full min-w-[240px] basis-0 grow-[25] max-h-[45vh] md:max-h-none md:h-full bg-white border-b md:border-b-0 md:border-l border-gray-200 shadow-md md:shadow-xl flex flex-col z-20 relative">
+      <div
+        className="@container w-full min-w-[240px] basis-0 grow-[25] max-h-[45vh] md:max-h-none md:h-full bg-white border-b md:border-b-0 md:border-l border-gray-200 shadow-md md:shadow-xl flex flex-col z-20 relative [--tk-title:clamp(1.05rem,4.5cqw,1.45rem)] [--tk-body:clamp(0.95rem,3.6cqw,1.15rem)] [--tk-pad:clamp(0.85rem,4cqw,1.4rem)]"
+      >
 
-        <div className="p-[clamp(0.85rem,4.5cqw,1.5rem)] border-b border-gray-200 flex justify-between items-center bg-gray-50 flex-shrink-0">
-          <div className="flex items-center gap-2 text-[#562D07] text-[clamp(1.05rem,5.5cqw,1.6rem)]">
+        <div className="p-[var(--tk-pad)] border-b border-gray-200 flex justify-between items-center bg-gray-50 flex-shrink-0">
+          <div className="flex items-center gap-2 text-[#562D07] text-[length:var(--tk-title)]">
             <svg
-              className="w-[1.2em] h-[1.2em] flex-shrink-0"
+              className="w-[1.15em] h-[1.15em] flex-shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -103,12 +105,12 @@ export default function PosView({
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
               />
             </svg>
-            <h3 className="font-bold text-[clamp(1.05rem,5.5cqw,1.6rem)]">Current Ticket</h3>
+            <h3 className="font-bold text-[length:var(--tk-title)]">Current Ticket</h3>
           </div>
           {cart.length > 0 && (
             <button
               onClick={() => setCart([])}
-              className="text-gray-400 hover:text-red-500 transition-colors p-1"
+              className="text-gray-400 hover:text-red-500 transition-colors p-[0.5em] min-h-[2.75rem] min-w-[2.75rem]"
               title="Clear Ticket"
             >
               <svg
@@ -138,10 +140,10 @@ export default function PosView({
               >
                 <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
               </svg>
-              <p className="font-medium text-[clamp(1.05rem,5.5cqw,1.55rem)] text-gray-500">
+              <p className="font-medium text-[length:var(--tk-title)] text-gray-500">
                 No items added
               </p>
-              <p className="text-[clamp(0.9rem,4.2cqw,1.25rem)] mt-1">
+              <p className="text-[length:var(--tk-body)] mt-1">
                 Tap products to add them to the ticket.
               </p>
             </div>
@@ -150,7 +152,7 @@ export default function PosView({
               {cart.map((item) => (
                 <li
                   key={item.id}
-                  className="p-[clamp(0.85rem,4.5cqw,1.5rem)] text-[clamp(0.95rem,4.3cqw,1.35rem)] hover:bg-gray-50 group"
+                  className="p-[var(--tk-pad)] text-[length:var(--tk-body)] hover:bg-gray-50 group"
                 >
                   <div className="flex justify-between items-start mb-[0.8em]">
                     <span className="font-bold text-gray-800">
@@ -164,7 +166,7 @@ export default function PosView({
                     <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
                       <button
                         onClick={() => adjustCartQty(item.id, -1)}
-                        className="w-[2.9em] h-[2.2em] flex items-center justify-center bg-gray-50 hover:bg-gray-200 text-gray-600 transition-colors"
+                        className="w-[2.9em] h-[2.9em] min-h-[2.75rem] flex items-center justify-center bg-gray-50 hover:bg-gray-200 text-gray-600 transition-colors"
                       >
                         <svg
                           className="w-[1.5em] h-[1.5em]"
@@ -185,7 +187,7 @@ export default function PosView({
                       </span>
                       <button
                         onClick={() => adjustCartQty(item.id, 1)}
-                        className="w-[2.9em] h-[2.2em] flex items-center justify-center bg-gray-50 hover:bg-gray-200 text-gray-600 transition-colors"
+                        className="w-[2.9em] h-[2.9em] min-h-[2.75rem] flex items-center justify-center bg-gray-50 hover:bg-gray-200 text-gray-600 transition-colors"
                       >
                         <svg
                           className="w-[1.5em] h-[1.5em]"
@@ -212,17 +214,17 @@ export default function PosView({
           )}
         </div>
 
-        <div className="border-t border-gray-200 bg-gray-50 p-[clamp(0.85rem,4.5cqw,1.5rem)] flex-shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-          <div className="space-y-[0.4em] mb-[clamp(0.85rem,4.5cqw,1.5rem)]">
-            <div className="flex justify-between text-gray-500 text-[clamp(0.95rem,4.3cqw,1.3rem)] font-medium">
+        <div className="border-t border-gray-200 bg-gray-50 p-[var(--tk-pad)] flex-shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+          <div className="space-y-[0.4em] mb-[var(--tk-pad)]">
+            <div className="flex justify-between text-gray-500 text-[length:var(--tk-body)] font-medium">
               <span>Subtotal</span>
               <span>₱{cartSubtotal.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-gray-500 text-[clamp(0.95rem,4.3cqw,1.3rem)] font-medium border-b border-gray-200 pb-[0.5em]">
+            <div className="flex justify-between text-gray-500 text-[length:var(--tk-body)] font-medium border-b border-gray-200 pb-[0.5em]">
               <span>Tax (5%)</span>
               <span>₱{cartTax.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-[#121212] text-[clamp(1.1rem,5.5cqw,1.75rem)] font-bold pt-[0.25em]">
+            <div className="flex justify-between text-[#121212] text-[length:var(--tk-title)] font-bold pt-[0.25em]">
               <span>Total</span>
               <span>₱{cartTotal.toFixed(2)}</span>
             </div>
@@ -241,7 +243,7 @@ export default function PosView({
                 notes: "",
               })
             }
-            className={`w-full py-[clamp(0.85rem,4.5cqw,1.5rem)] rounded-xl text-[clamp(1rem,4.6cqw,1.4rem)] font-bold shadow-lg transition-all transform active:scale-[0.98] ${
+            className={`w-full min-h-[3rem] py-[var(--tk-pad)] rounded-xl text-[length:var(--tk-title)] font-bold shadow-lg transition-all transform active:scale-[0.98] ${
               cart.length > 0
                 ? "bg-[#F17D0C] hover:bg-[#d86b06] text-white"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
