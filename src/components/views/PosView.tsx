@@ -86,7 +86,7 @@ export default function PosView({
       </div>
 
       {/* RIGHT: Current Ticket / Cart */}
-      <div className="w-full max-h-[45vh] md:max-h-none md:h-full md:w-[clamp(300px,28vw,800px)] bg-white border-b md:border-b-0 md:border-l border-gray-200 shadow-md md:shadow-xl flex flex-col flex-shrink-0 z-20 relative">
+      <div className="w-full max-h-[45vh] md:max-h-none md:h-full md:w-[clamp(240px,20vw,600px)] bg-white border-b md:border-b-0 md:border-l border-gray-200 shadow-md md:shadow-xl flex flex-col flex-shrink-0 z-20 relative">
 
         <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 flex-shrink-0">
           <div className="flex items-center gap-2 text-[#562D07]">
