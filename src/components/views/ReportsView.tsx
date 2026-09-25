@@ -5,6 +5,7 @@ import ClosingInventory from "../reports/ClosingInventory";
 import type {
   DayClosing,
   DayClosingData,
+  EditSaleInput,
   Expense,
   ExpenseData,
   ExpenseId,
@@ -13,12 +14,14 @@ import type {
   MenuItemStock,
   ReportsTabId,
   Sale,
+  SaleId,
 } from "../../types/domain";
 
 interface ReportsViewProps {
   activeTab: ReportsTabId;
   sales: Sale[];
   onReprintSale: (sale: Sale | null) => void;
+  onSaveSaleEdit: (id: SaleId, input: EditSaleInput) => void;
   expenses: Expense[];
   dayClosings: DayClosing[];
   onAddExpense: (data: ExpenseData) => void;
@@ -33,6 +36,7 @@ export default function ReportsView({
   activeTab,
   sales,
   onReprintSale,
+  onSaveSaleEdit,
   expenses,
   dayClosings,
   onAddExpense,
@@ -44,7 +48,9 @@ export default function ReportsView({
 }: ReportsViewProps) {
   return (
     <>
-      {activeTab === "reports-dashboard" && <ReportsDashboard sales={sales} onReprintSale={onReprintSale} />}
+      {activeTab === "reports-dashboard" && (
+        <ReportsDashboard sales={sales} onReprintSale={onReprintSale} onSaveSaleEdit={onSaveSaleEdit} />
+      )}
 
       {/* =========================================
           VIEW: END-OF-DAY CLOSING
