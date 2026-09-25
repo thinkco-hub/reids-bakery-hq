@@ -25,7 +25,7 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
           </div>
           <h2 className="text-xl font-bold text-[#121212]">Sale Complete</h2>
           <p className="text-gray-500 text-sm mt-1">{receipt.id}</p>
-          {receipt.type === "Pre-Order" && (
+          {receipt.type === "Order" && (
             <p className="text-xs font-semibold text-[#F17D0C] mt-2 bg-orange-50 rounded-full px-3 py-1 inline-block">
               Added to Orders — tracked through production &amp; delivery
             </p>
@@ -47,7 +47,7 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
             <span>Payment Method</span>
             <span className="font-semibold text-gray-800">{receipt.paymentMethod}</span>
           </div>
-          {receipt.type === "Pre-Order" && (
+          {receipt.type === "Order" && (
             <div className="flex justify-between">
               <span>Delivery Date</span>
               <span className="font-semibold text-gray-800">{receipt.deliveryDate}</span>

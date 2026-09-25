@@ -100,8 +100,8 @@ export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
       })),
       requestedDate: today,
       notes: sale.notes
-        ? `Placed via POS Pre-Order — ${sale.notes}`
-        : "Placed via POS Pre-Order",
+        ? `Placed via POS Order — ${sale.notes}`
+        : "Placed via POS Order",
     });
     const finalOrder: Order = {
       ...order,

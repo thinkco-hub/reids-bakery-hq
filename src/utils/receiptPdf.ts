@@ -45,7 +45,7 @@ export function downloadReceiptPdf(sale: Sale): void {
 
   doc.setFontSize(9);
   doc.setFont("courier", "normal");
-  doc.text(sale.type === "Pre-Order" ? "PRE-ORDER RECEIPT" : "SALE RECEIPT", PAGE_W / 2, y, {
+  doc.text(sale.type === "Order" ? "ORDER RECEIPT" : "SALE RECEIPT", PAGE_W / 2, y, {
     align: "center",
   });
   y += LINE_H;
@@ -57,7 +57,7 @@ export function downloadReceiptPdf(sale: Sale): void {
   kv("Customer", sale.customerName || "-");
   if (sale.customerContact) kv("Contact", sale.customerContact);
   kv("Payment", sale.paymentMethod);
-  if (sale.type === "Pre-Order") kv("Delivery", sale.deliveryDate);
+  if (sale.type === "Order") kv("Delivery", sale.deliveryDate);
   kv("Date", new Date(sale.createdAt).toLocaleString());
 
   divider();

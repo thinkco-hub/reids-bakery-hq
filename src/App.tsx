@@ -178,6 +178,7 @@ export default function BakeryCommandCenter() {
     confirmModal,
     setConfirmModal,
     updateConfirmField,
+    setSaleType,
     closeConfirmModal,
     completeSale,
     sales,
@@ -261,6 +262,7 @@ export default function BakeryCommandCenter() {
           cartTotal={cartTotal}
           todayISO={todayISO}
           onFieldChange={updateConfirmField}
+          onSaleTypeChange={setSaleType}
           onClose={closeConfirmModal}
           onConfirm={completeSale}
           disabled={isConfirmOrderDisabled}
@@ -339,7 +341,6 @@ export default function BakeryCommandCenter() {
             cartTax={cartTax}
             cartTotal={cartTotal}
             setConfirmModal={setConfirmModal}
-            todayISO={todayISO}
             windowWidth={windowWidth}
             cartWidth={cartWidth}
             startResizing={startResizing}
