@@ -184,9 +184,6 @@ export default function BakeryCommandCenter() {
     sales,
     receipt,
     setReceipt,
-    cartWidth,
-    isResizing,
-    startResizing,
     todayISO,
     isConfirmOrderDisabled,
   } = pos;
@@ -227,11 +224,7 @@ export default function BakeryCommandCenter() {
   }
 
   return (
-    <div
-      className={`flex flex-col md:flex-row h-screen bg-[#FDF9F3] font-sans text-[#121212] overflow-hidden relative ${
-        isResizing ? "cursor-col-resize select-none" : ""
-      }`}
-    >
+    <div className="flex flex-col md:flex-row h-screen bg-[#FDF9F3] font-sans text-[#121212] overflow-hidden relative">
       {activeView === "chams" && canViewChams ? (
         <ChamsStockLedger onSwitchView={() => setActiveView("reids")} />
       ) : (
@@ -341,9 +334,6 @@ export default function BakeryCommandCenter() {
             cartTax={cartTax}
             cartTotal={cartTotal}
             setConfirmModal={setConfirmModal}
-            windowWidth={windowWidth}
-            cartWidth={cartWidth}
-            startResizing={startResizing}
           />
         )}
 

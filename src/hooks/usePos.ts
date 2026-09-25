@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
-import type { MouseEvent as ReactMouseEvent } from "react";
+import { useState } from "react";
 import { recordAuditEvent } from "../utils/auditLog";
 import { isValidCustomerContact } from "../utils/orders";
 import type {
@@ -41,7 +40,7 @@ interface UsePosOptions {
 
 /**
  * Owns the POS feature: product category filter, cart, checkout confirmation
- * modal, completed sales, receipts and the resizable ticket panel.
+ * modal, completed sales and receipts.
  */
 export function usePos({
   posProducts,
@@ -54,40 +53,6 @@ export function usePos({
   const [confirmModal, setConfirmModal] = useState<ConfirmModalState>(EMPTY_CONFIRM_MODAL);
   const [sales, setSales] = useState<Sale[]>([]);
   const [receipt, setReceipt] = useState<Sale | null>(null);
-
-  // --- RESIZABLE TICKET STATE ---
-  const [cartWidth, setCartWidth] = useState(400);
-  const [isResizing, setIsResizing] = useState(false);
-
-  const startResizing = useCallback((e: ReactMouseEvent) => {
-    setIsResizing(true);
-    e.preventDefault();
-  }, []);
-
-  const stopResizing = useCallback(() => {
-    setIsResizing(false);
-  }, []);
-
-  const resize = useCallback(
-    (e: MouseEvent) => {
-      if (isResizing) {
-        const newWidth = window.innerWidth - e.clientX;
-        if (newWidth >= 300 && newWidth <= 800) {
-          setCartWidth(newWidth);
-        }
-      }
-    },
-    [isResizing]
-  );
-
-  useEffect(() => {
-    window.addEventListener("mousemove", resize);
-    window.addEventListener("mouseup", stopResizing);
-    return () => {
-      window.removeEventListener("mousemove", resize);
-      window.removeEventListener("mouseup", stopResizing);
-    };
-  }, [resize, stopResizing]);
 
   // --- PRODUCT FILTER & CART TOTALS ---
   const filteredPosProducts =
@@ -241,9 +206,6 @@ export function usePos({
     sales,
     receipt,
     setReceipt,
-    cartWidth,
-    isResizing,
-    startResizing,
     todayISO,
     isConfirmOrderDisabled,
   };
