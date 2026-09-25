@@ -36,7 +36,7 @@ export default function PosView({
 }: PosViewProps) {
   return (
     <div className="flex flex-col-reverse md:flex-row h-full w-full animate-fadeIn">
-      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+      <div className="flex-1 basis-0 grow-[78] flex flex-col min-h-0 overflow-hidden">
         <div className="bg-white shadow-sm border-b border-gray-200 z-10 flex-shrink-0">
           <div className="p-4 flex items-center gap-4 overflow-x-auto hide-scrollbar">
             {(["All", "Pastries", "Bread", "Cakes", "Drinks"] as const satisfies readonly PosCategory[]).map(
@@ -86,7 +86,7 @@ export default function PosView({
       </div>
 
       {/* RIGHT: Current Ticket / Cart */}
-      <div className="@container w-full max-h-[45vh] md:max-h-none md:h-full md:w-[clamp(240px,20vw,600px)] bg-white border-b md:border-b-0 md:border-l border-gray-200 shadow-md md:shadow-xl flex flex-col flex-shrink-0 z-20 relative">
+      <div className="@container w-full min-w-[220px] basis-0 grow-[22] max-h-[45vh] md:max-h-none md:h-full bg-white border-b md:border-b-0 md:border-l border-gray-200 shadow-md md:shadow-xl flex flex-col z-20 relative">
 
         <div className="p-[clamp(0.75rem,3.5cqw,1.25rem)] border-b border-gray-200 flex justify-between items-center bg-gray-50 flex-shrink-0">
           <div className="flex items-center gap-2 text-[#562D07]">
