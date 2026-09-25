@@ -100,7 +100,12 @@ export function usePos({
   );
   const cartTax = cartSubtotal * 0.05;
   const cartTotal = cartSubtotal + cartTax;
-  const todayISO = new Date().toISOString().slice(0, 10);
+  // Local calendar date (not UTC) so "today" matches the cashier's clock — in UTC+8,
+  // toISOString() is still yesterday between 00:00 and 08:00.
+  const now = new Date();
+  const todayISO = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(
+    now.getDate()
+  ).padStart(2, "0")}`;
 
   // --- CART ACTIONS ---
   const addToCart = (product: PosProduct) => {
@@ -134,6 +139,8 @@ export function usePos({
     // Orders (chosen explicitly in the modal) are tracked in the Orders view;
     // walk-ins only appear in Sales.
     const isOrder = confirmModal.saleType === "Order";
+    // An Order must be delivered after today (also enforced by isConfirmOrderDisabled).
+    if (isOrder && !(confirmModal.deliveryDate > todayISO)) return;
     const sale: Sale = {
       id: `SALE-${String(sales.length + 1).padStart(4, "0")}`,
       type: confirmModal.saleType,

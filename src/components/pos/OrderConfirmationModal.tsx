@@ -152,11 +152,17 @@ export default function OrderConfirmationModal({
               onChange={(e) => onFieldChange("deliveryDate", e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
             />
-            <p className="text-xs text-gray-400 mt-1.5">
-              {modal.deliveryDate > todayISO
-                ? "This order will be tracked in Orders (production & delivery)."
-                : "Pick a delivery date after today to place this order."}
-            </p>
+            {modal.deliveryDate && modal.deliveryDate <= todayISO ? (
+              <p role="alert" className="text-xs font-semibold text-red-600 mt-1.5">
+                Delivery date must be after today. Choose Walk-in for a same-day sale.
+              </p>
+            ) : (
+              <p className="text-xs text-gray-400 mt-1.5">
+                {modal.deliveryDate
+                  ? "This order will be tracked in Orders (production & delivery)."
+                  : "Pick a delivery date after today to place this order."}
+              </p>
+            )}
           </div>
         )}
 
