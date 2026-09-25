@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { recordAuditEvent } from "../utils/auditLog";
+import { isValidCustomerContact } from "../utils/orders";
 import type {
   CartItem,
   ConfirmModalState,
@@ -139,6 +140,9 @@ export function usePos({
     // Orders (chosen explicitly in the modal) are tracked in the Orders view;
     // walk-ins only appear in Sales.
     const isOrder = confirmModal.saleType === "Order";
+    // Guardrail: never confirm without a complete contact number
+    // (also enforced by isConfirmOrderDisabled).
+    if (!isValidCustomerContact(confirmModal.customerContact)) return;
     // An Order must be delivered after today (also enforced by isConfirmOrderDisabled).
     if (isOrder && !(confirmModal.deliveryDate > todayISO)) return;
     const sale: Sale = {
@@ -209,10 +213,12 @@ export function usePos({
     setConfirmModal(EMPTY_CONFIRM_MODAL);
   };
 
-  // An Order needs a delivery date after today; a walk-in needs none.
+  // Every sale type needs a reachable customer, so the contact must be a full
+  // number; an Order additionally needs a delivery date after today.
   const isConfirmOrderDisabled =
     !confirmModal.paymentMethod ||
     !confirmModal.customerName.trim() ||
+    !isValidCustomerContact(confirmModal.customerContact) ||
     (confirmModal.saleType === "Order" && !(confirmModal.deliveryDate > todayISO));
 
   return {

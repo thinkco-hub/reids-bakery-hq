@@ -1,5 +1,5 @@
 import React from "react";
-import { PAYMENT_METHODS } from "../../utils/orders";
+import { PAYMENT_METHODS, toContactDigits } from "../../utils/orders";
 import type { CartItem, ConfirmModalState, ISODate, SaleType } from "../../types/domain";
 
 const SALE_TYPES: SaleType[] = ["Walk-in", "Order"];
@@ -132,9 +132,12 @@ export default function OrderConfirmationModal({
             </label>
             <input
               type="tel"
-              placeholder="09XX XXX XXXX"
+              inputMode="numeric"
+              placeholder="09XXXXXXXXX"
               value={modal.customerContact}
-              onChange={(e) => onFieldChange("customerContact", e.target.value)}
+              onChange={(e) =>
+                onFieldChange("customerContact", toContactDigits(e.target.value))
+              }
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
             />
           </div>
