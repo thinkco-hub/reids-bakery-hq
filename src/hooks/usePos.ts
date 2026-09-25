@@ -139,6 +139,8 @@ export function usePos({
     // Orders (chosen explicitly in the modal) are tracked in the Orders view;
     // walk-ins only appear in Sales.
     const isOrder = confirmModal.saleType === "Order";
+    // Guardrail: never confirm without a customer contact (also enforced by isConfirmOrderDisabled).
+    if (!confirmModal.customerContact.trim()) return;
     // An Order must be delivered after today (also enforced by isConfirmOrderDisabled).
     if (isOrder && !(confirmModal.deliveryDate > todayISO)) return;
     const sale: Sale = {
@@ -209,10 +211,12 @@ export function usePos({
     setConfirmModal(EMPTY_CONFIRM_MODAL);
   };
 
-  // An Order needs a delivery date after today; a walk-in needs none.
+  // Every sale type requires a contact so the customer can be reached;
+  // an Order additionally needs a delivery date after today.
   const isConfirmOrderDisabled =
     !confirmModal.paymentMethod ||
     !confirmModal.customerName.trim() ||
+    !confirmModal.customerContact.trim() ||
     (confirmModal.saleType === "Order" && !(confirmModal.deliveryDate > todayISO));
 
   return {
