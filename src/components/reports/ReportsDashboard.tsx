@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import RevenueByDayChart from "./RevenueByDayChart";
 import SellerBarList from "./SellerBarList";
+import EditSaleModal from "./EditSaleModal";
 import {
   DATE_PRESETS,
   getPresetRange,
@@ -13,7 +14,7 @@ import {
   salesToCSV,
   downloadCSV,
 } from "../../utils/sales";
-import type { DatePresetId, Sale } from "../../types/domain";
+import type { DatePresetId, EditSaleInput, Sale, SaleId } from "../../types/domain";
 
 function StatCard({
   label,
@@ -35,12 +36,14 @@ function StatCard({
 interface ReportsDashboardProps {
   sales: Sale[];
   onReprintSale?: (sale: Sale) => void;
+  onSaveSaleEdit: (id: SaleId, input: EditSaleInput) => void;
 }
 
-export default function ReportsDashboard({ sales, onReprintSale }: ReportsDashboardProps) {
+export default function ReportsDashboard({ sales, onReprintSale, onSaveSaleEdit }: ReportsDashboardProps) {
   const [preset, setPreset] = useState<DatePresetId | "custom">("month");
   const [customStart, setCustomStart] = useState("");
   const [customEnd, setCustomEnd] = useState("");
+  const [editingSale, setEditingSale] = useState<Sale | null>(null);
 
   const range = useMemo(() => {
     if (preset === "custom") return { start: customStart, end: customEnd };
@@ -65,6 +68,17 @@ export default function ReportsDashboard({ sales, onReprintSale }: ReportsDashbo
 
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
+      {editingSale && (
+        <EditSaleModal
+          sale={editingSale}
+          onClose={() => setEditingSale(null)}
+          onSave={(input) => {
+            onSaveSaleEdit(editingSale.id, input);
+            setEditingSale(null);
+          }}
+        />
+      )}
+
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
           <h2 className="text-3xl font-bold text-[#121212]">Sales Reports</h2>
@@ -179,25 +193,52 @@ export default function ReportsDashboard({ sales, onReprintSale }: ReportsDashbo
                 <th className="px-6 py-3">Customer</th>
                 <th className="px-6 py-3">Payment</th>
                 <th className="px-6 py-3 text-right">Total</th>
+                <th className="px-6 py-3 text-right">Edit</th>
                 <th className="px-6 py-3 text-right">Receipt</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 text-sm">
               {filteredSales.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
                     No sales found in the selected range.
                   </td>
                 </tr>
               ) : (
                 filteredSales.map((sale) => (
                   <tr key={sale.id} className="hover:bg-gray-50/50">
-                    <td className="px-6 py-3 font-medium text-gray-900">{sale.id}</td>
+                    <td className="px-6 py-3 font-medium text-gray-900">
+                      {sale.id}
+                      {!!sale.editHistory?.length && (
+                        <span
+                          title={`Edited ${sale.editHistory.length} time${sale.editHistory.length === 1 ? "" : "s"}`}
+                          className="ml-2 inline-block px-1.5 py-0.5 rounded-full bg-orange-50 text-[#F17D0C] text-[10px] font-bold uppercase tracking-wide"
+                        >
+                          Edited
+                        </span>
+                      )}
+                    </td>
                     <td className="px-6 py-3 text-gray-600">{new Date(sale.createdAt).toLocaleString()}</td>
                     <td className="px-6 py-3 text-gray-600">{sale.type}</td>
                     <td className="px-6 py-3 text-gray-800">{sale.customerName}</td>
                     <td className="px-6 py-3 text-gray-600">{sale.paymentMethod}</td>
                     <td className="px-6 py-3 text-right font-semibold text-gray-900">₱{sale.total.toFixed(2)}</td>
+                    <td className="px-6 py-3 text-right">
+                      <button
+                        onClick={() => setEditingSale(sale)}
+                        title="Edit sale details"
+                        className="p-2 rounded-lg text-gray-400 hover:text-[#562D07] hover:bg-orange-50 transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                      </button>
+                    </td>
                     <td className="px-6 py-3 text-right">
                       <button
                         onClick={() => onReprintSale?.(sale)}

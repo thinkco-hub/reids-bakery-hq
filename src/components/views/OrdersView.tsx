@@ -4,6 +4,7 @@ import OrderDetail from "../orders/OrderDetail";
 import type {
   Client,
   CreateOrderData,
+  EditOrderInput,
   MenuItemStock,
   Order,
   OrderDeliveryInput,
@@ -19,6 +20,7 @@ interface OrdersViewProps {
   viewingOrder: Order | null;
   onViewOrder: (order: Order | null) => void;
   onCreate: (data: CreateOrderData) => void;
+  onEditOrder: (id: OrderId, input: EditOrderInput) => void;
   onAdvanceStatus: (id: OrderId, status: OrderStatus | null) => void;
   onScheduleDelivery: (id: OrderId, input: OrderDeliveryInput) => void;
   onMarkDelivered: (id: OrderId) => void;
@@ -33,6 +35,7 @@ export default function OrdersView({
   viewingOrder,
   onViewOrder,
   onCreate,
+  onEditOrder,
   onAdvanceStatus,
   onScheduleDelivery,
   onMarkDelivered,
@@ -61,6 +64,7 @@ export default function OrdersView({
       onScheduleDelivery={onScheduleDelivery}
       onMarkDelivered={onMarkDelivered}
       onRecordPayment={onRecordPayment}
+      onEditOrder={onEditOrder}
       onGoToProduction={onGoToProduction}
     />
   );
