@@ -124,6 +124,8 @@ export interface Order {
   clientId: ClientId | null;
   /** Present on pre-orders created from the POS. */
   customerName?: string;
+  /** Present on POS-created orders or manual edits of walk-in orders. */
+  customerContact?: string;
   items: OrderItem[];
   requestedDate: ISODate;
   status: OrderStatus;
@@ -134,6 +136,8 @@ export interface Order {
   deliveredAt: ISODate | null;
   paymentMethod: PaymentMethod | null;
   amountPaid: number;
+  /** Appended by editOrder; absent until the order is edited. */
+  editHistory?: EditHistoryEntry[];
 }
 
 /** Payload of the create-order modal (CreateOrderModal). */
@@ -154,6 +158,32 @@ export interface OrderPaymentInput {
 export interface OrderDeliveryInput {
   deliveryDate: ISODate;
   assignedTo: string;
+}
+
+/** Payload of the edit-order modal (EditOrderModal). */
+export interface EditOrderInput {
+  customerName: string;
+  customerContact: string;
+  items: OrderItem[];
+  /** Renders one line in the history summary; names are resolved by the caller. */
+  describeItem: (line: OrderItem) => string;
+}
+
+// ---------- Edit history ----------
+/** One changed field captured when an order or sale is edited. */
+export interface FieldEdit {
+  field: string;
+  label: string;
+  from: string;
+  to: string;
+}
+
+/** One save action in an edited record's history. */
+export interface EditHistoryEntry {
+  id: string;
+  at: ISODateTime;
+  userName: string;
+  changes: FieldEdit[];
 }
 
 // ---------- POS / sales ----------
@@ -182,6 +212,15 @@ export interface Sale {
   deliveryDate: ISODate;
   notes: string;
   createdAt: ISODateTime;
+  /** Appended by editSale; absent until the sale is edited. */
+  editHistory?: EditHistoryEntry[];
+}
+
+/** Payload of the edit-sale modal (EditSaleModal). */
+export interface EditSaleInput {
+  customerName: string;
+  customerContact: string;
+  items: CartItem[];
 }
 
 /** State of the order confirmation modal (OrderConfirmationModal). */
@@ -329,7 +368,9 @@ export type AuditActionType =
   | "auth.logout"
   | "user.role_changed"
   | "sale.completed"
+  | "sale.edited"
   | "order.created"
+  | "order.edited"
   | "order.payment_recorded"
   | "order.status_advanced"
   | "order.delivery_scheduled"

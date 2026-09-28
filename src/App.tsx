@@ -133,6 +133,7 @@ export default function BakeryCommandCenter() {
     setViewingOrder,
     createOrder,
     createOrderFromSale,
+    editOrder,
     recordOrderPayment,
     advanceOrderStatus,
     scheduleOrderDelivery,
@@ -181,6 +182,7 @@ export default function BakeryCommandCenter() {
     setSaleType,
     closeConfirmModal,
     completeSale,
+    editSale,
     sales,
     receipt,
     setReceipt,
@@ -348,6 +350,7 @@ export default function BakeryCommandCenter() {
             viewingOrder={viewingOrder}
             onViewOrder={setViewingOrder}
             onCreate={createOrder}
+            onEditOrder={editOrder}
             onAdvanceStatus={advanceOrderStatus}
             onScheduleDelivery={scheduleOrderDelivery}
             onMarkDelivered={markOrderDelivered}
@@ -455,6 +458,7 @@ export default function BakeryCommandCenter() {
             activeTab={activeTab}
             sales={sales}
             onReprintSale={setReceipt}
+            onSaveSaleEdit={editSale}
             expenses={expenses}
             dayClosings={dayClosings}
             onAddExpense={addExpense}

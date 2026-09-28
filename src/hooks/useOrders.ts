@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { initialOrders } from "../data/initialOrders";
 import { recordAuditEvent } from "../utils/auditLog";
+import { buildEditHistoryEntry, diffField, diffLines } from "../utils/editHistory";
+import { isValidCustomerContact } from "../utils/orders";
 import type {
+  AuditActionType,
   ClientId,
   CreateOrderData,
+  EditOrderInput,
+  FieldEdit,
   Order,
   OrderDeliveryInput,
   OrderId,
@@ -25,11 +30,13 @@ const buildOrder = (
   data: Omit<CreateOrderData, "clientId"> & {
     clientId: ClientId | null;
     customerName?: string;
+    customerContact?: string;
   }
 ): Order => ({
   id,
   clientId: data.clientId,
   customerName: data.customerName,
+  customerContact: data.customerContact,
   items: data.items,
   requestedDate: data.requestedDate,
   status: "Pending",
@@ -61,7 +68,7 @@ export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
 
   const logOrderEvent = (
-    action: "order.created" | "order.payment_recorded" | "order.status_advanced" | "order.delivery_scheduled" | "order.delivered",
+    action: AuditActionType,
     orderId: OrderId,
     details: string
   ) => {
@@ -92,6 +99,7 @@ export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
     const order: Order = buildOrder(nextOrderId(), {
       clientId: null,
       customerName: sale.customerName,
+      customerContact: sale.customerContact,
       items: sale.items.map((item) => ({
         menuItemId: item.id,
         name: item.name,
@@ -132,6 +140,46 @@ export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
     });
     setOrders((prev) => prev.map((o) => (o.id === id ? apply(o) : o)));
     setViewingOrder((prev) => (prev && prev.id === id ? apply(prev) : prev));
+  };
+
+  /**
+   * Applies customer-detail and item edits to an order, appending a history
+   * entry describing every changed field. Delivered orders keep their
+   * recorded items (stock was already deducted at delivery).
+   */
+  const editOrder = (id: OrderId, input: EditOrderInput) => {
+    const order = orders.find((o) => o.id === id);
+    // Guardrail: never edit a delivered order (also disabled in OrderDetail).
+    if (!order || order.status === "Delivered") return;
+    const isClientOrder = order.clientId !== null;
+    // Contact is only editable on walk-in/POS orders; client records own their
+    // own contact details.
+    if (!isClientOrder && !isValidCustomerContact(input.customerContact)) return;
+
+    const changes: FieldEdit[] = [];
+    if (!isClientOrder) {
+      const name = diffField("customerName", "Customer name", order.customerName || "", input.customerName);
+      if (name) changes.push(name);
+      const contact = diffField("customerContact", "Contact number", order.customerContact || "", input.customerContact);
+      if (contact) changes.push(contact);
+    }
+    const items = diffLines("items", "Ordered items", order.items, input.items, input.describeItem);
+    if (items) changes.push(items);
+    if (changes.length === 0) return;
+
+    const entry = buildEditHistoryEntry(currentUser?.name || "Unknown", changes);
+    patchOrder(id, (o) => ({
+      ...(isClientOrder
+        ? {}
+        : { customerName: input.customerName.trim(), customerContact: input.customerContact.trim() }),
+      items: input.items,
+      editHistory: [...(o.editHistory || []), entry],
+    }));
+    logOrderEvent(
+      "order.edited",
+      id,
+      `Edited order ${id}: ${changes.map((c) => `${c.label} "${c.from}" -> "${c.to}"`).join("; ")}`
+    );
   };
 
   const recordOrderPayment = (id: OrderId, { method, amount }: OrderPaymentInput) => {
@@ -176,6 +224,7 @@ export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
     setViewingOrder,
     createOrder,
     createOrderFromSale,
+    editOrder,
     recordOrderPayment,
     advanceOrderStatus,
     scheduleOrderDelivery,

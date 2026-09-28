@@ -1,14 +1,18 @@
 import { useState } from "react";
 import { recordAuditEvent } from "../utils/auditLog";
+import { buildEditHistoryEntry, diffField, diffLines } from "../utils/editHistory";
 import { isValidCustomerContact } from "../utils/orders";
 import type {
   CartItem,
   ConfirmModalState,
+  EditSaleInput,
+  FieldEdit,
   OrderItem,
   PaymentMethod,
   PosCategory,
   PosProduct,
   Sale,
+  SaleId,
   SaleType,
   User,
 } from "../types/domain";
@@ -22,6 +26,12 @@ const EMPTY_CONFIRM_MODAL: ConfirmModalState = {
   deliveryDate: "",
   notes: "",
 };
+
+/** VAT applied to every sale subtotal. */
+const SALES_TAX_RATE = 0.05;
+
+/** How one sale line reads in an edit-history entry. */
+const describeSaleLine = (line: CartItem) => `${line.qty} × ${line.name}`;
 
 interface UsePosOptions {
   posProducts: PosProduct[];
@@ -64,7 +74,7 @@ export function usePos({
     (sum, item) => sum + item.price * item.qty,
     0
   );
-  const cartTax = cartSubtotal * 0.05;
+  const cartTax = cartSubtotal * SALES_TAX_RATE;
   const cartTotal = cartSubtotal + cartTax;
   // Local calendar date (not UTC) so "today" matches the cashier's clock — in UTC+8,
   // toISOString() is still yesterday between 00:00 and 08:00.
@@ -158,6 +168,58 @@ export function usePos({
     setReceipt(sale);
   };
 
+  /**
+   * Edits a completed sale's customer details or items from the sales log,
+   * appending a history entry per changed field. Money totals are recomputed
+   * from the saved lines; reports, CSV export and reprinted receipts follow.
+   */
+  const editSale = (id: SaleId, input: EditSaleInput) => {
+    const sale = sales.find((s) => s.id === id);
+    if (!sale) return;
+    // Guardrails mirrored by the disabled Save in EditSaleModal.
+    if (!input.customerName.trim()) return;
+    if (!isValidCustomerContact(input.customerContact)) return;
+
+    const changes: FieldEdit[] = [];
+    const name = diffField("customerName", "Customer name", sale.customerName, input.customerName);
+    if (name) changes.push(name);
+    const contact = diffField("customerContact", "Contact number", sale.customerContact, input.customerContact);
+    if (contact) changes.push(contact);
+    const items = diffLines("items", "Ordered items", sale.items, input.items, describeSaleLine);
+    if (items) changes.push(items);
+    if (changes.length === 0) return;
+
+    const entry = buildEditHistoryEntry(currentUser?.name || "Unknown", changes);
+    setSales((prev) =>
+      prev.map((s) => {
+        if (s.id !== id) return s;
+        const subtotal = input.items.reduce((sum, item) => sum + item.price * item.qty, 0);
+        const tax = subtotal * SALES_TAX_RATE;
+        return {
+          ...s,
+          customerName: input.customerName.trim(),
+          customerContact: input.customerContact.trim(),
+          items: input.items,
+          subtotal,
+          tax,
+          total: subtotal + tax,
+          editHistory: [...(s.editHistory || []), entry],
+        };
+      })
+    );
+    if (currentUser) {
+      recordAuditEvent({
+        userId: currentUser.id,
+        userName: currentUser.name,
+        userRole: currentUser.role,
+        action: "sale.edited",
+        entityType: "Sale",
+        entityId: id,
+        details: `Edited sale ${id}: ${changes.map((c) => `${c.label} "${c.from}" -> "${c.to}"`).join("; ")}`,
+      });
+    }
+  };
+
   const updateConfirmField = (
     field: Exclude<keyof ConfirmModalState, "isOpen" | "saleType">,
     value: string
@@ -203,6 +265,7 @@ export function usePos({
     setSaleType,
     closeConfirmModal,
     completeSale,
+    editSale,
     sales,
     receipt,
     setReceipt,

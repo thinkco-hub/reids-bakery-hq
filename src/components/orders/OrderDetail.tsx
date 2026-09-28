@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import OrderStatusBadge from "./OrderStatusBadge";
 import PaymentStatusBadge from "./PaymentStatusBadge";
+import EditOrderModal from "./EditOrderModal";
+import EditHistoryList from "../common/EditHistoryList";
 import { CalendarIcon } from "../icons";
 import {
   computeAmountDue,
@@ -14,6 +16,7 @@ import {
 import type { FormEvent } from "react";
 import type {
   Client,
+  EditOrderInput,
   MenuItemStock,
   Order,
   OrderDeliveryInput,
@@ -184,6 +187,7 @@ interface OrderDetailProps {
   onScheduleDelivery: (id: OrderId, data: OrderDeliveryInput) => void;
   onMarkDelivered: (id: OrderId) => void;
   onRecordPayment: (id: OrderId, data: OrderPaymentInput) => void;
+  onEditOrder: (id: OrderId, input: EditOrderInput) => void;
   onGoToProduction: () => void;
 }
 
@@ -196,10 +200,12 @@ export default function OrderDetail({
   onScheduleDelivery,
   onMarkDelivered,
   onRecordPayment,
+  onEditOrder,
   onGoToProduction,
 }: OrderDetailProps) {
   const [isScheduling, setIsScheduling] = useState(false);
   const [isRecordingPayment, setIsRecordingPayment] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const shortfalls = order.status !== "Delivered" ? getOrderShortfalls(order, menuInventory) : [];
   const total = computeOrderTotal(order);
   const amountDue = computeAmountDue(order);
@@ -227,6 +233,19 @@ export default function OrderDetail({
         />
       )}
 
+      {isEditing && (
+        <EditOrderModal
+          order={order}
+          client={client}
+          menuInventory={menuInventory}
+          onClose={() => setIsEditing(false)}
+          onSave={(input) => {
+            onEditOrder(order.id, input);
+            setIsEditing(false);
+          }}
+        />
+      )}
+
       <div className="flex items-center text-[15px] mb-6 text-gray-500 font-medium tracking-wide">
         <button onClick={onBack} className="hover:text-[#F17D0C] transition-colors">
           Orders
@@ -251,6 +270,14 @@ export default function OrderDetail({
           <div className="flex flex-wrap items-center gap-3 md:ml-auto">
             <OrderStatusBadge status={order.status} />
             <PaymentStatusBadge status={paymentStatus} />
+            <button
+              onClick={() => setIsEditing(true)}
+              disabled={order.status === "Delivered"}
+              title={order.status === "Delivered" ? "Delivered orders can no longer be edited" : undefined}
+              className="px-4 py-1.5 rounded-full border border-gray-300 bg-white text-gray-800 text-sm font-semibold shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors"
+            >
+              Edit Details
+            </button>
             {amountDue > 0 && (
               <button
                 onClick={() => setIsRecordingPayment(true)}
@@ -327,7 +354,9 @@ export default function OrderDetail({
             <div>
               <p className="text-base font-bold text-[#121212]">{client ? client.name : order.customerName || "—"}</p>
               <p className="text-xs text-gray-400 font-medium">
-                {client?.contact || (order.customerName ? "Walk-in / POS customer" : "No contact on file")}
+                {client?.contact ||
+                  order.customerContact ||
+                  (order.customerName ? "Walk-in / POS customer" : "No contact on file")}
               </p>
             </div>
           </div>
@@ -509,6 +538,23 @@ export default function OrderDetail({
           </div>
         </div>
       </div>
+
+      {order.editHistory && order.editHistory.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
+          <div className="flex items-center mb-4">
+            <svg className="w-5 h-5 text-orange-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <h3 className="text-base font-bold text-[#121212]">Edit History</h3>
+          </div>
+          <EditHistoryList entries={order.editHistory} />
+        </div>
+      )}
     </div>
   );
 }
