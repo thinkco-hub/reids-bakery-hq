@@ -272,14 +272,15 @@ export default function OrderDetail({
           </div>
         </div>
         {/* Pills and actions are separate flex units: one shared wrap container let the
-            buttons reflow onto the pills' row. They stack right-aligned beside the title
-            until xl, where they merge into the single desktop line. */}
-        <div className="flex flex-col items-end gap-3 xl:flex-row xl:flex-wrap xl:items-center">
-          <div className="flex flex-wrap items-center justify-end gap-3">
+            buttons reflow onto the pills' row. On phones they stack under the title, sharing
+            its left edge so a wrapped row keeps that edge still. From md they sit opposite the
+            title and run to the right edge, and at xl they merge into the single desktop line. */}
+        <div className="ml-14 flex flex-col items-start gap-3 md:ml-0 md:items-end xl:flex-row xl:flex-wrap xl:items-center">
+          <div className="flex flex-wrap items-center gap-3 md:justify-end">
             <OrderStatusBadge status={order.status} />
             <PaymentStatusBadge status={paymentStatus} />
           </div>
-          <div className="flex flex-wrap items-center justify-end gap-3">
+          <div className="flex flex-wrap items-center gap-3 md:justify-end">
             <button
               onClick={() => setIsEditing(true)}
               disabled={order.status === "Delivered"}
