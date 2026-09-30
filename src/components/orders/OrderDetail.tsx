@@ -268,13 +268,14 @@ export default function OrderDetail({
             <h2 className="text-[32px] font-bold text-[#121212] leading-none">Order {order.id}</h2>
           </div>
           {/* Pills and actions are separate flex units: one shared wrap container let
-              the buttons reflow onto the pills' row at narrow widths. */}
-          <div className="flex flex-col items-start gap-3 xl:flex-row xl:flex-wrap xl:items-center xl:ml-auto">
-            <div className="flex flex-wrap items-center gap-3">
+              the buttons reflow onto the pills' row at narrow widths. Both units hug the
+              right edge so the cluster stays anchored where it sits on desktop. */}
+          <div className="flex flex-col items-end gap-3 xl:flex-row xl:flex-wrap xl:items-center xl:ml-auto">
+            <div className="flex flex-wrap items-center justify-end gap-3">
               <OrderStatusBadge status={order.status} />
               <PaymentStatusBadge status={paymentStatus} />
             </div>
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center justify-end gap-3">
               <button
                 onClick={() => setIsEditing(true)}
                 disabled={order.status === "Delivered"}
