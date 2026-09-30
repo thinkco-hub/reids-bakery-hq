@@ -255,7 +255,7 @@ export default function OrderDetail({
       </div>
 
       <div className="flex flex-col gap-2 mb-8">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        <div className="flex flex-col gap-3 xl:flex-row xl:justify-between xl:items-center">
           <div className="flex items-center gap-4">
             <button
               onClick={onBack}
@@ -267,52 +267,58 @@ export default function OrderDetail({
             </button>
             <h2 className="text-[32px] font-bold text-[#121212] leading-none">Order {order.id}</h2>
           </div>
-          <div className="flex flex-wrap items-center gap-3 md:ml-auto">
-            <OrderStatusBadge status={order.status} />
-            <PaymentStatusBadge status={paymentStatus} />
-            <button
-              onClick={() => setIsEditing(true)}
-              disabled={order.status === "Delivered"}
-              title={order.status === "Delivered" ? "Delivered orders can no longer be edited" : undefined}
-              className="px-4 py-1.5 rounded-full border border-gray-300 bg-white text-gray-800 text-sm font-semibold shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors"
-            >
-              Edit Details
-            </button>
-            {amountDue > 0 && (
+          {/* Pills and actions are separate flex units: one shared wrap container let
+              the buttons reflow onto the pills' row at narrow widths. */}
+          <div className="flex flex-col items-start gap-3 xl:flex-row xl:flex-wrap xl:items-center xl:ml-auto">
+            <div className="flex flex-wrap items-center gap-3">
+              <OrderStatusBadge status={order.status} />
+              <PaymentStatusBadge status={paymentStatus} />
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
               <button
-                onClick={() => setIsRecordingPayment(true)}
-                className="px-4 py-1.5 rounded-full border border-gray-300 bg-white text-gray-800 text-sm font-semibold shadow-sm hover:bg-gray-50 transition-colors"
+                onClick={() => setIsEditing(true)}
+                disabled={order.status === "Delivered"}
+                title={order.status === "Delivered" ? "Delivered orders can no longer be edited" : undefined}
+                className="px-4 py-1.5 rounded-full border border-gray-300 bg-white text-gray-800 text-sm font-semibold shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors"
               >
-                Record Payment
+                Edit Details
               </button>
-            )}
-            {advanceLabel && (
-              <button
-                onClick={() => onAdvanceStatus(order.id, nextStatus(order.status))}
-                className="px-4 py-1.5 rounded-full border border-gray-300 bg-white text-gray-800 text-sm font-semibold shadow-sm hover:bg-gray-50 transition-colors"
-              >
-                {advanceLabel}
-              </button>
-            )}
-            {order.status === "Ready" && (
-              <>
+              {amountDue > 0 && (
                 <button
-                  onClick={() => setIsScheduling(true)}
+                  onClick={() => setIsRecordingPayment(true)}
                   className="px-4 py-1.5 rounded-full border border-gray-300 bg-white text-gray-800 text-sm font-semibold shadow-sm hover:bg-gray-50 transition-colors"
                 >
-                  {order.deliveryDate ? "Reschedule Delivery" : "Schedule Delivery"}
+                  Record Payment
                 </button>
+              )}
+              {advanceLabel && (
                 <button
-                  onClick={() => onMarkDelivered(order.id)}
-                  className="px-4 py-1.5 rounded-full bg-[#562D07] hover:bg-[#3a1d04] text-white text-sm font-semibold shadow-sm transition-colors"
+                  onClick={() => onAdvanceStatus(order.id, nextStatus(order.status))}
+                  className="px-4 py-1.5 rounded-full border border-gray-300 bg-white text-gray-800 text-sm font-semibold shadow-sm hover:bg-gray-50 transition-colors"
                 >
-                  Mark Delivered
+                  {advanceLabel}
                 </button>
-              </>
-            )}
+              )}
+              {order.status === "Ready" && (
+                <>
+                  <button
+                    onClick={() => setIsScheduling(true)}
+                    className="px-4 py-1.5 rounded-full border border-gray-300 bg-white text-gray-800 text-sm font-semibold shadow-sm hover:bg-gray-50 transition-colors"
+                  >
+                    {order.deliveryDate ? "Reschedule Delivery" : "Schedule Delivery"}
+                  </button>
+                  <button
+                    onClick={() => onMarkDelivered(order.id)}
+                    className="px-4 py-1.5 rounded-full bg-[#562D07] hover:bg-[#3a1d04] text-white text-sm font-semibold shadow-sm transition-colors"
+                  >
+                    Mark Delivered
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
-        <p className="text-gray-500 text-[15px] font-medium tracking-wide md:ml-14">
+        <p className="text-gray-500 text-[15px] font-medium tracking-wide xl:ml-14">
           Requested for {order.requestedDate}
         </p>
       </div>
