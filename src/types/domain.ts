@@ -140,7 +140,7 @@ export interface Order {
   editHistory?: EditHistoryEntry[];
 }
 
-/** Payload of the create-order modal (CreateOrderModal). */
+/** Order payload consumed by useOrders.buildOrder; POS is the only creator. */
 export interface CreateOrderData {
   clientId: ClientId;
   requestedDate: ISODate;

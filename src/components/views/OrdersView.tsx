@@ -3,7 +3,6 @@ import OrdersList from "../orders/OrdersList";
 import OrderDetail from "../orders/OrderDetail";
 import type {
   Client,
-  CreateOrderData,
   EditOrderInput,
   MenuItemStock,
   Order,
@@ -19,7 +18,6 @@ interface OrdersViewProps {
   menuInventory: MenuItemStock[];
   viewingOrder: Order | null;
   onViewOrder: (order: Order | null) => void;
-  onCreate: (data: CreateOrderData) => void;
   onEditOrder: (id: OrderId, input: EditOrderInput) => void;
   onAdvanceStatus: (id: OrderId, status: OrderStatus | null) => void;
   onScheduleDelivery: (id: OrderId, input: OrderDeliveryInput) => void;
@@ -34,7 +32,6 @@ export default function OrdersView({
   menuInventory,
   viewingOrder,
   onViewOrder,
-  onCreate,
   onEditOrder,
   onAdvanceStatus,
   onScheduleDelivery,
@@ -48,7 +45,6 @@ export default function OrdersView({
         orders={orders}
         clients={clients}
         menuInventory={menuInventory}
-        onCreate={onCreate}
         onView={onViewOrder}
       />
     );
