@@ -141,7 +141,7 @@ export default function ProductionRunsList({
 
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-[#121212]">Production Runs</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#121212]">Production Runs</h2>
           <p className="text-gray-500 mt-1">Schedule batches and track them against ingredient stock.</p>
         </div>
         <button
