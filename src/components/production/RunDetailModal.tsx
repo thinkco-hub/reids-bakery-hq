@@ -1,19 +1,18 @@
 import React from "react";
 import { createPortal } from "react-dom";
 import { computeBatches, computeRequiredIngredients, isRunFeasible } from "../../utils/production";
-import type { IngredientStock, MenuItemStock, ProductionRun, ProductionRunId, Recipe } from "../../types/domain";
+import type { IngredientStock, ProductionRun, ProductionRunId, Recipe } from "../../types/domain";
 
 interface RunDetailModalProps {
   run: ProductionRun;
   recipe: Recipe;
-  menuItem: MenuItemStock | undefined;
   ingredients: IngredientStock[];
   onClose: () => void;
   onComplete: (id: ProductionRunId) => void;
   onDelete: () => void;
 }
 
-export default function RunDetailModal({ run, recipe, menuItem, ingredients, onClose, onComplete, onDelete }: RunDetailModalProps) {
+export default function RunDetailModal({ run, recipe, ingredients, onClose, onComplete, onDelete }: RunDetailModalProps) {
   const batches = computeBatches(run.plannedQty, recipe);
   const required = computeRequiredIngredients(run, recipe, ingredients);
   const feasible = isRunFeasible(run, recipe, ingredients);
@@ -28,7 +27,7 @@ export default function RunDetailModal({ run, recipe, menuItem, ingredients, onC
     >
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg animate-fadeIn max-h-[85dvh] flex flex-col overflow-hidden">
         <div className="flex-1 min-h-0 overflow-y-auto p-6 md:p-8">
-          <div className="flex items-center justify-between gap-3 mb-1">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mb-1">
             <h2 className="min-w-0 text-lg md:text-2xl font-bold text-[#121212]">{recipe.name}</h2>
             {isCompleted ? (
               <span className="shrink-0 whitespace-nowrap px-3 py-1 rounded-full border border-green-300 bg-green-50 text-green-700 text-xs font-bold">
@@ -44,9 +43,7 @@ export default function RunDetailModal({ run, recipe, menuItem, ingredients, onC
               </span>
             )}
           </div>
-          <p className="text-gray-500 text-sm mb-6">
-            {menuItem ? menuItem.name : "—"} · Planned {run.plannedDate}
-          </p>
+          <p className="text-gray-500 text-sm mb-6">Planned {run.plannedDate}</p>
 
           <div className="grid grid-cols-3 gap-3 mb-6">
             <div className="bg-gray-50 rounded-lg p-3 text-center">
