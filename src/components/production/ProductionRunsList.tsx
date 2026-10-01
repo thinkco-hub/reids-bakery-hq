@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ScheduleRunModal from "./ScheduleRunModal";
 import RunDetailModal from "./RunDetailModal";
+import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
 import { getRunStatus, RUN_STATUS_LABELS } from "../../utils/production";
 import type {
   IngredientStock,
@@ -47,6 +48,7 @@ export default function ProductionRunsList({
   const [statusFilter, setStatusFilter] = useState<"all" | ProductionRunDisposition>("all");
   const [isScheduling, setIsScheduling] = useState(false);
   const [selectedRunId, setSelectedRunId] = useState<ProductionRunId | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<ProductionRun | null>(null);
 
   const withStatus = productionRuns.map((run) => {
     const recipe = recipes.find((r) => r.id === run.recipeId) || null;
@@ -96,9 +98,14 @@ export default function ProductionRunsList({
     setSelectedRunId(null);
   };
 
-  const handleDelete = (run: ProductionRun) => {
-    if (!window.confirm(`Delete this scheduled run (${run.plannedQty} planned)? This can't be undone.`)) return;
-    onDelete(run.id);
+  const pendingRecipe = pendingDelete
+    ? recipes.find((recipe) => recipe.id === pendingDelete.recipeId)
+    : undefined;
+
+  const confirmPendingDelete = () => {
+    if (!pendingDelete) return;
+    onDelete(pendingDelete.id);
+    setPendingDelete(null);
     setSelectedRunId(null);
   };
 
@@ -115,13 +122,26 @@ export default function ProductionRunsList({
           ingredients={ingredients}
           onClose={() => setSelectedRunId(null)}
           onComplete={handleComplete}
-          onDelete={() => handleDelete(selectedModalEntry.run)}
+          onDelete={() => setPendingDelete(selectedModalEntry.run)}
+        />
+      )}
+      {pendingDelete && (
+        <DeleteConfirmDialog
+          title="Delete this run?"
+          message={`Deleting ${
+            pendingRecipe
+              ? `${pendingRecipe.name} (${pendingDelete.plannedQty} ${pendingRecipe.yieldUnit})`
+              : "this scheduled run"
+          } is irreversible and cannot be undone.`}
+          confirmLabel="Delete run"
+          onConfirm={confirmPendingDelete}
+          onCancel={() => setPendingDelete(null)}
         />
       )}
 
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-[#121212]">Production Runs</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#121212]">Production Runs</h2>
           <p className="text-gray-500 mt-1">Schedule batches and track them against ingredient stock.</p>
         </div>
         <button
@@ -197,7 +217,7 @@ export default function ProductionRunsList({
                             </button>
                             {status !== "completed" && (
                               <button
-                                onClick={() => handleDelete(run)}
+                                onClick={() => setPendingDelete(run)}
                                 className="text-gray-400 hover:text-red-500 hover:bg-red-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                               >
                                 Delete
