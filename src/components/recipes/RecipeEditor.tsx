@@ -156,7 +156,7 @@ export default function RecipeEditor({ recipe, ingredients, pricingRules, onCanc
                   <select
                     value={form.category}
                     onChange={(e) => updateCategory(e.target.value as PosItemCategory)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                    className="select-chevron w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
                   >
                     {CATEGORY_OPTIONS.map((cat) => (
                       <option key={cat} value={cat}>
@@ -267,7 +267,7 @@ export default function RecipeEditor({ recipe, ingredients, pricingRules, onCanc
                           updateLine(idx, "ingredientId", e.target.value);
                           if (selected) updateLine(idx, "unit", selected.unit);
                         }}
-                        className="flex-1 w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                        className="select-chevron flex-1 w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
                       >
                         <option value="">Select ingredient...</option>
                         {ingredients.map((i) => (

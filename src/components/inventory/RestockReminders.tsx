@@ -46,7 +46,7 @@ export default function RestockReminders({ ingredients, reminders, onAdd, onTogg
               <select
                 value={form.ingredientId}
                 onChange={(e) => setForm({ ...form, ingredientId: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                className="select-chevron w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
               >
                 {ingredients.map((i) => (
                   <option key={i.id} value={i.id}>

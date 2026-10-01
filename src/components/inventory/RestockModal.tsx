@@ -39,7 +39,7 @@ export default function RestockModal({
               Item to Restock
             </label>
             <select
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+              className="select-chevron w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
               value={modal.selectedItemId}
               onChange={(e) => onItemChange(e.target.value)}
             >

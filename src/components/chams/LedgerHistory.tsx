@@ -56,7 +56,7 @@ export default function LedgerHistory({ branches, products, beginnings, movement
           <select
             value={branchId}
             onChange={(e) => setBranchId(e.target.value)}
-            className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800 bg-white shadow-sm"
+            className="select-chevron pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800 bg-white shadow-sm"
           >
             {branches.map((b) => (
               <option key={b.id} value={b.id}>
@@ -67,7 +67,7 @@ export default function LedgerHistory({ branches, products, beginnings, movement
           <select
             value={productId}
             onChange={(e) => setProductId(e.target.value)}
-            className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800 bg-white shadow-sm"
+            className="select-chevron pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800 bg-white shadow-sm"
           >
             {products.map((p) => (
               <option key={p.id} value={p.id}>

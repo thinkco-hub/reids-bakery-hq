@@ -106,7 +106,7 @@ export default function UserManagementView({
                               ? "Only a Super Admin can change this user's role"
                               : undefined
                           }
-                          className="px-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-800 focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed cursor-pointer"
+                          className="select-chevron pl-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-800 focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed cursor-pointer"
                         >
                           {options.map(({ role, allowed }) => (
                             <option key={role} value={role} disabled={!allowed}>
