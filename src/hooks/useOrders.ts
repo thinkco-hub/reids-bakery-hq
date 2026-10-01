@@ -24,7 +24,7 @@ import type {
 let nextOrderSeq = 1048 + initialOrders.length;
 const nextOrderId = (): OrderId => `#${nextOrderSeq++}`;
 
-/** Shared order construction for createOrder / createOrderFromSale. */
+/** Shared order construction for createOrderFromSale. */
 const buildOrder = (
   id: OrderId,
   data: Omit<CreateOrderData, "clientId"> & {
@@ -82,16 +82,6 @@ export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
       entityId: orderId,
       details,
     });
-  };
-
-  const createOrder = (data: CreateOrderData) => {
-    const order = buildOrder(nextOrderId(), data);
-    setOrders((prev) => [order, ...prev]);
-    logOrderEvent(
-      "order.created",
-      order.id,
-      `Created order ${order.id}${order.customerName ? ` for ${order.customerName}` : ""}`
-    );
   };
 
   const createOrderFromSale = (sale: Sale) => {
@@ -222,7 +212,6 @@ export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
     orders,
     viewingOrder,
     setViewingOrder,
-    createOrder,
     createOrderFromSale,
     editOrder,
     recordOrderPayment,

@@ -131,7 +131,6 @@ export default function BakeryCommandCenter() {
     orders,
     viewingOrder,
     setViewingOrder,
-    createOrder,
     createOrderFromSale,
     editOrder,
     recordOrderPayment,
@@ -349,7 +348,6 @@ export default function BakeryCommandCenter() {
             menuInventory={menuInventory}
             viewingOrder={viewingOrder}
             onViewOrder={setViewingOrder}
-            onCreate={createOrder}
             onEditOrder={editOrder}
             onAdvanceStatus={advanceOrderStatus}
             onScheduleDelivery={scheduleOrderDelivery}

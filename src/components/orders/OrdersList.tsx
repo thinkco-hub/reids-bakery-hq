@@ -1,25 +1,22 @@
 import React, { useState } from "react";
-import CreateOrderModal from "./CreateOrderModal";
 import OrderCardList from "./OrderCardList";
 import OrderStatusBadge from "./OrderStatusBadge";
 import PaymentStatusBadge from "./PaymentStatusBadge";
 import { SearchIcon } from "../icons";
 import { computeOrderTotal, getPaymentStatus, hasShortfall, ORDER_STATUSES } from "../../utils/orders";
-import type { Client, CreateOrderData, MenuItemStock, Order, OrderStatus } from "../../types/domain";
+import type { Client, MenuItemStock, Order, OrderStatus } from "../../types/domain";
 
 interface OrdersListProps {
   orders: Order[];
   clients: Client[];
   menuInventory: MenuItemStock[];
-  onCreate: (data: CreateOrderData) => void;
   onView: (order: Order) => void;
 }
 
-export default function OrdersList({ orders, clients, menuInventory, onCreate, onView }: OrdersListProps) {
+export default function OrdersList({ orders, clients, menuInventory, onView }: OrdersListProps) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "All">("All");
   const [dateFilter, setDateFilter] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
 
   const clientName = (order: Order) =>
     clients.find((c) => c.id === order.clientId)?.name || order.customerName || "—";
@@ -34,41 +31,12 @@ export default function OrdersList({ orders, clients, menuInventory, onCreate, o
     return matchStatus && matchDate && matchSearch;
   });
 
-  const handleCreate = (data: CreateOrderData) => {
-    onCreate(data);
-    setIsCreating(false);
-  };
-
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
-      {isCreating && (
-        <CreateOrderModal
-          clients={clients}
-          menuInventory={menuInventory}
-          onClose={() => setIsCreating(false)}
-          onCreate={handleCreate}
-        />
-      )}
-
-      <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
-        <div>
-          <h2 className="text-3xl font-bold text-[#121212]">Orders</h2>
-          <p className="text-gray-500 mt-1">Manage all customer orders and production status.</p>
-        </div>
-        <button
-          onClick={() => setIsCreating(true)}
-          disabled={clients.length === 0}
-          className="px-4 py-2.5 rounded-lg bg-[#562D07] hover:bg-[#3a1d04] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold text-sm shadow-sm transition-colors whitespace-nowrap"
-        >
-          + New Order
-        </button>
+      <header className="mb-6 md:mb-8">
+        <h2 className="text-3xl font-bold text-[#121212]">Orders</h2>
+        <p className="text-gray-500 mt-1">Manage all customer orders and production status.</p>
       </header>
-
-      {clients.length === 0 && (
-        <p className="text-sm text-gray-500 bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
-          No clients yet — add one under Clients before creating an order.
-        </p>
-      )}
 
       <div className="bg-white border border-gray-200 rounded-lg p-2 mb-4 flex flex-col md:flex-row items-center gap-2 shadow-sm">
         <div className="relative flex-1 w-full">
