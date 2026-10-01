@@ -24,6 +24,13 @@
   background-position: right 0.75rem center;
   background-size: 1rem;
   background-repeat: no-repeat;
+
+  /* A background image cannot be transformed, so the open state swaps in the
+     mirrored chevron rather than rotating it. :open is Baseline 2026; where it
+     isn't supported the arrow simply stays pointing down. */
+  &:open {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%236b7280' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12l4-4 4 4'/%3E%3C/svg%3E");
+  }
 }
 
 
