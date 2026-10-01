@@ -310,8 +310,8 @@ export default function RecipeEditor({ recipe, ingredients, pricingRules, onCanc
             </div>
           </div>
 
-          <div className="lg:col-span-1 space-y-6">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sticky top-4">
+          <div className="lg:col-span-1 flex flex-col gap-6 lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)]">
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 lg:min-h-0 lg:overflow-y-auto">
               <h3 className="text-lg font-bold text-[#121212] mb-4">Live Cost Summary</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between text-gray-600 font-medium">
@@ -360,7 +360,7 @@ export default function RecipeEditor({ recipe, ingredients, pricingRules, onCanc
               </div>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-3 lg:shrink-0">
               <button
                 type="button"
                 onClick={onCancel}
