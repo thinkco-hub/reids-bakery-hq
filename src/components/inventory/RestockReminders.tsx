@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import SelectField from "../common/SelectField";
 import type { FormEvent } from "react";
 import type { IngredientStock, IngredientId, ISODate, RestockReminder, RestockReminderData } from "../../types/domain";
 
@@ -43,17 +44,17 @@ export default function RestockReminders({ ingredients, reminders, onAdd, onTogg
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Ingredient</label>
-              <select
+              <SelectField
                 value={form.ingredientId}
                 onChange={(e) => setForm({ ...form, ingredientId: e.target.value })}
-                className="select-chevron w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
               >
                 {ingredients.map((i) => (
                   <option key={i.id} value={i.id}>
                     {i.name}
                   </option>
                 ))}
-              </select>
+              </SelectField>
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Due Date</label>

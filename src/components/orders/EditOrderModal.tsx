@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import EditHistoryList from "../common/EditHistoryList";
+import SelectField from "../common/SelectField";
 import type { FormEvent } from "react";
 import { isValidCustomerContact, toContactDigits } from "../../utils/orders";
 import type { Client, EditOrderInput, MenuItemStock, Order, OrderItem } from "../../types/domain";
@@ -126,10 +127,11 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
             <div className="space-y-2">
               {lines.map((line, idx) => (
                 <div key={idx} className="flex gap-2 items-center">
-                  <select
+                  <SelectField
                     value={line.menuItemId}
                     onChange={(e) => changeItem(idx, e.target.value)}
-                    className="select-chevron flex-1 pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800 text-sm"
+                    wrapperClassName="flex-1"
+                    className="w-full pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800 text-sm"
                   >
                     <option value="">Select item...</option>
                     {!menuInventory.some((m) => m.id === line.menuItemId) && line.menuItemId && (
@@ -140,7 +142,7 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
                         {m.name} (₱{m.price})
                       </option>
                     ))}
-                  </select>
+                  </SelectField>
                   <input
                     type="number"
                     min="1"

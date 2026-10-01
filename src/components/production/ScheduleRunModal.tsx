@@ -3,11 +3,12 @@ import { createPortal } from "react-dom";
 import { computeBatches } from "../../utils/production";
 import type { FormEvent } from "react";
 import type { Recipe, ScheduleRunData } from "../../types/domain";
+import SelectField from "../common/SelectField";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
 const SELECT_BASE =
-  "select-chevron rounded-lg border border-gray-300 py-2.5 text-gray-800 outline-none focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C]";
+  "rounded-lg border border-gray-300 py-2.5 text-gray-800 outline-none focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C]";
 
 interface ScheduleRunModalProps {
   recipes: Recipe[];
@@ -59,7 +60,7 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Recipe</label>
-              <select
+              <SelectField
                 value={form.recipeId}
                 onChange={(e) => setForm({ ...form, recipeId: e.target.value })}
                 className={`w-full pl-4 ${SELECT_BASE}`}
@@ -70,7 +71,7 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
                     {r.name}
                   </option>
                 ))}
-              </select>
+              </SelectField>
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Quantity to Produce</label>
@@ -84,14 +85,15 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
                   className="min-w-0 flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
                   required
                 />
-                <select
+                <SelectField
                   value={form.qtyUnit}
                   onChange={(e) => setForm({ ...form, qtyUnit: e.target.value })}
-                  className={`shrink-0 pl-3 font-medium ${SELECT_BASE}`}
+                  wrapperClassName="shrink-0"
+                  className={`pl-3 font-medium ${SELECT_BASE}`}
                 >
                   <option value="pcs">{recipe ? recipe.yieldUnit : "pcs"}</option>
                   <option value="batch">batch{qtyNum === 1 ? "" : "es"}</option>
-                </select>
+                </SelectField>
               </div>
               {recipe && form.qty && isBatchMode && (
                 <p className="text-xs text-gray-500 mt-1">

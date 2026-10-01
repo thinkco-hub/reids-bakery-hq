@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import SelectField from "../common/SelectField";
 import { formatMonthLabel, monthKey } from "../../utils/ledger";
 import type { FormEvent } from "react";
 import type { ChamsBranch, ChamsMovement, ChamsProduct, MonthKey } from "../../types/domain";
@@ -75,45 +76,45 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Branch</label>
-            <select
+            <SelectField
               value={branchId}
               onChange={(e) => setBranchId(e.target.value)}
-              className="select-chevron w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
+              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
             >
               {branches.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.name}
                 </option>
               ))}
-            </select>
+            </SelectField>
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Siopao Type</label>
-            <select
+            <SelectField
               value={productId}
               onChange={(e) => setProductId(e.target.value)}
-              className="select-chevron w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
+              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
             >
               {products.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
                 </option>
               ))}
-            </select>
+            </SelectField>
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Month</label>
-            <select
+            <SelectField
               value={month}
               onChange={(e) => setMonth(e.target.value)}
-              className="select-chevron w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
+              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
             >
               {MONTH_OPTIONS.map((m) => (
                 <option key={m} value={m}>
                   {formatMonthLabel(m)}
                 </option>
               ))}
-            </select>
+            </SelectField>
           </div>
         </div>
 

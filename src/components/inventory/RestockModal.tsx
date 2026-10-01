@@ -1,4 +1,5 @@
 import React from "react";
+import SelectField from "../common/SelectField";
 import type { RestockModalState, StockItem } from "../../types/domain";
 
 interface RestockModalProps {
@@ -38,8 +39,8 @@ export default function RestockModal({
             <label className="block text-sm font-semibold text-gray-700 mb-1">
               Item to Restock
             </label>
-            <select
-              className="select-chevron w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+            <SelectField
+              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
               value={modal.selectedItemId}
               onChange={(e) => onItemChange(e.target.value)}
             >
@@ -48,7 +49,7 @@ export default function RestockModal({
                   {item.name} (Current: {item.qty})
                 </option>
               ))}
-            </select>
+            </SelectField>
           </div>
 
           <div>
