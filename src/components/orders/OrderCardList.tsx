@@ -51,7 +51,7 @@ export default function OrderCardList({ orders, menuInventory, getClientName, on
           className="px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm font-medium text-gray-700 focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none"
         >
           <option value="created">Newest first</option>
-          <option value="date">Due date</option>
+          <option value="date">Requested date</option>
           <option value="total">Total amount</option>
         </select>
       </div>
@@ -120,7 +120,7 @@ function OrderCard({ order, clientName, menuInventory, expanded, onToggle, onVie
           )}
           {/* Ambiguous bare dates get an explicit label; status pills stay unlabeled. */}
           <span className="text-xs text-gray-600 ml-auto whitespace-nowrap">
-            Due {formatDueDate(order.requestedDate)}
+            Requested {formatDueDate(order.requestedDate)}
           </span>
           <svg
             className={`w-4 h-4 text-gray-400 transition-transform ${expanded ? "rotate-180" : ""}`}
