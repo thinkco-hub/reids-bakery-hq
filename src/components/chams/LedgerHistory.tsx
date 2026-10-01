@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import SelectField from "../common/SelectField";
 import { formatMonthLabel, buildLedgerHistoryForBranchProduct } from "../../utils/ledger";
 import { discrepancyLabel } from "../../utils/counts";
 import type { ChamsBeginning, ChamsBranch, ChamsCount, ChamsMovement, ChamsProduct, LedgerRow } from "../../types/domain";
@@ -53,28 +54,28 @@ export default function LedgerHistory({ branches, products, beginnings, movement
           </p>
         </div>
         <div className="flex gap-2">
-          <select
+          <SelectField
             value={branchId}
             onChange={(e) => setBranchId(e.target.value)}
-            className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800 bg-white shadow-sm"
+            className="pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800 bg-white shadow-sm"
           >
             {branches.map((b) => (
               <option key={b.id} value={b.id}>
                 {b.name}
               </option>
             ))}
-          </select>
-          <select
+          </SelectField>
+          <SelectField
             value={productId}
             onChange={(e) => setProductId(e.target.value)}
-            className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800 bg-white shadow-sm"
+            className="pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800 bg-white shadow-sm"
           >
             {products.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name}
               </option>
             ))}
-          </select>
+          </SelectField>
         </div>
       </header>
 

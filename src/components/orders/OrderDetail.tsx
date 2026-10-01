@@ -3,6 +3,7 @@ import OrderStatusBadge from "./OrderStatusBadge";
 import PaymentStatusBadge from "./PaymentStatusBadge";
 import EditOrderModal from "./EditOrderModal";
 import EditHistoryList from "../common/EditHistoryList";
+import SelectField from "../common/SelectField";
 import { CalendarIcon } from "../icons";
 import {
   computeAmountDue,
@@ -132,17 +133,17 @@ function RecordPaymentModal({
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Payment Method</label>
-            <select
+            <SelectField
               value={method}
               onChange={(e) => setMethod(e.target.value as PaymentMethod)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
             >
               {PAYMENT_METHODS.map((m) => (
                 <option key={m} value={m}>
                   {m}
                 </option>
               ))}
-            </select>
+            </SelectField>
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Amount Received</label>

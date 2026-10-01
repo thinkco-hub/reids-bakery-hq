@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import SelectField from "../common/SelectField";
 import { computeRecipeCost, suggestedPrice } from "../../utils/pricing";
 import type { FormEvent } from "react";
 import type {
@@ -153,17 +154,17 @@ export default function RecipeEditor({ recipe, ingredients, pricingRules, onCanc
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Category</label>
-                  <select
+                  <SelectField
                     value={form.category}
                     onChange={(e) => updateCategory(e.target.value as PosItemCategory)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                    className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
                   >
                     {CATEGORY_OPTIONS.map((cat) => (
                       <option key={cat} value={cat}>
                         {cat}
                       </option>
                     ))}
-                  </select>
+                  </SelectField>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Price (₱)</label>
@@ -260,14 +261,15 @@ export default function RecipeEditor({ recipe, ingredients, pricingRules, onCanc
                   const ingredient = ingredients.find((i) => i.id === line.ingredientId);
                   return (
                     <div key={idx} className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-                      <select
+                      <SelectField
                         value={line.ingredientId}
                         onChange={(e) => {
                           const selected = ingredients.find((i) => i.id === e.target.value);
                           updateLine(idx, "ingredientId", e.target.value);
                           if (selected) updateLine(idx, "unit", selected.unit);
                         }}
-                        className="flex-1 w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                        wrapperClassName="flex-1 w-full"
+                        className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
                       >
                         <option value="">Select ingredient...</option>
                         {ingredients.map((i) => (
@@ -275,7 +277,7 @@ export default function RecipeEditor({ recipe, ingredients, pricingRules, onCanc
                             {i.name}
                           </option>
                         ))}
-                      </select>
+                      </SelectField>
                       <input
                         type="number"
                         min="0"
