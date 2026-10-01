@@ -22,7 +22,10 @@ export default function RunDetailModal({ run, recipe, menuItem, ingredients, onC
 
   // Portalled to <body>: <main> is `relative z-10`, which caps this overlay's z-[100] below the mobile top bar's z-30.
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div
+      onClick={(event) => event.target === event.currentTarget && onClose()}
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+    >
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg animate-fadeIn max-h-[85dvh] flex flex-col overflow-hidden">
         <div className="flex-1 min-h-0 overflow-y-auto p-6 md:p-8">
           <div className="flex items-center justify-between gap-3 mb-1">
