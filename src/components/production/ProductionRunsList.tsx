@@ -118,7 +118,6 @@ export default function ProductionRunsList({
         <RunDetailModal
           run={selectedModalEntry.run}
           recipe={selectedModalEntry.recipe}
-          menuItem={menuInventory.find((m) => m.id === selectedModalEntry.recipe.id)}
           ingredients={ingredients}
           onClose={() => setSelectedRunId(null)}
           onComplete={handleComplete}
