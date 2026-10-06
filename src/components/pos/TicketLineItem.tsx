@@ -65,9 +65,7 @@ export default function TicketLineItem({
             </svg>
           </button>
         </div>
-        <span>
-          {item.qty} x ₱{item.price.toFixed(2)}
-        </span>
+        <span>x ₱{item.price.toFixed(2)}</span>
       </div>
     </li>
   );
