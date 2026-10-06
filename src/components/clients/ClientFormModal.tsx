@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { FormEvent } from "react";
+import { toContactDigits } from "../../utils/orders";
 import type { Client, ClientFormData } from "../../types/domain";
 
 interface ClientFormModalProps {
@@ -48,9 +49,11 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Contact Number</label>
               <input
-                type="text"
+                type="tel"
+                inputMode="numeric"
+                placeholder="09XXXXXXXXX"
                 value={form.contact}
-                onChange={(e) => update("contact", e.target.value)}
+                onChange={(e) => update("contact", toContactDigits(e.target.value))}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
               />
             </div>
