@@ -104,7 +104,7 @@ export default function InventoryView({
     <div className="space-y-6">
       {/* Header: Menu Items / Raw Materials toggle + Closing Count button */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="inline-flex rounded-xl bg-[#4a2605] p-1 shadow-inner">
+        <div className="self-center sm:self-auto inline-flex rounded-xl bg-[#4a2605] p-1 shadow-inner">
           <button
             onClick={() => setStockView("menu")}
             className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${
