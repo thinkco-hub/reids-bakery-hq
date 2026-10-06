@@ -139,7 +139,8 @@ export default function PosMobile({
                 <span>₱{cartTotal.toFixed(2)}</span>
               </div>
             </div>
-            <OrderButton
+            <TicketButton
+              label="Order"
               total={cartTotal}
               disabled={cart.length === 0}
               onClick={onConfirmOrder}
@@ -149,7 +150,8 @@ export default function PosMobile({
       ) : (
         <>
           <div className="flex-shrink-0 p-4 pb-3">
-            <OrderButton
+            <TicketButton
+              label="Check Ticket"
               total={cartTotal}
               disabled={cart.length === 0}
               onClick={() => setIsTicketOpen(true)}
@@ -258,12 +260,16 @@ export default function PosMobile({
   );
 }
 
-/** The ticket's one action, shown on both phone screens. */
-function OrderButton({
+/** The wide phone action, pinned above the catalogue and at the foot of the
+ *  ticket. The two screens ask for different things, so the label comes from
+ *  the caller while the running total stays. */
+function TicketButton({
+  label,
   total,
   disabled,
   onClick,
 }: {
+  label: string;
   total: number;
   disabled: boolean;
   onClick: () => void;
@@ -278,7 +284,7 @@ function OrderButton({
           : "bg-[#F17D0C] hover:bg-[#d86b06] text-white"
       }`}
     >
-      <span className="text-[1.05rem]">Order</span>
+      <span className="text-[1.05rem]">{label}</span>
       <span className="text-[0.95rem]">₱{total.toFixed(2)}</span>
     </button>
   );

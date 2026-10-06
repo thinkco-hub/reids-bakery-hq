@@ -83,6 +83,8 @@ export function usePos({
   );
   const cartTax = cartSubtotal * SALES_TAX_RATE;
   const cartTotal = cartSubtotal + cartTax;
+  /** Units ringing up, so repeats of one product count as the cashier rang them. */
+  const cartQty = cart.reduce((sum, item) => sum + item.qty, 0);
   // Local calendar date (not UTC) so "today" matches the cashier's clock — in UTC+8,
   // toISOString() is still yesterday between 00:00 and 08:00.
   const now = new Date();
@@ -302,6 +304,7 @@ export function usePos({
     cartSubtotal,
     cartTax,
     cartTotal,
+    cartQty,
     confirmModal,
     updateConfirmField,
     setSaleType,

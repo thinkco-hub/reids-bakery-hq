@@ -4,6 +4,7 @@ import type { TicketCustomer } from "../../types/domain";
 
 /** Ticket header shown in place of the app title while the POS tab is open. */
 export interface MobileTicketBar {
+  /** Units on the ticket, counting a product added three times as three. */
   ticketCount: number;
   customer: TicketCustomer | null;
   onAddCustomer: () => void;

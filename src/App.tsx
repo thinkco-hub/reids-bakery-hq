@@ -185,6 +185,7 @@ export default function BakeryCommandCenter() {
     cartSubtotal,
     cartTax,
     cartTotal,
+    cartQty,
     confirmModal,
     updateConfirmField,
     setSaleType,
@@ -294,7 +295,7 @@ export default function BakeryCommandCenter() {
         pos={
           activeTab === "pos"
             ? {
-                ticketCount: cart.length,
+                ticketCount: cartQty,
                 customer: ticketCustomer,
                 onAddCustomer: openCustomerPicker,
                 onClearTicket: clearTicket,
