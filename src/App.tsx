@@ -4,6 +4,7 @@ import LoginPage from "./components/auth/LoginPage";
 import Sidebar from "./components/layout/Sidebar";
 import MobileTopBar from "./components/layout/MobileTopBar";
 import OrderConfirmationModal from "./components/pos/OrderConfirmationModal";
+import PosCustomerPicker from "./components/pos/PosCustomerPicker";
 import ReceiptModal from "./components/pos/ReceiptModal";
 import RestockModal from "./components/inventory/RestockModal";
 import DashboardView from "./components/views/DashboardView";
@@ -167,16 +168,24 @@ export default function BakeryCommandCenter() {
   const {
     posCategory,
     setPosCategory,
+    posSearch,
+    setPosSearch,
     filteredPosProducts,
     addToCart,
     cart,
     adjustCartQty,
-    setCart,
+    clearTicket,
+    ticketCustomer,
+    attachTicketCustomer,
+    clearTicketCustomer,
+    isCustomerPickerOpen,
+    openCustomerPicker,
+    closeCustomerPicker,
+    openConfirmModal,
     cartSubtotal,
     cartTax,
     cartTotal,
     confirmModal,
-    setConfirmModal,
     updateConfirmField,
     setSaleType,
     closeConfirmModal,
@@ -268,11 +277,30 @@ export default function BakeryCommandCenter() {
         <ReceiptModal receipt={receipt} onClose={() => setReceipt(null)} />
       )}
 
+      {/* ADD CUSTOMER TO TICKET (phone POS; reached from the mobile top bar) */}
+      {isCustomerPickerOpen && (
+        <PosCustomerPicker
+          clients={clients}
+          attached={ticketCustomer}
+          onClose={closeCustomerPicker}
+          onAttach={attachTicketCustomer}
+          onCreateClient={addClient}
+        />
+      )}
+
       {/* MOBILE TOP BAR (extracted to src/components/layout/MobileTopBar.tsx) */}
       <MobileTopBar
         onOpenMobileNav={() => setIsMobileOpen(true)}
-        onSwitchView={() => setActiveView("chams")}
-        canSwitchToChams={canViewChams}
+        pos={
+          activeTab === "pos"
+            ? {
+                ticketCount: cart.length,
+                customer: ticketCustomer,
+                onAddCustomer: openCustomerPicker,
+                onClearTicket: clearTicket,
+              }
+            : null
+        }
       />
 
       {/* SIDEBAR (extracted to src/components/layout/Sidebar.tsx) */}
@@ -326,15 +354,19 @@ export default function BakeryCommandCenter() {
           <PosView
             posCategory={posCategory}
             setPosCategory={setPosCategory}
+            posSearch={posSearch}
+            setPosSearch={setPosSearch}
             filteredPosProducts={filteredPosProducts}
             addToCart={addToCart}
             cart={cart}
             adjustCartQty={adjustCartQty}
-            setCart={setCart}
+            clearTicket={clearTicket}
             cartSubtotal={cartSubtotal}
             cartTax={cartTax}
             cartTotal={cartTotal}
-            setConfirmModal={setConfirmModal}
+            customer={ticketCustomer}
+            onRemoveCustomer={clearTicketCustomer}
+            openConfirmModal={openConfirmModal}
           />
         )}
 

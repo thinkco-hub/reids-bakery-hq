@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { recordAuditEvent } from "../utils/auditLog";
 import { buildEditHistoryEntry, diffField, diffLines } from "../utils/editHistory";
-import { isValidCustomerContact } from "../utils/orders";
+import { isValidCustomerContact, toContactDigits } from "../utils/orders";
 import type {
   CartItem,
   ConfirmModalState,
@@ -14,6 +14,7 @@ import type {
   Sale,
   SaleId,
   SaleType,
+  TicketCustomer,
   User,
 } from "../types/domain";
 
@@ -49,8 +50,9 @@ interface UsePosOptions {
 }
 
 /**
- * Owns the POS feature: product category filter, cart, checkout confirmation
- * modal, completed sales and receipts.
+ * Owns the POS feature: product category and text filters, cart, the customer
+ * attached to the open ticket, checkout confirmation modal, completed sales and
+ * receipts.
  */
 export function usePos({
   posProducts,
@@ -59,16 +61,21 @@ export function usePos({
   currentUser,
 }: UsePosOptions) {
   const [posCategory, setPosCategory] = useState<PosCategory>("All");
+  const [posSearch, setPosSearch] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [ticketCustomer, setTicketCustomer] = useState<TicketCustomer | null>(null);
+  const [isCustomerPickerOpen, setIsCustomerPickerOpen] = useState(false);
   const [confirmModal, setConfirmModal] = useState<ConfirmModalState>(EMPTY_CONFIRM_MODAL);
   const [sales, setSales] = useState<Sale[]>([]);
   const [receipt, setReceipt] = useState<Sale | null>(null);
 
   // --- PRODUCT FILTER & CART TOTALS ---
-  const filteredPosProducts =
-    posCategory === "All"
-      ? posProducts
-      : posProducts.filter((p) => p.category === posCategory);
+  const searchQuery = posSearch.trim().toLowerCase();
+  const filteredPosProducts = posProducts.filter(
+    (p) =>
+      (posCategory === "All" || p.category === posCategory) &&
+      (!searchQuery || p.name.toLowerCase().includes(searchQuery))
+  );
 
   const cartSubtotal = cart.reduce(
     (sum, item) => sum + item.price * item.qty,
@@ -107,6 +114,32 @@ export function usePos({
           return item;
         })
         .filter((item): item is CartItem => item !== null);
+    });
+  };
+
+  /** Empties the ticket. The customer goes with it so the next sale at the
+   *  counter can never inherit a stranger's pre-filled details. */
+  const clearTicket = () => {
+    setCart([]);
+    setTicketCustomer(null);
+  };
+
+  const attachTicketCustomer = (customer: TicketCustomer) => {
+    setTicketCustomer(customer);
+    setIsCustomerPickerOpen(false);
+  };
+
+  const clearTicketCustomer = () => setTicketCustomer(null);
+  const openCustomerPicker = () => setIsCustomerPickerOpen(true);
+  const closeCustomerPicker = () => setIsCustomerPickerOpen(false);
+
+  /** Opens the confirm modal with the attached customer, if any, pre-filled. */
+  const openConfirmModal = () => {
+    setConfirmModal({
+      ...EMPTY_CONFIRM_MODAL,
+      isOpen: true,
+      customerName: ticketCustomer?.name ?? "",
+      customerContact: ticketCustomer ? toContactDigits(ticketCustomer.contact) : "",
     });
   };
 
@@ -164,6 +197,7 @@ export function usePos({
       );
     }
     setCart([]);
+    setTicketCustomer(null);
     setConfirmModal(EMPTY_CONFIRM_MODAL);
     setReceipt(sale);
   };
@@ -251,16 +285,24 @@ export function usePos({
   return {
     posCategory,
     setPosCategory,
+    posSearch,
+    setPosSearch,
     filteredPosProducts,
     addToCart,
     cart,
     adjustCartQty,
-    setCart,
+    clearTicket,
+    ticketCustomer,
+    attachTicketCustomer,
+    clearTicketCustomer,
+    isCustomerPickerOpen,
+    openCustomerPicker,
+    closeCustomerPicker,
+    openConfirmModal,
     cartSubtotal,
     cartTax,
     cartTotal,
     confirmModal,
-    setConfirmModal,
     updateConfirmField,
     setSaleType,
     closeConfirmModal,
