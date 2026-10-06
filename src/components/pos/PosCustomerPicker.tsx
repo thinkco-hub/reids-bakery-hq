@@ -16,9 +16,11 @@ interface PosCustomerPickerProps {
 }
 
 /**
- * Phone screen for putting a customer on the ticket. Reads from the Clients
- * records, so a name typed once in Clients is reusable at the counter; a
- * walk-in with no record yet is created here and saved to Clients.
+ * Full-screen sheet for putting a customer on the ticket, at every width: the
+ * client list wants the room, and the ticket panel it covers is only a side
+ * column. Reads from the Clients records, so a name typed once in Clients is
+ * reusable at the counter; a walk-in with no record yet is created here and
+ * saved to Clients.
  */
 export default function PosCustomerPicker({
   clients,
@@ -43,7 +45,7 @@ export default function PosCustomerPicker({
   };
 
   return (
-    <div className="md:hidden fixed inset-0 z-[100] bg-[#FDF9F3] flex flex-col animate-fadeIn">
+    <div className="fixed inset-0 z-[100] bg-[#FDF9F3] flex flex-col animate-fadeIn">
       {isFormOpen && (
         <ClientFormModal
           initial={null}

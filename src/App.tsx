@@ -289,7 +289,7 @@ export default function BakeryCommandCenter() {
         <ReceiptModal receipt={receipt} onClose={() => setReceipt(null)} />
       )}
 
-      {/* ADD CUSTOMER TO TICKET (phone POS; reached from the mobile top bar) */}
+      {/* ADD CUSTOMER TO TICKET (reached from the phone ticket bar and the ticket panel) */}
       {isCustomerPickerOpen && (
         <PosCustomerPicker
           clients={clients}
@@ -381,6 +381,7 @@ export default function BakeryCommandCenter() {
             cartTotal={cartTotal}
             customer={ticketCustomer}
             onRemoveCustomer={clearTicketCustomer}
+            onAddCustomer={openCustomerPicker}
             openConfirmModal={openConfirmModal}
           />
         )}
