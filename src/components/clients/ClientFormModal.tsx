@@ -11,10 +11,7 @@ interface ClientFormModalProps {
 
 export default function ClientFormModal({ initial, onClose, onSave }: ClientFormModalProps) {
   const [form, setForm] = useState<ClientFormData>(
-    // Stored contacts may hold separators ("0917 123 4567"); the field is digits-only.
-    initial
-      ? { ...initial, contact: toContactDigits(initial.contact) }
-      : { name: "", contact: "", email: "", address: "", standingOrder: "" }
+    initial || { name: "", contact: "", email: "", address: "", standingOrder: "" }
   );
 
   const update = (field: keyof ClientFormData, value: string) =>
