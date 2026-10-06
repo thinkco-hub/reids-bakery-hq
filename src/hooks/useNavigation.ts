@@ -3,8 +3,8 @@ import type { AppView, NavTabId } from "../types/domain";
 
 /**
  * Owns application navigation: the active view (Reid's HQ vs Chams ledger),
- * the active tab, sidebar open/expanded state and the window width used by
- * the responsive sidebar and POS ticket.
+ * the active tab, the off-canvas sidebar drawer state and the window width used
+ * by the responsive sidebar and POS ticket.
  *
  * Detail-panel state (viewing an order / client / recipe) is owned by its
  * feature hook and is cleared by the app shell on navigation.
@@ -12,8 +12,7 @@ import type { AppView, NavTabId } from "../types/domain";
 export function useNavigation() {
   const [activeView, setActiveView] = useState<AppView>("reids");
   const [activeTab, setActiveTab] = useState<NavTabId>("dashboard");
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [isTabletSidebarOpen, setIsTabletSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isInventoryExpanded, setIsInventoryExpanded] = useState(false);
   const [isReportsExpanded, setIsReportsExpanded] = useState(false);
   const [windowWidth, setWindowWidth] = useState(
@@ -31,10 +30,8 @@ export function useNavigation() {
     setActiveView,
     activeTab,
     setActiveTab,
-    isMobileOpen,
-    setIsMobileOpen,
-    isTabletSidebarOpen,
-    setIsTabletSidebarOpen,
+    isSidebarOpen,
+    setIsSidebarOpen,
     isInventoryExpanded,
     setIsInventoryExpanded,
     isReportsExpanded,
