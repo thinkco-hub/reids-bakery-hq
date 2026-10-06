@@ -19,6 +19,9 @@ interface PosMobileProps {
   addToCart: (product: PosProduct) => void;
   cart: CartItem[];
   adjustCartQty: (id: string, delta: number) => void;
+  isTicketViewOpen: boolean;
+  openTicketView: () => void;
+  closeTicketView: () => void;
   cartSubtotal: number;
   cartTax: number;
   cartTotal: number;
@@ -41,6 +44,9 @@ export default function PosMobile({
   addToCart,
   cart,
   adjustCartQty,
+  isTicketViewOpen,
+  openTicketView,
+  closeTicketView,
   cartSubtotal,
   cartTax,
   cartTotal,
@@ -48,12 +54,7 @@ export default function PosMobile({
   onRemoveCustomer,
   onConfirmOrder,
 }: PosMobileProps) {
-  const [isTicketOpen, setIsTicketOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-
-  // The ticket empties itself when its last line is stepped down, and on
-  // checkout, so there is never an empty ticket screen to look at.
-  const showTicket = isTicketOpen && cart.length > 0;
 
   const closeSearch = () => {
     setIsSearchOpen(false);
@@ -65,10 +66,10 @@ export default function PosMobile({
 
   return (
     <div className="md:hidden flex flex-col h-full w-full min-h-0 animate-fadeIn">
-      {showTicket ? (
+      {isTicketViewOpen ? (
         <>
           <button
-            onClick={() => setIsTicketOpen(false)}
+            onClick={closeTicketView}
             className="flex-shrink-0 flex items-center gap-2 min-h-[3rem] px-4 text-left font-bold text-[#562D07] hover:bg-gray-200 active:bg-gray-300 transition-colors"
           >
             <svg
@@ -154,7 +155,7 @@ export default function PosMobile({
               label="Check Ticket"
               total={cartTotal}
               disabled={cart.length === 0}
-              onClick={() => setIsTicketOpen(true)}
+              onClick={openTicketView}
             />
           </div>
 

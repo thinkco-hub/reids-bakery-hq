@@ -65,6 +65,13 @@ export function usePos({
   const [cart, setCart] = useState<CartItem[]>([]);
   const [ticketCustomer, setTicketCustomer] = useState<TicketCustomer | null>(null);
   const [isCustomerPickerOpen, setIsCustomerPickerOpen] = useState(false);
+  /**
+   * Whether the phone POS shows its ticket screen instead of the catalogue.
+   * Lives here rather than in the view because every action that empties the
+   * ticket has to close it too, otherwise the next item tapped throws the
+   * cashier back at a ticket they had already left.
+   */
+  const [isTicketViewOpen, setIsTicketViewOpen] = useState(false);
   const [confirmModal, setConfirmModal] = useState<ConfirmModalState>(EMPTY_CONFIRM_MODAL);
   const [sales, setSales] = useState<Sale[]>([]);
   const [receipt, setReceipt] = useState<Sale | null>(null);
@@ -105,18 +112,14 @@ export function usePos({
     });
   };
 
+  // Steps a line's quantity and drops the line at zero. Reads the current cart
+  // instead of an updater form so an emptied ticket can close in the same action.
   const adjustCartQty = (id: string, delta: number) => {
-    setCart((prevCart) => {
-      return prevCart
-        .map((item) => {
-          if (item.id === id) {
-            const newQty = item.qty + delta;
-            return newQty > 0 ? { ...item, qty: newQty } : null;
-          }
-          return item;
-        })
-        .filter((item): item is CartItem => item !== null);
-    });
+    const nextCart = cart
+      .map((item) => (item.id === id ? { ...item, qty: item.qty + delta } : item))
+      .filter((item) => item.qty > 0);
+    setCart(nextCart);
+    if (nextCart.length === 0) setIsTicketViewOpen(false);
   };
 
   /** Empties the ticket. The customer goes with it so the next sale at the
@@ -124,7 +127,11 @@ export function usePos({
   const clearTicket = () => {
     setCart([]);
     setTicketCustomer(null);
+    setIsTicketViewOpen(false);
   };
+
+  const openTicketView = () => setIsTicketViewOpen(true);
+  const closeTicketView = () => setIsTicketViewOpen(false);
 
   const attachTicketCustomer = (customer: TicketCustomer) => {
     setTicketCustomer(customer);
@@ -200,6 +207,7 @@ export function usePos({
     }
     setCart([]);
     setTicketCustomer(null);
+    setIsTicketViewOpen(false);
     setConfirmModal(EMPTY_CONFIRM_MODAL);
     setReceipt(sale);
   };
@@ -294,6 +302,9 @@ export function usePos({
     cart,
     adjustCartQty,
     clearTicket,
+    isTicketViewOpen,
+    openTicketView,
+    closeTicketView,
     ticketCustomer,
     attachTicketCustomer,
     clearTicketCustomer,

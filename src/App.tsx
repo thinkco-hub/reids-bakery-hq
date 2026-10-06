@@ -175,6 +175,9 @@ export default function BakeryCommandCenter() {
     cart,
     adjustCartQty,
     clearTicket,
+    isTicketViewOpen,
+    openTicketView,
+    closeTicketView,
     ticketCustomer,
     attachTicketCustomer,
     clearTicketCustomer,
@@ -361,6 +364,9 @@ export default function BakeryCommandCenter() {
             addToCart={addToCart}
             cart={cart}
             adjustCartQty={adjustCartQty}
+            isTicketViewOpen={isTicketViewOpen}
+            openTicketView={openTicketView}
+            closeTicketView={closeTicketView}
             clearTicket={clearTicket}
             cartSubtotal={cartSubtotal}
             cartTax={cartTax}

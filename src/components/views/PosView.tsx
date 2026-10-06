@@ -19,6 +19,9 @@ interface PosViewProps {
   addToCart: (product: PosProduct) => void;
   cart: CartItem[];
   adjustCartQty: (id: string, delta: number) => void;
+  isTicketViewOpen: boolean;
+  openTicketView: () => void;
+  closeTicketView: () => void;
   clearTicket: () => void;
   cartSubtotal: number;
   cartTax: number;
@@ -43,6 +46,9 @@ export default function PosView({
   addToCart,
   cart,
   adjustCartQty,
+  isTicketViewOpen,
+  openTicketView,
+  closeTicketView,
   clearTicket,
   cartSubtotal,
   cartTax,
@@ -62,6 +68,9 @@ export default function PosView({
         addToCart={addToCart}
         cart={cart}
         adjustCartQty={adjustCartQty}
+        isTicketViewOpen={isTicketViewOpen}
+        openTicketView={openTicketView}
+        closeTicketView={closeTicketView}
         cartSubtotal={cartSubtotal}
         cartTax={cartTax}
         cartTotal={cartTotal}
