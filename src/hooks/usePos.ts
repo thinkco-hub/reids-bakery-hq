@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { recordAuditEvent } from "../utils/auditLog";
 import { buildEditHistoryEntry, diffField, diffLines } from "../utils/editHistory";
-import { isValidCustomerContact } from "../utils/orders";
+import { isValidCustomerContact, toContactDigits } from "../utils/orders";
 import type {
   CartItem,
   ConfirmModalState,
@@ -14,6 +14,7 @@ import type {
   Sale,
   SaleId,
   SaleType,
+  TicketCustomer,
   User,
 } from "../types/domain";
 
@@ -49,8 +50,9 @@ interface UsePosOptions {
 }
 
 /**
- * Owns the POS feature: product category filter, cart, checkout confirmation
- * modal, completed sales and receipts.
+ * Owns the POS feature: product category and text filters, cart, the customer
+ * attached to the open ticket, checkout confirmation modal, completed sales and
+ * receipts.
  */
 export function usePos({
   posProducts,
@@ -59,16 +61,28 @@ export function usePos({
   currentUser,
 }: UsePosOptions) {
   const [posCategory, setPosCategory] = useState<PosCategory>("All");
+  const [posSearch, setPosSearch] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [ticketCustomer, setTicketCustomer] = useState<TicketCustomer | null>(null);
+  const [isCustomerPickerOpen, setIsCustomerPickerOpen] = useState(false);
+  /**
+   * Whether the phone POS shows its ticket screen instead of the catalogue.
+   * Lives here rather than in the view because every action that empties the
+   * ticket has to close it too, otherwise the next item tapped throws the
+   * cashier back at a ticket they had already left.
+   */
+  const [isTicketViewOpen, setIsTicketViewOpen] = useState(false);
   const [confirmModal, setConfirmModal] = useState<ConfirmModalState>(EMPTY_CONFIRM_MODAL);
   const [sales, setSales] = useState<Sale[]>([]);
   const [receipt, setReceipt] = useState<Sale | null>(null);
 
   // --- PRODUCT FILTER & CART TOTALS ---
-  const filteredPosProducts =
-    posCategory === "All"
-      ? posProducts
-      : posProducts.filter((p) => p.category === posCategory);
+  const searchQuery = posSearch.trim().toLowerCase();
+  const filteredPosProducts = posProducts.filter(
+    (p) =>
+      (posCategory === "All" || p.category === posCategory) &&
+      (!searchQuery || p.name.toLowerCase().includes(searchQuery))
+  );
 
   const cartSubtotal = cart.reduce(
     (sum, item) => sum + item.price * item.qty,
@@ -76,6 +90,8 @@ export function usePos({
   );
   const cartTax = cartSubtotal * SALES_TAX_RATE;
   const cartTotal = cartSubtotal + cartTax;
+  /** Units ringing up, so repeats of one product count as the cashier rang them. */
+  const cartQty = cart.reduce((sum, item) => sum + item.qty, 0);
   // Local calendar date (not UTC) so "today" matches the cashier's clock — in UTC+8,
   // toISOString() is still yesterday between 00:00 and 08:00.
   const now = new Date();
@@ -96,17 +112,43 @@ export function usePos({
     });
   };
 
+  // Steps a line's quantity and drops the line at zero. Reads the current cart
+  // instead of an updater form so an emptied ticket can close in the same action.
   const adjustCartQty = (id: string, delta: number) => {
-    setCart((prevCart) => {
-      return prevCart
-        .map((item) => {
-          if (item.id === id) {
-            const newQty = item.qty + delta;
-            return newQty > 0 ? { ...item, qty: newQty } : null;
-          }
-          return item;
-        })
-        .filter((item): item is CartItem => item !== null);
+    const nextCart = cart
+      .map((item) => (item.id === id ? { ...item, qty: item.qty + delta } : item))
+      .filter((item) => item.qty > 0);
+    setCart(nextCart);
+    if (nextCart.length === 0) setIsTicketViewOpen(false);
+  };
+
+  /** Empties the ticket. The customer goes with it so the next sale at the
+   *  counter can never inherit a stranger's pre-filled details. */
+  const clearTicket = () => {
+    setCart([]);
+    setTicketCustomer(null);
+    setIsTicketViewOpen(false);
+  };
+
+  const openTicketView = () => setIsTicketViewOpen(true);
+  const closeTicketView = () => setIsTicketViewOpen(false);
+
+  const attachTicketCustomer = (customer: TicketCustomer) => {
+    setTicketCustomer(customer);
+    setIsCustomerPickerOpen(false);
+  };
+
+  const clearTicketCustomer = () => setTicketCustomer(null);
+  const openCustomerPicker = () => setIsCustomerPickerOpen(true);
+  const closeCustomerPicker = () => setIsCustomerPickerOpen(false);
+
+  /** Opens the confirm modal with the attached customer, if any, pre-filled. */
+  const openConfirmModal = () => {
+    setConfirmModal({
+      ...EMPTY_CONFIRM_MODAL,
+      isOpen: true,
+      customerName: ticketCustomer?.name ?? "",
+      customerContact: ticketCustomer ? toContactDigits(ticketCustomer.contact) : "",
     });
   };
 
@@ -164,6 +206,8 @@ export function usePos({
       );
     }
     setCart([]);
+    setTicketCustomer(null);
+    setIsTicketViewOpen(false);
     setConfirmModal(EMPTY_CONFIRM_MODAL);
     setReceipt(sale);
   };
@@ -251,16 +295,28 @@ export function usePos({
   return {
     posCategory,
     setPosCategory,
+    posSearch,
+    setPosSearch,
     filteredPosProducts,
     addToCart,
     cart,
     adjustCartQty,
-    setCart,
+    clearTicket,
+    isTicketViewOpen,
+    openTicketView,
+    closeTicketView,
+    ticketCustomer,
+    attachTicketCustomer,
+    clearTicketCustomer,
+    isCustomerPickerOpen,
+    openCustomerPicker,
+    closeCustomerPicker,
+    openConfirmModal,
     cartSubtotal,
     cartTax,
     cartTotal,
+    cartQty,
     confirmModal,
-    setConfirmModal,
     updateConfirmField,
     setSaleType,
     closeConfirmModal,

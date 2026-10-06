@@ -1,6 +1,15 @@
-import type { PosProduct } from "../types/domain";
+import type { PosCategory, PosProduct } from "../types/domain";
 
-// POS product catalog (static seed for the POS grid; cart state lives in usePos).
+/** Category filter values in display order. "All" is filter-only. */
+export const POS_CATEGORIES: readonly PosCategory[] = [
+  "All",
+  "Pastries",
+  "Bread",
+  "Cakes",
+  "Drinks",
+];
+
+// POS product catalog (static seed for the POS catalog; cart state lives in usePos).
 // Product ids mirror the recipe/menu-inventory ids (B-101, …) for goods that are
 // stocked, so POS walk-in sales and pre-order deliveries deduct the matching
 // finished-goods stock (FR-8). POS-only products without tracked stock keep

@@ -199,6 +199,12 @@ export interface CartItem extends PosProduct {
   qty: Quantity;
 }
 
+/** Customer attached to the open POS ticket. Its details prefill the confirm modal. */
+export interface TicketCustomer {
+  name: string;
+  contact: string;
+}
+
 export interface Sale {
   id: SaleId;
   type: SaleType;
