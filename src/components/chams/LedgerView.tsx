@@ -40,7 +40,7 @@ export default function LedgerView({ branches, products, beginnings, movements, 
             Beginning, restocked, spoilage, sold and remaining siopao stock per branch.
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-2 py-1.5 shadow-sm">
+        <div className="self-center md:self-auto flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-2 py-1.5 shadow-sm">
           <button
             onClick={() => onMonthChange(shiftMonthKey(month, -1))}
             className="p-1.5 rounded-md hover:bg-gray-100 text-gray-600"

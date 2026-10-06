@@ -31,6 +31,12 @@ export default function DashboardView({
   onNavClick,
   onViewOrder,
 }: DashboardViewProps) {
+  const todayLabel = new Date().toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
@@ -40,9 +46,9 @@ export default function DashboardView({
             Overview of your bakery operations today.
           </p>
         </div>
-        <div className="bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm flex items-center text-sm font-medium text-gray-600">
+        <div className="self-center md:self-auto bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm flex items-center text-sm font-medium text-gray-600">
           <CalendarIcon className="w-4 h-4 mr-2 text-[#F17D0C]" />
-          May 20, 2026
+          {todayLabel}
         </div>
       </header>
 
