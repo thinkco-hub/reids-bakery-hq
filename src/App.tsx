@@ -35,6 +35,7 @@ import {
   canAccessReconciliation,
   canAccessTab,
 } from "./utils/permissions";
+import { canUseSidebarRail, isPhoneViewport } from "./utils/responsive";
 import type { NavTabId, Order } from "./types/domain";
 
 export default function BakeryCommandCenter() {
@@ -52,16 +53,19 @@ export default function BakeryCommandCenter() {
     setActiveView,
     activeTab,
     setActiveTab,
-    isMobileOpen,
-    setIsMobileOpen,
-    isTabletSidebarOpen,
-    setIsTabletSidebarOpen,
+    isSidebarOpen,
+    setIsSidebarOpen,
     isInventoryExpanded,
     setIsInventoryExpanded,
     isReportsExpanded,
     setIsReportsExpanded,
     windowWidth,
   } = useNavigation();
+
+  // Wide, mouse-driven viewports keep the pinned sidebar rail; phones and tablets
+  // (including touch devices that report a desktop viewport) use the hamburger
+  // drawer, so the top bar and the drawer have to be gated on the same test.
+  const isDesktopRail = canUseSidebarRail(windowWidth);
 
   // Send the user somewhere they can access when their role no longer allows the
   // current view (role changed live, or a different user signed in on a stale tab).
@@ -219,7 +223,7 @@ export default function BakeryCommandCenter() {
     clearViewingClient();
     setViewingRecipe(null);
     setIsCreatingRecipe(false);
-    setIsMobileOpen(false);
+    setIsSidebarOpen(false);
   };
 
   const handleViewOrder = (order: Order) => {
@@ -238,7 +242,11 @@ export default function BakeryCommandCenter() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-[#FDF9F3] font-sans text-[#121212] overflow-hidden relative">
+    <div
+      className={`flex flex-col ${
+        isDesktopRail ? "md:flex-row" : ""
+      } h-screen bg-[#FDF9F3] font-sans text-[#121212] overflow-hidden relative`}
+    >
       {activeView === "chams" && canViewChams ? (
         <ChamsStockLedger onSwitchView={() => setActiveView("reids")} />
       ) : (
@@ -281,7 +289,7 @@ export default function BakeryCommandCenter() {
         <ReceiptModal receipt={receipt} onClose={() => setReceipt(null)} />
       )}
 
-      {/* ADD CUSTOMER TO TICKET (phone POS; reached from the mobile top bar) */}
+      {/* ADD CUSTOMER TO TICKET (reached from the phone ticket bar and the ticket panel) */}
       {isCustomerPickerOpen && (
         <PosCustomerPicker
           clients={clients}
@@ -292,20 +300,22 @@ export default function BakeryCommandCenter() {
         />
       )}
 
-      {/* MOBILE TOP BAR (extracted to src/components/layout/MobileTopBar.tsx) */}
-      <MobileTopBar
-        onOpenMobileNav={() => setIsMobileOpen(true)}
-        pos={
-          activeTab === "pos"
-            ? {
-                ticketCount: cartQty,
-                customer: ticketCustomer,
-                onAddCustomer: openCustomerPicker,
-                onClearTicket: clearTicket,
-              }
-            : null
-        }
-      />
+      {/* TOP BAR — drawer layouts only (phone and tablet) */}
+      {!isDesktopRail && (
+        <MobileTopBar
+          onOpenMobileNav={() => setIsSidebarOpen(true)}
+          pos={
+            activeTab === "pos" && isPhoneViewport(windowWidth)
+              ? {
+                  ticketCount: cartQty,
+                  customer: ticketCustomer,
+                  onAddCustomer: openCustomerPicker,
+                  onClearTicket: clearTicket,
+                }
+              : null
+          }
+        />
+      )}
 
       {/* SIDEBAR (extracted to src/components/layout/Sidebar.tsx) */}
       <Sidebar
@@ -313,10 +323,8 @@ export default function BakeryCommandCenter() {
         currentUser={currentUser}
         onLogout={logout}
         windowWidth={windowWidth}
-        isMobileOpen={isMobileOpen}
-        setIsMobileOpen={setIsMobileOpen}
-        isTabletSidebarOpen={isTabletSidebarOpen}
-        setIsTabletSidebarOpen={setIsTabletSidebarOpen}
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
         isInventoryExpanded={isInventoryExpanded}
         setIsInventoryExpanded={setIsInventoryExpanded}
         isReportsExpanded={isReportsExpanded}
@@ -373,6 +381,7 @@ export default function BakeryCommandCenter() {
             cartTotal={cartTotal}
             customer={ticketCustomer}
             onRemoveCustomer={clearTicketCustomer}
+            onAddCustomer={openCustomerPicker}
             openConfirmModal={openConfirmModal}
           />
         )}

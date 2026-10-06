@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
+import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
 import PosMobile from "../pos/PosMobile";
+import SelectField from "../common/SelectField";
 import TicketLineItem from "../pos/TicketLineItem";
 import { SearchIcon } from "../icons";
 import { POS_CATEGORIES } from "../../data/initialProducts";
@@ -28,6 +30,7 @@ interface PosViewProps {
   cartTotal: number;
   customer: TicketCustomer | null;
   onRemoveCustomer: () => void;
+  onAddCustomer: () => void;
   openConfirmModal: () => void;
 }
 
@@ -55,8 +58,16 @@ export default function PosView({
   cartTotal,
   customer,
   onRemoveCustomer,
+  onAddCustomer,
   openConfirmModal,
 }: PosViewProps) {
+  const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
+
+  const confirmClear = () => {
+    clearTicket();
+    setIsClearConfirmOpen(false);
+  };
+
   return (
     <>
       <PosMobile
@@ -82,20 +93,19 @@ export default function PosView({
       <div className="hidden md:flex md:flex-row h-full w-full animate-fadeIn">
         <div className="flex-1 basis-0 grow-[75] flex flex-col min-h-0 overflow-hidden">
           <div className="bg-white shadow-sm border-b border-gray-200 z-10 flex-shrink-0">
-            <div className="p-4 flex items-center gap-4 overflow-x-auto hide-scrollbar">
-              {POS_CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setPosCategory(cat)}
-                  className={`px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-colors ${
-                    posCategory === cat
-                      ? "bg-[#562D07] text-white shadow-md"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
+            <div className="p-4 flex items-center gap-4">
+              <SelectField
+                value={posCategory}
+                onChange={(e) => setPosCategory(e.target.value as PosCategory)}
+                aria-label="Filter items by category"
+                className="min-h-[2.75rem] w-56 pl-3 bg-gray-100 border border-gray-200 rounded-lg text-sm font-bold text-gray-800 focus:ring-2 focus:ring-[#F17D0C] outline-none"
+              >
+                {POS_CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat === "All" ? "All items" : cat}
+                  </option>
+                ))}
+              </SelectField>
               <div className="ml-auto flex-shrink-0 relative">
                 <input
                   type="text"
@@ -150,26 +160,96 @@ export default function PosView({
                 Current Ticket
               </h3>
             </div>
-            {cart.length > 0 && (
+            <button
+              onClick={() => setIsClearConfirmOpen(true)}
+              disabled={cart.length === 0}
+              className={`transition-colors p-[0.5em] min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center rounded-lg ${
+                cart.length > 0
+                  ? "text-gray-400 hover:text-red-500 hover:bg-red-50"
+                  : "text-gray-300 cursor-not-allowed"
+              }`}
+              title="Clear Ticket"
+              aria-label="Clear Ticket"
+            >
+              <svg
+                className="w-[1.4em] h-[1.4em]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </button>
+          </div>
+
+          {isClearConfirmOpen && (
+            <DeleteConfirmDialog
+              title="Clear ticket?"
+              message="Removes every item and the customer from the current ticket."
+              confirmLabel="Clear Ticket"
+              onConfirm={confirmClear}
+              onCancel={() => setIsClearConfirmOpen(false)}
+            />
+          )}
+
+          {/* Ticket customer. Its own row rather than a header control: the panel
+              narrows to 240px on a small tablet and the title has to stay legible. */}
+          <div className="flex-shrink-0 border-b border-gray-200 bg-white p-[var(--tk-pad)] text-[length:var(--tk-body)]">
+            {customer ? (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={onAddCustomer}
+                  title={`Change the ticket customer, currently ${customer.name}`}
+                  className="min-w-0 flex-1 text-left"
+                >
+                  <p className="text-[0.72em] font-semibold uppercase tracking-wide text-gray-500">
+                    Customer
+                  </p>
+                  <p className="truncate font-bold text-gray-800">{customer.name}</p>
+                </button>
+                <button
+                  onClick={onRemoveCustomer}
+                  aria-label={`Remove ${customer.name} from the ticket`}
+                  className="flex-shrink-0 min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-gray-100 transition-colors"
+                >
+                  <svg
+                    className="w-[1.15em] h-[1.15em]"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            ) : (
               <button
-                onClick={clearTicket}
-                className="text-gray-400 hover:text-red-500 transition-colors p-[0.5em] min-h-[2.75rem] min-w-[2.75rem]"
-                title="Clear Ticket"
-                aria-label="Clear Ticket"
+                onClick={onAddCustomer}
+                className="w-full min-h-[2.75rem] px-2 rounded-lg border border-dashed border-gray-300 flex items-center justify-center gap-2 font-bold text-[#562D07] hover:bg-gray-50 transition-colors"
               >
                 <svg
-                  className="w-[1.4em] h-[1.4em]"
+                  className="w-[1.15em] h-[1.15em] flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="8.5" cy="7" r="4" />
+                  <path d="M20 8v6M23 11h-6" />
                 </svg>
+                Add customer
               </button>
             )}
           </div>

@@ -4,6 +4,7 @@ import BeginningInventoryForm from "./BeginningInventoryForm";
 import MovementLogForm from "./MovementLogForm";
 import RemainingCountForm from "./RemainingCountForm";
 import LedgerHistory from "./LedgerHistory";
+import { canUseSidebarRail } from "../../utils/responsive";
 import { monthKey, shiftMonthKey } from "../../utils/ledger";
 import type {
   ChamsBeginning,
@@ -166,8 +167,7 @@ interface ChamsStockLedgerProps {
 
 export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps) {
   const [activeChamsTab, setActiveChamsTab] = useState<ChamsTabId>("ledger");
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [isTabletSidebarOpen, setIsTabletSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth : 1024
   );
@@ -186,25 +186,16 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
   const [movements, setMovements] = useState(seed.movements);
   const [counts, setCounts] = useState(seed.counts);
 
-  // Touch devices use click-to-expand behavior even when iPadOS reports a
-  // desktop-sized viewport in landscape mode.
-  const isTouchDevice =
-    typeof navigator !== "undefined" && navigator.maxTouchPoints > 0;
-  const isTablet =
-    windowWidth >= 768 && (windowWidth < 1024 || isTouchDevice);
-  const sidebarExpanded = isTablet && isTabletSidebarOpen;
-  const sidebarLabelCls = sidebarExpanded
-    ? "opacity-100"
-    : "opacity-100 md:opacity-0 lg:group-hover:opacity-100";
+  // Same rule as the Bakery HQ shell: only a mouse-driven viewport gets the
+  // pinned hover rail, everything else uses the hamburger drawer.
+  const isDesktopRail = canUseSidebarRail(windowWidth);
+  const sidebarLabelCls = isDesktopRail
+    ? "opacity-0 group-hover:opacity-100"
+    : "opacity-100";
 
   const handleNavClick = (tab: ChamsTabId) => {
-    if (isTablet && !sidebarExpanded) {
-      setIsTabletSidebarOpen(true);
-      return;
-    }
-
     setActiveChamsTab(tab);
-    setIsMobileOpen(false);
+    setIsSidebarOpen(false);
   };
 
   const upsertBeginning = (data: Omit<ChamsBeginning, "id">) => {
@@ -245,60 +236,55 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
 
   return (
     <>
-      {/* MOBILE TOP BAR */}
-      <div className="md:hidden bg-[#1B2A4A] text-[#EAF0FB] p-4 flex justify-between items-center shadow-md z-30 w-full">
-        <button
-          onClick={() => setIsMobileOpen(true)}
-          className="p-2 focus:outline-none bg-[#3B5BA5]/20 rounded-md"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-        <button onClick={onSwitchView} className="flex items-center" title="Switch to Reid's Bakery HQ">
-          <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2 p-1">
-            <span className="text-[#1B2A4A] font-bold text-xs">CH</span>
-          </div>
-          <h1 className="text-lg font-bold">Chams Ledger</h1>
-        </button>
-      </div>
-
-      {/* MOBILE OVERLAY */}
-      {isMobileOpen && (
-        <div
-          className="md:hidden fixed inset-0 bg-black/50 z-40 transition-opacity"
-          onClick={() => setIsMobileOpen(false)}
-        />
+      {/* TOP BAR — drawer layouts only (phone and tablet) */}
+      {!isDesktopRail && (
+        <div className="bg-[#1B2A4A] text-[#EAF0FB] p-4 flex justify-between items-center shadow-md z-30 w-full">
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            aria-label="Open navigation"
+            className="p-2 focus:outline-none bg-[#3B5BA5]/20 rounded-md"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <button onClick={onSwitchView} className="flex items-center" title="Switch to Reid's Bakery HQ">
+            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2 p-1">
+              <span className="text-[#1B2A4A] font-bold text-xs">CH</span>
+            </div>
+            <h1 className="text-lg font-bold">Chams Ledger</h1>
+          </button>
+        </div>
       )}
 
-      {/* TABLET SIDEBAR BACKDROP — click outside the expanded rail to close it */}
-      {sidebarExpanded && (
+      {/* DRAWER OVERLAY — tap outside the open sidebar to dismiss it */}
+      {isSidebarOpen && !isDesktopRail && (
         <div
           className="fixed inset-0 bg-black/50 z-40 transition-opacity"
-          onClick={() => setIsTabletSidebarOpen(false)}
+          onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* SIDEBAR */}
       <aside
         className={`
-        fixed md:relative inset-y-0 left-0 z-50
-        transform ${isMobileOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0
-        w-72 ${sidebarExpanded ? "md:w-72" : "md:w-20"} lg:hover:w-72
-        transition-all duration-300 ease-in-out
-        bg-[#1B2A4A] text-[#EAF0FB] flex flex-col shadow-2xl group
+        inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out
+        flex flex-col shadow-2xl group
+        ${
+          isDesktopRail
+            ? "relative w-20 lg:hover:w-72"
+            : `fixed w-72 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`
+        }
+        bg-[#1B2A4A] text-[#EAF0FB]
       `}
       >
-        <div className="p-5 border-b border-[#3B5BA5]/20 flex justify-between items-center whitespace-nowrap md:h-[76px]">
+        <div
+          className={`p-5 border-b border-[#3B5BA5]/20 flex justify-between items-center whitespace-nowrap ${
+            isDesktopRail ? "h-[76px]" : ""
+          }`}
+        >
           <button
-            onClick={() => {
-              if (isTablet && !sidebarExpanded) {
-                setIsTabletSidebarOpen(true);
-                return;
-              }
-
-              onSwitchView();
-            }}
+            onClick={onSwitchView}
             className="flex items-center"
             title="Switch to Reid's Bakery HQ"
           >
@@ -315,14 +301,17 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
               Chams Ledger
             </span>
           </button>
-          <button
-            onClick={() => setIsMobileOpen(false)}
-            className="md:hidden p-1 text-[#EAF0FB]/60 hover:text-white"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          {!isDesktopRail && (
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              aria-label="Close navigation"
+              className="p-1 text-[#EAF0FB]/60 hover:text-white"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
         </div>
 
         <nav className="flex-1 p-3 space-y-3 mt-4 overflow-y-auto hide-scrollbar">
@@ -352,14 +341,7 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
 
         <div className="p-3 border-t border-[#3B5BA5]/20">
           <button
-            onClick={() => {
-              if (isTablet && !sidebarExpanded) {
-                setIsTabletSidebarOpen(true);
-                return;
-              }
-
-              onSwitchView();
-            }}
+            onClick={onSwitchView}
             className="w-full flex items-center p-3 rounded-lg font-bold text-[#EAF0FB]/60 hover:bg-[#3B5BA5]/10 hover:text-white transition-colors whitespace-nowrap overflow-hidden"
           >
             <div className="flex items-center justify-center w-8 flex-shrink-0">

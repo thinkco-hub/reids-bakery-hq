@@ -18,9 +18,10 @@ interface MobileTopBarProps {
 }
 
 /**
- * Phone header. The Chams ledger switch lives in the navigation drawer rather
- * than here, which frees this row up for the ticket controls the POS needs
- * within thumb reach at all times.
+ * Header for the drawer layouts (phone and tablet); the shell only renders it
+ * while the sidebar is off-canvas. The Chams ledger switch lives in the
+ * navigation drawer rather than here, which frees the phone row up for the
+ * ticket controls the POS needs within thumb reach at all times.
  */
 export default function MobileTopBar({ onOpenMobileNav, pos }: MobileTopBarProps) {
   const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
@@ -31,7 +32,7 @@ export default function MobileTopBar({ onOpenMobileNav, pos }: MobileTopBarProps
   };
 
   return (
-    <div className="md:hidden bg-[#562D07] text-[#FDF9F3] p-4 flex items-center gap-3 shadow-md z-30">
+    <div className="bg-[#562D07] text-[#FDF9F3] p-4 flex items-center gap-3 shadow-md z-30">
       <button
         onClick={onOpenMobileNav}
         aria-label="Open navigation"
