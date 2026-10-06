@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
 import PosMobile from "../pos/PosMobile";
 import SelectField from "../common/SelectField";
 import TicketLineItem from "../pos/TicketLineItem";
@@ -60,6 +61,13 @@ export default function PosView({
   onAddCustomer,
   openConfirmModal,
 }: PosViewProps) {
+  const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
+
+  const confirmClear = () => {
+    clearTicket();
+    setIsClearConfirmOpen(false);
+  };
+
   return (
     <>
       <PosMobile
@@ -153,7 +161,7 @@ export default function PosView({
               </h3>
             </div>
             <button
-              onClick={clearTicket}
+              onClick={() => setIsClearConfirmOpen(true)}
               disabled={cart.length === 0}
               className={`transition-colors p-[0.5em] min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center rounded-lg ${
                 cart.length > 0
@@ -179,6 +187,16 @@ export default function PosView({
               </svg>
             </button>
           </div>
+
+          {isClearConfirmOpen && (
+            <DeleteConfirmDialog
+              title="Clear ticket?"
+              message="Removes every item and the customer from the current ticket."
+              confirmLabel="Clear Ticket"
+              onConfirm={confirmClear}
+              onCancel={() => setIsClearConfirmOpen(false)}
+            />
+          )}
 
           {/* Ticket customer. Its own row rather than a header control: the panel
               narrows to 240px on a small tablet and the title has to stay legible. */}
