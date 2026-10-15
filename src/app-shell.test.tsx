@@ -56,3 +56,23 @@ describe("app shell state identity", () => {
     ).toBeInTheDocument();
   });
 });
+
+describe("sign-out", () => {
+  it("starts the next sign-in on the default tab, not the tab just left", async () => {
+    const user = userEvent.setup();
+    renderShell("/pos");
+    await signInAsCashier(user);
+    await screen.findByRole("heading", { name: "Current Ticket" });
+
+    await user.click(within(sidebar()).getByText("Log Out"));
+    await screen.findByRole("button", { name: "Log In" });
+
+    // The URL is the only thing that outlives the session, so a sign-out that
+    // leaves it on /pos puts the next user straight back on the POS tab.
+    await signInAsCashier(user);
+    expect(
+      await screen.findByRole("heading", { name: "Dashboard" }, { timeout: 3000 })
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Current Ticket" })).toBeNull();
+  });
+});

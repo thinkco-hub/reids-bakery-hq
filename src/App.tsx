@@ -248,6 +248,13 @@ export default function BakeryCommandCenter() {
     clearViewingOrder();
   };
 
+  // The tab survives logout because the URL does, so hand the address bar back
+  // to the default tab instead of leaving the next sign-in on this one.
+  const handleLogout = () => {
+    logout();
+    navigate(PATH_BY_TAB[DEFAULT_TAB], { replace: true });
+  };
+
   if (!currentUser) {
     return <LoginPage onLogin={login} getLockedUntil={getLockedUntil} />;
   }
@@ -323,7 +330,7 @@ export default function BakeryCommandCenter() {
       {/* SIDEBAR (extracted to src/components/layout/Sidebar.tsx) */}
       <Sidebar
         currentUser={currentUser}
-        onLogout={logout}
+        onLogout={handleLogout}
         windowWidth={windowWidth}
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}

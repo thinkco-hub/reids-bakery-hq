@@ -23,7 +23,11 @@ export async function signInAsCashier(user: UserEvent) {
   const password = document.querySelector('input[type="password"]');
   if (!(password instanceof HTMLInputElement)) throw new Error("No password field");
 
-  await user.type(screen.getByRole("textbox"), "cashier@rbc.test");
+  // The form reopens pre-filled with the last email, so a second sign-in in one
+  // test would otherwise append to it.
+  const email = screen.getByRole("textbox");
+  await user.clear(email);
+  await user.type(email, "cashier@rbc.test");
   await user.type(password, "cashier123");
   await user.click(screen.getByRole("button", { name: "Log In" }));
 }
