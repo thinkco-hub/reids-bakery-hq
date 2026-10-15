@@ -1,0 +1,51 @@
+import { describe, expect, it } from "vitest";
+import { CHAMS_PATH, PATH_BY_TAB, isChamsPath, tabFromPath } from "./routes";
+import { ALL_ROLES, canAccessTab } from "./utils/permissions";
+import type { NavTabId } from "./types/domain";
+
+const TAB_IDS = Object.keys(PATH_BY_TAB) as NavTabId[];
+
+describe("path <-> NavTabId", () => {
+  it("gives every tab exactly one path", () => {
+    const paths = TAB_IDS.map((tab) => PATH_BY_TAB[tab]);
+    expect(new Set(paths).size).toBe(paths.length);
+  });
+
+  it("parses each tab's path back to the same tab", () => {
+    for (const tab of TAB_IDS) {
+      expect(tabFromPath(PATH_BY_TAB[tab])).toBe(tab);
+    }
+  });
+
+  it("uses a leading slash, and no trailing slash below the root", () => {
+    for (const tab of TAB_IDS) {
+      const path = PATH_BY_TAB[tab];
+      expect(path.startsWith("/")).toBe(true);
+      if (path === "/") continue;
+      expect(path.endsWith("/")).toBe(false);
+    }
+  });
+
+  it("keeps the Chams ledger out of the tab table", () => {
+    expect(TAB_IDS.map((tab) => PATH_BY_TAB[tab])).not.toContain(CHAMS_PATH);
+    expect(tabFromPath(CHAMS_PATH)).toBeNull();
+    expect(isChamsPath(CHAMS_PATH)).toBe(true);
+  });
+
+  it("returns no tab for an unknown path", () => {
+    expect(tabFromPath("/nope")).toBeNull();
+    expect(tabFromPath("/inventory/nope")).toBeNull();
+  });
+
+  it("treats a trailing slash as the same route the router matches", () => {
+    expect(tabFromPath("/orders/")).toBe("orders");
+    expect(tabFromPath("/")).toBe("dashboard");
+  });
+
+  it("spells the roles tab as /roles without renaming its permission key", () => {
+    expect(PATH_BY_TAB["user-management"]).toBe("/roles");
+    for (const role of ALL_ROLES) {
+      expect(canAccessTab(role, tabFromPath("/roles")!)).toBe(canAccessTab(role, "user-management"));
+    }
+  });
+});
