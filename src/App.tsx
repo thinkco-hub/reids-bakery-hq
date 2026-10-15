@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router";
 import ChamsStockLedger from "./components/chams/ChamsStockLedger";
 import LoginPage from "./components/auth/LoginPage";
 import Sidebar from "./components/layout/Sidebar";
@@ -28,6 +29,7 @@ import { useOrders } from "./hooks/useOrders";
 import { useClosing } from "./hooks/useClosing";
 import { usePos } from "./hooks/usePos";
 import { useAuth } from "./hooks/useAuth";
+import { CHAMS_PATH, PATH_BY_TAB, isChamsPath } from "./routes";
 import {
   DEFAULT_TAB,
   canAccessChams,
@@ -49,10 +51,7 @@ export default function BakeryCommandCenter() {
 
   // --- NAVIGATION (src/hooks/useNavigation.ts) ---
   const {
-    activeView,
-    setActiveView,
     activeTab,
-    setActiveTab,
     isSidebarOpen,
     setIsSidebarOpen,
     isInventoryExpanded,
@@ -61,19 +60,25 @@ export default function BakeryCommandCenter() {
     setIsReportsExpanded,
     windowWidth,
   } = useNavigation();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isOnChams = isChamsPath(location.pathname);
 
   // Wide, mouse-driven viewports keep the pinned sidebar rail; phones and tablets
   // (including touch devices that report a desktop viewport) use the hamburger
   // drawer, so the top bar and the drawer have to be gated on the same test.
   const isDesktopRail = canUseSidebarRail(windowWidth);
+  const isPosRoute = activeTab === "pos";
 
   // Send the user somewhere they can access when their role no longer allows the
-  // current view (role changed live, or a different user signed in on a stale tab).
+  // route they are on (role changed live, or a different user signed in on a stale tab).
   useEffect(() => {
     if (!role) return;
-    if (!canAccessTab(role, activeTab)) setActiveTab(DEFAULT_TAB);
-    if (activeView === "chams" && !canAccessChams(role)) setActiveView("reids");
-  }, [role, activeTab, activeView, setActiveTab, setActiveView]);
+    const forbidden = isOnChams
+      ? !canAccessChams(role)
+      : activeTab !== null && !canAccessTab(role, activeTab);
+    if (forbidden) navigate(PATH_BY_TAB[DEFAULT_TAB], { replace: true });
+  }, [role, isOnChams, activeTab, navigate]);
 
   // --- INVENTORY (src/hooks/useInventory.ts) ---
   const inventory = useInventory({ currentUser });
@@ -216,9 +221,9 @@ export default function BakeryCommandCenter() {
   );
 
   // --- NAVIGATION HANDLERS (compose navigation + feature-owned resets) ---
-  const handleNavClick = (tab: NavTabId) => {
-    if (!canView(tab)) return;
-    setActiveTab(tab);
+  // Event-driven on purpose: the three navigation paths clear different things,
+  // so a single route-watching effect could only ever express one of them.
+  const resetForNavigation = () => {
     clearViewingOrder();
     clearViewingClient();
     setViewingRecipe(null);
@@ -226,14 +231,20 @@ export default function BakeryCommandCenter() {
     setIsSidebarOpen(false);
   };
 
+  const handleNavClick = (tab: NavTabId) => {
+    if (!canView(tab)) return;
+    navigate(PATH_BY_TAB[tab]);
+    resetForNavigation();
+  };
+
   const handleViewOrder = (order: Order) => {
-    setActiveTab("orders");
+    navigate(PATH_BY_TAB.orders);
     setViewingOrder(order);
   };
 
   const goToProductionRuns = () => {
     if (!canView("production-runs")) return;
-    setActiveTab("production-runs");
+    navigate(PATH_BY_TAB["production-runs"]);
     clearViewingOrder();
   };
 
@@ -241,16 +252,10 @@ export default function BakeryCommandCenter() {
     return <LoginPage onLogin={login} getLockedUntil={getLockedUntil} />;
   }
 
-  return (
-    <div
-      className={`flex flex-col ${
-        isDesktopRail ? "md:flex-row" : ""
-      } h-screen bg-[#FDF9F3] font-sans text-[#121212] overflow-hidden relative`}
-    >
-      {activeView === "chams" && canViewChams ? (
-        <ChamsStockLedger onSwitchView={() => setActiveView("reids")} />
-      ) : (
-        <>
+  // The shell is the layout route: it owns the overlays and every feature hook,
+  // so a navigation swaps only the outlet below them and never reseeds a hook.
+  const shell = (
+    <>
       {/* RESTOCK MODAL (extracted to src/components/inventory/RestockModal.tsx) */}
       {restockModal.isOpen && (
         <RestockModal
@@ -285,9 +290,7 @@ export default function BakeryCommandCenter() {
       )}
 
       {/* RECEIPT MODAL (extracted to src/components/pos/ReceiptModal.tsx) */}
-      {receipt && (
-        <ReceiptModal receipt={receipt} onClose={() => setReceipt(null)} />
-      )}
+      {receipt && <ReceiptModal receipt={receipt} onClose={() => setReceipt(null)} />}
 
       {/* ADD CUSTOMER TO TICKET (reached from the phone ticket bar and the ticket panel) */}
       {isCustomerPickerOpen && (
@@ -305,7 +308,7 @@ export default function BakeryCommandCenter() {
         <MobileTopBar
           onOpenMobileNav={() => setIsSidebarOpen(true)}
           pos={
-            activeTab === "pos" && isPhoneViewport(windowWidth)
+            isPosRoute && isPhoneViewport(windowWidth)
               ? {
                   ticketCount: cartQty,
                   customer: ticketCustomer,
@@ -319,7 +322,6 @@ export default function BakeryCommandCenter() {
 
       {/* SIDEBAR (extracted to src/components/layout/Sidebar.tsx) */}
       <Sidebar
-        activeTab={activeTab}
         currentUser={currentUser}
         onLogout={logout}
         windowWidth={windowWidth}
@@ -329,213 +331,223 @@ export default function BakeryCommandCenter() {
         setIsInventoryExpanded={setIsInventoryExpanded}
         isReportsExpanded={isReportsExpanded}
         setIsReportsExpanded={setIsReportsExpanded}
-        onNavClick={handleNavClick}
-        onSwitchView={() => setActiveView("chams")}
+        onNavSelect={resetForNavigation}
       />
 
       {/* MAIN CONTENT AREA */}
       <main
         className={`flex-1 relative z-10 w-full flex flex-col ${
-          activeTab === "pos"
+          isPosRoute
             ? "p-0 overflow-hidden bg-gray-100"
             : "p-4 md:p-8 overflow-y-auto"
         }`}
       >
-        {/* Views render only when the signed-in role may open the active tab. */}
-        {canView(activeTab) && (
-        <>
-        {/* =========================================
-            VIEW: DASHBOARD
-        ========================================= */}
-        {activeTab === "dashboard" && (
-          <DashboardView
-            orders={orders}
-            clients={clients}
-            lowStockAlerts={lowStockAlerts}
-            pendingOrdersCount={pendingOrdersCount}
-            readyOrdersCount={readyOrdersCount}
-            onNavClick={handleNavClick}
-            onViewOrder={handleViewOrder}
-          />
-        )}
-
-        {/* =========================================
-            VIEW: POS (Loyverse Style)
-        ========================================= */}
-        {activeTab === "pos" && (
-          <PosView
-            posCategory={posCategory}
-            setPosCategory={setPosCategory}
-            posSearch={posSearch}
-            setPosSearch={setPosSearch}
-            filteredPosProducts={filteredPosProducts}
-            addToCart={addToCart}
-            cart={cart}
-            adjustCartQty={adjustCartQty}
-            isTicketViewOpen={isTicketViewOpen}
-            openTicketView={openTicketView}
-            closeTicketView={closeTicketView}
-            clearTicket={clearTicket}
-            cartSubtotal={cartSubtotal}
-            cartTax={cartTax}
-            cartTotal={cartTotal}
-            customer={ticketCustomer}
-            onRemoveCustomer={clearTicketCustomer}
-            onAddCustomer={openCustomerPicker}
-            openConfirmModal={openConfirmModal}
-          />
-        )}
-
-        {/* =========================================
-            VIEW: ORDERS
-        ========================================= */}
-        {activeTab === "orders" && (
-          <OrdersView
-            orders={orders}
-            clients={clients}
-            menuInventory={menuInventory}
-            viewingOrder={viewingOrder}
-            onViewOrder={setViewingOrder}
-            onEditOrder={editOrder}
-            onAdvanceStatus={advanceOrderStatus}
-            onScheduleDelivery={scheduleOrderDelivery}
-            onMarkDelivered={markOrderDelivered}
-            onRecordPayment={recordOrderPayment}
-            onGoToProduction={goToProductionRuns}
-          />
-        )}
-
-        {/* =========================================
-            VIEW: CLIENTS
-        ========================================= */}
-        {activeTab === "clients" && (
-          <ClientsView
-            clients={clients}
-            orders={orders}
-            viewingClient={viewingClient}
-            onView={setViewingClient}
-            onAdd={addClient}
-            onUpdate={updateClient}
-            onViewOrder={(order) => {
-              setActiveTab("orders");
-              setViewingClient(null);
-              setViewingOrder(order);
-            }}
-          />
-        )}
-
-        {/* =========================================
-            VIEW: INVENTORY
-        ========================================= */}
-        {(
-          activeTab === "inventory" ||
-          activeTab === "inventory-closing-count" ||
-          activeTab === "inventory-reconciliation"
-        ) && (
-          <InventoryView
-            activeTab={activeTab}
-            menuInventory={menuInventory}
-            ingredients={ingredients}
-            restockReminders={restockReminders}
-            inventoryCounts={inventoryCounts}
-            canViewIngredients={!!role && canAccessIngredients(role)}
-            canReconcile={!!role && canAccessReconciliation(role)}
-            onNavClick={handleNavClick}
-            onRestockToProduction={goToProductionRuns}
-            onOpenRestock={openRestock}
-            onAddIngredient={addIngredient}
-            onUpdateIngredient={updateIngredient}
-            onAddReminder={addRestockReminder}
-            onToggleReminderDone={toggleReminderDone}
-            onSubmitClosingCount={submitClosingCount}
-            onResolveCount={resolveInventoryCount}
-            onApplyAllCounts={applyAllPendingCounts}
-          />
-        )}
-
-        {/* =========================================
-            VIEW: RECIPES / BOM
-        ========================================= */}
-        {activeTab === "recipes" && (
-          <RecipesView
-            recipes={recipes}
-            ingredients={ingredients}
-            menuInventory={menuInventory}
-            pricingRules={pricingRules}
-            viewingRecipe={viewingRecipe}
-            isCreatingRecipe={isCreatingRecipe}
-            onViewRecipe={setViewingRecipe}
-            onCreateRecipe={() => setIsCreatingRecipe(true)}
-            onEditRule={updatePricingRule}
-            onCancelEdit={cancelRecipeEdit}
-            onSave={saveRecipe}
-          />
-        )}
-
-        {/* =========================================
-            VIEW: PRODUCTION RUNS
-        ========================================= */}
-        {activeTab === "production-runs" && (
-          <ProductionView
-            productionRuns={productionRuns}
-            recipes={recipes}
-            menuInventory={menuInventory}
-            ingredients={ingredients}
-            onSchedule={scheduleProductionRun}
-            onComplete={completeProductionRun}
-            onDelete={deleteProductionRun}
-          />
-        )}
-
-        {/* =========================================
-            VIEW: CALENDAR
-        ========================================= */}
-        {activeTab === "calendar" && <CalendarView />}
-
-        {/* =========================================
-            VIEWS: REPORTS
-        ========================================= */}
-        {(
-          activeTab === "reports-dashboard" ||
-          activeTab === "reports-closing" ||
-          activeTab === "reports-inventory"
-        ) && (
-          <ReportsView
-            activeTab={activeTab}
-            sales={sales}
-            onReprintSale={setReceipt}
-            onSaveSaleEdit={editSale}
-            expenses={expenses}
-            dayClosings={dayClosings}
-            onAddExpense={addExpense}
-            onDeleteExpense={deleteExpense}
-            onCloseDay={closeDay}
-            menuInventory={menuInventory}
-            ingredients={ingredients}
-            inventoryCounts={inventoryCounts}
-          />
-        )}
-
-        {/* =========================================
-            VIEW: AUDIT LOGS (admin tier only, via permissions.ts)
-        ========================================= */}
-        {activeTab === "audit-logs" && <AuditLogsView />}
-
-        {/* =========================================
-            VIEW: ROLES (admin tier only, via permissions.ts)
-        ========================================= */}
-        {activeTab === "user-management" && (
-          <UserManagementView
-            users={users}
-            currentUser={currentUser}
-            onChangeRole={updateUserRole}
-          />
-        )}
-        </>
-        )}
+        {/* Routes render only when the signed-in role may open the tab named by the URL. */}
+        {activeTab && canView(activeTab) && <Outlet />}
       </main>
-        </>
-      )}
+    </>
+  );
+
+  const inventoryViewProps = {
+    menuInventory,
+    ingredients,
+    restockReminders,
+    inventoryCounts,
+    canViewIngredients: !!role && canAccessIngredients(role),
+    canReconcile: !!role && canAccessReconciliation(role),
+    onNavClick: handleNavClick,
+    onRestockToProduction: goToProductionRuns,
+    onOpenRestock: openRestock,
+    onAddIngredient: addIngredient,
+    onUpdateIngredient: updateIngredient,
+    onAddReminder: addRestockReminder,
+    onToggleReminderDone: toggleReminderDone,
+    onSubmitClosingCount: submitClosingCount,
+    onResolveCount: resolveInventoryCount,
+    onApplyAllCounts: applyAllPendingCounts,
+  };
+
+  const reportsViewProps = {
+    sales,
+    onReprintSale: setReceipt,
+    onSaveSaleEdit: editSale,
+    expenses,
+    dayClosings,
+    onAddExpense: addExpense,
+    onDeleteExpense: deleteExpense,
+    onCloseDay: closeDay,
+    menuInventory,
+    ingredients,
+    inventoryCounts,
+  };
+
+  return (
+    <div
+      className={`flex flex-col ${
+        isDesktopRail ? "md:flex-row" : ""
+      } h-screen bg-[#FDF9F3] font-sans text-[#121212] overflow-hidden relative`}
+    >
+      <Routes>
+        <Route path="/" element={shell}>
+          <Route
+            index
+            element={
+              <DashboardView
+                orders={orders}
+                clients={clients}
+                lowStockAlerts={lowStockAlerts}
+                pendingOrdersCount={pendingOrdersCount}
+                readyOrdersCount={readyOrdersCount}
+                onNavClick={handleNavClick}
+                onViewOrder={handleViewOrder}
+              />
+            }
+          />
+          <Route
+            path="pos"
+            element={
+              <PosView
+                posCategory={posCategory}
+                setPosCategory={setPosCategory}
+                posSearch={posSearch}
+                setPosSearch={setPosSearch}
+                filteredPosProducts={filteredPosProducts}
+                addToCart={addToCart}
+                cart={cart}
+                adjustCartQty={adjustCartQty}
+                isTicketViewOpen={isTicketViewOpen}
+                openTicketView={openTicketView}
+                closeTicketView={closeTicketView}
+                clearTicket={clearTicket}
+                cartSubtotal={cartSubtotal}
+                cartTax={cartTax}
+                cartTotal={cartTotal}
+                customer={ticketCustomer}
+                onRemoveCustomer={clearTicketCustomer}
+                onAddCustomer={openCustomerPicker}
+                openConfirmModal={openConfirmModal}
+              />
+            }
+          />
+          <Route
+            path="orders"
+            element={
+              <OrdersView
+                orders={orders}
+                clients={clients}
+                menuInventory={menuInventory}
+                viewingOrder={viewingOrder}
+                onViewOrder={setViewingOrder}
+                onEditOrder={editOrder}
+                onAdvanceStatus={advanceOrderStatus}
+                onScheduleDelivery={scheduleOrderDelivery}
+                onMarkDelivered={markOrderDelivered}
+                onRecordPayment={recordOrderPayment}
+                onGoToProduction={goToProductionRuns}
+              />
+            }
+          />
+          <Route
+            path="clients"
+            element={
+              <ClientsView
+                clients={clients}
+                orders={orders}
+                viewingClient={viewingClient}
+                onView={setViewingClient}
+                onAdd={addClient}
+                onUpdate={updateClient}
+                onViewOrder={(order) => {
+                  navigate(PATH_BY_TAB.orders);
+                  setViewingClient(null);
+                  setViewingOrder(order);
+                }}
+              />
+            }
+          />
+          <Route
+            path="inventory"
+            element={<InventoryView activeTab="inventory" {...inventoryViewProps} />}
+          />
+          <Route
+            path="inventory/closing-count"
+            element={
+              <InventoryView activeTab="inventory-closing-count" {...inventoryViewProps} />
+            }
+          />
+          <Route
+            path="inventory/reconciliation"
+            element={
+              <InventoryView activeTab="inventory-reconciliation" {...inventoryViewProps} />
+            }
+          />
+          <Route
+            path="recipes"
+            element={
+              <RecipesView
+                recipes={recipes}
+                ingredients={ingredients}
+                menuInventory={menuInventory}
+                pricingRules={pricingRules}
+                viewingRecipe={viewingRecipe}
+                isCreatingRecipe={isCreatingRecipe}
+                onViewRecipe={setViewingRecipe}
+                onCreateRecipe={() => setIsCreatingRecipe(true)}
+                onEditRule={updatePricingRule}
+                onCancelEdit={cancelRecipeEdit}
+                onSave={saveRecipe}
+              />
+            }
+          />
+          <Route
+            path="production-runs"
+            element={
+              <ProductionView
+                productionRuns={productionRuns}
+                recipes={recipes}
+                menuInventory={menuInventory}
+                ingredients={ingredients}
+                onSchedule={scheduleProductionRun}
+                onComplete={completeProductionRun}
+                onDelete={deleteProductionRun}
+              />
+            }
+          />
+          <Route path="calendar" element={<CalendarView />} />
+          <Route
+            path="reports"
+            element={<ReportsView activeTab="reports-dashboard" {...reportsViewProps} />}
+          />
+          <Route
+            path="reports/closing"
+            element={<ReportsView activeTab="reports-closing" {...reportsViewProps} />}
+          />
+          <Route
+            path="reports/inventory"
+            element={<ReportsView activeTab="reports-inventory" {...reportsViewProps} />}
+          />
+          <Route path="audit-logs" element={<AuditLogsView />} />
+          <Route
+            path="roles"
+            element={
+              <UserManagementView
+                users={users}
+                currentUser={currentUser}
+                onChangeRole={updateUserRole}
+              />
+            }
+          />
+        </Route>
+        <Route
+          path={CHAMS_PATH}
+          element={
+            canViewChams ? (
+              <ChamsStockLedger onSwitchView={() => navigate(PATH_BY_TAB[DEFAULT_TAB])} />
+            ) : null
+          }
+        />
+        <Route path="*" element={<Navigate to={PATH_BY_TAB[DEFAULT_TAB]} replace />} />
+      </Routes>
     </div>
   );
 }

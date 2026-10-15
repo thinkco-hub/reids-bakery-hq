@@ -1,5 +1,6 @@
 import { useState } from "react";
-import type { AppView, NavTabId, User } from "../../types/domain";
+import { NavLink, useLocation, useNavigate } from "react-router";
+import type { User } from "../../types/domain";
 import type { Dispatch, SetStateAction } from "react";
 import {
   canAccessChams,
@@ -7,9 +8,9 @@ import {
   canAccessTab,
 } from "../../utils/permissions";
 import { canUseSidebarRail } from "../../utils/responsive";
+import { CHAMS_PATH, PATH_BY_TAB } from "../../routes";
 
 interface SidebarProps {
-  activeTab: NavTabId;
   currentUser: User;
   onLogout: () => void;
   windowWidth: number;
@@ -19,15 +20,31 @@ interface SidebarProps {
   setIsInventoryExpanded: Dispatch<SetStateAction<boolean>>;
   isReportsExpanded: boolean;
   setIsReportsExpanded: Dispatch<SetStateAction<boolean>>;
-  onNavClick: (tab: NavTabId) => void;
-  onSwitchView: (view: AppView) => void;
+  /** Drops the detail panels and closes the drawer when a link is chosen. */
+  onNavSelect: () => void;
 }
 
 /** Width (px) of the collapsed sidebar rail = desktop hover zone (Tailwind w-20). */
 const COLLAPSED_RAIL_PX = 80;
 
+/** A top-level item; `extra` carries the group headers' justify-between. */
+function itemCls(active: boolean, extra = "") {
+  return `w-full flex ${extra}items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
+    active
+      ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
+      : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
+  }`;
+}
+
+function subItemCls(active: boolean) {
+  return `w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
+    active
+      ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
+      : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
+  }`;
+}
+
 export default function Sidebar({
-  activeTab,
   currentUser,
   onLogout,
   windowWidth,
@@ -37,13 +54,20 @@ export default function Sidebar({
   setIsInventoryExpanded,
   isReportsExpanded,
   setIsReportsExpanded,
-  onNavClick,
-  onSwitchView,
+  onNavSelect,
 }: SidebarProps) {
   // --- ROLE-BASED VISIBILITY (src/utils/permissions.ts) ---
   const role = currentUser.role;
   const canReconcile = canAccessReconciliation(role);
   const canSwitchToChams = canAccessChams(role);
+
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const reportsPath = PATH_BY_TAB["reports-dashboard"];
+  // The Reports header only expands its submenu, it never navigates, so there is
+  // no NavLink here to ask whether the group is active.
+  const isReportsActive =
+    pathname === reportsPath || pathname.startsWith(`${reportsPath}/`);
 
   // --- SIDEBAR RESPONSIVE HELPERS ---
   // Phones and tablets open the sidebar from the hamburger as an off-canvas
@@ -114,7 +138,7 @@ export default function Sidebar({
           }`}
         >
           <button
-            onClick={() => onSwitchView("chams")}
+            onClick={() => navigate(CHAMS_PATH)}
             disabled={!canSwitchToChams}
             className={`flex items-center ${canSwitchToChams ? "" : "cursor-default"}`}
             title={canSwitchToChams ? "Switch to Chams Branch Stock Ledger" : undefined}
@@ -158,13 +182,11 @@ export default function Sidebar({
         {/* Navigation Menu */}
         <nav className="flex-1 p-3 space-y-3 mt-4 overflow-y-auto hide-scrollbar">
           {canAccessTab(role, "dashboard") && (
-            <button
-              onClick={() => onNavClick("dashboard")}
-              className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-                activeTab === "dashboard"
-                  ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                  : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-              }`}
+            <NavLink
+              to={PATH_BY_TAB.dashboard}
+              end
+              onClick={onNavSelect}
+              className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
                 <svg
@@ -184,17 +206,15 @@ export default function Sidebar({
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Dashboard
               </span>
-            </button>
+            </NavLink>
           )}
 
           {canAccessTab(role, "pos") && (
-            <button
-              onClick={() => onNavClick("pos")}
-              className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-                activeTab === "pos"
-                  ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                  : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-              }`}
+            <NavLink
+              to={PATH_BY_TAB.pos}
+              end
+              onClick={onNavSelect}
+              className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -204,17 +224,15 @@ export default function Sidebar({
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Point of Sale
               </span>
-            </button>
+            </NavLink>
           )}
 
           {canAccessTab(role, "orders") && (
-            <button
-              onClick={() => onNavClick("orders")}
-              className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-                activeTab === "orders"
-                  ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                  : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-              }`}
+            <NavLink
+              to={PATH_BY_TAB.orders}
+              end
+              onClick={onNavSelect}
+              className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -224,17 +242,15 @@ export default function Sidebar({
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Orders
               </span>
-            </button>
+            </NavLink>
           )}
 
           {canAccessTab(role, "clients") && (
-            <button
-              onClick={() => onNavClick("clients")}
-              className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-                activeTab === "clients"
-                  ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                  : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-              }`}
+            <NavLink
+              to={PATH_BY_TAB.clients}
+              end
+              onClick={onNavSelect}
+              className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -249,25 +265,22 @@ export default function Sidebar({
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Clients
               </span>
-            </button>
+            </NavLink>
           )}
 
           {canAccessTab(role, "inventory") && (
             <div className="flex flex-col">
-              <button
+              <NavLink
+                to={PATH_BY_TAB.inventory}
                 onClick={() => {
                   if (canReconcile) {
                     // Reconciliation roles: first click expands the submenu;
                     // the main view stays reachable via the item itself below.
                     setIsInventoryExpanded(!isInventoryExpanded);
                   }
-                  onNavClick("inventory");
+                  onNavSelect();
                 }}
-                className={`w-full flex justify-between items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-                  activeTab === "inventory" || activeTab === "inventory-closing-count" || activeTab === "inventory-reconciliation"
-                    ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                    : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-                }`}
+                className={({ isActive }) => itemCls(isActive, "justify-between")}
               >
                 <div className="flex items-center">
                   <div className="flex items-center justify-center w-8 flex-shrink-0">
@@ -276,7 +289,7 @@ export default function Sidebar({
                       fill="currentColor"
                       viewBox="0 0 24 24"
                     >
-                      <path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18-.21 0-.41-.06-.57-.18l-7.9-4.44A.991.991 0 013 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18.21 0 .41.06.57.18l7.9 4.44c.32.17.53.5.53.88v9zM12 4.15L6.04 7.5 12 10.85l5.96-3.35L12 4.15zM5 15.91l6 3.38v-6.71L5 9.21v6.7zM19 15.91v-6.7l-6 3.37v6.71l6-3.38z" />
+                      <path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18-.21 0-.41-.06-.57-.18l-7.9-4.44A.991.991 0 013 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18.21 0-.41-.06-.57.18l7.9 4.44c.32.17.53.5.53.88v9zM12 4.15L6.04 7.5 12 10.85l5.96-3.35L12 4.15zM5 15.91l6 3.38v-6.71L5 9.21v6.7zM19 15.91v-6.7l-6 3.37v6.71l6-3.38z" />
                     </svg>
                   </div>
                   <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
@@ -287,6 +300,7 @@ export default function Sidebar({
                   <svg
                     onClick={(e) => {
                       // Chevron tap toggles the submenu without navigating
+                      e.preventDefault();
                       e.stopPropagation();
                       setIsInventoryExpanded(!isInventoryExpanded);
                     }}
@@ -305,35 +319,31 @@ export default function Sidebar({
                     />
                   </svg>
                 )}
-              </button>
+              </NavLink>
 
               {canReconcile && isInventoryExpanded && (
                 <div
                   className={`mt-1 space-y-1 bg-[#4a2605] rounded-lg overflow-hidden transition-all shadow-inner ${submenuCls}`}
                 >
-                  <button
-                    onClick={() => onNavClick("inventory-reconciliation")}
-                    className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
-                      activeTab === "inventory-reconciliation"
-                        ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
-                        : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
-                    }`}
+                  <NavLink
+                    to={PATH_BY_TAB["inventory-reconciliation"]}
+                    end
+                    onClick={onNavSelect}
+                    className={({ isActive }) => subItemCls(isActive)}
                   >
                     Reconciliation
-                  </button>
+                  </NavLink>
                 </div>
               )}
             </div>
           )}
 
           {canAccessTab(role, "recipes") && (
-            <button
-              onClick={() => onNavClick("recipes")}
-              className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-                activeTab === "recipes"
-                  ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                  : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-              }`}
+            <NavLink
+              to={PATH_BY_TAB.recipes}
+              end
+              onClick={onNavSelect}
+              className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -348,17 +358,15 @@ export default function Sidebar({
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Recipes
               </span>
-            </button>
+            </NavLink>
           )}
 
           {canAccessTab(role, "production-runs") && (
-            <button
-              onClick={() => onNavClick("production-runs")}
-              className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-                activeTab === "production-runs"
-                  ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                  : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-              }`}
+            <NavLink
+              to={PATH_BY_TAB["production-runs"]}
+              end
+              onClick={onNavSelect}
+              className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -373,17 +381,15 @@ export default function Sidebar({
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Production Runs
               </span>
-            </button>
+            </NavLink>
           )}
 
           {canAccessTab(role, "calendar") && (
-            <button
-              onClick={() => onNavClick("calendar")}
-              className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-                activeTab === "calendar"
-                  ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                  : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-              }`}
+            <NavLink
+              to={PATH_BY_TAB.calendar}
+              end
+              onClick={onNavSelect}
+              className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -393,18 +399,14 @@ export default function Sidebar({
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Calendar
               </span>
-            </button>
+            </NavLink>
           )}
 
           {canAccessTab(role, "reports-dashboard") && (
             <div className="flex flex-col">
               <button
                 onClick={() => setIsReportsExpanded(!isReportsExpanded)}
-                className={`w-full flex justify-between items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-                  activeTab.startsWith("reports")
-                    ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                    : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-                }`}
+                className={itemCls(isReportsActive, "justify-between")}
               >
                 <div className="flex items-center">
                   <div className="flex items-center justify-center w-8 flex-shrink-0">
@@ -437,49 +439,41 @@ export default function Sidebar({
                 <div
                   className={`mt-1 space-y-1 bg-[#4a2605] rounded-lg overflow-hidden transition-all shadow-inner ${submenuCls}`}
                 >
-                  <button
-                    onClick={() => onNavClick("reports-dashboard")}
-                    className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
-                      activeTab === "reports-dashboard"
-                        ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
-                        : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
-                    }`}
+                  <NavLink
+                    to={PATH_BY_TAB["reports-dashboard"]}
+                    end
+                    onClick={onNavSelect}
+                    className={({ isActive }) => subItemCls(isActive)}
                   >
                     Sales Dashboard
-                  </button>
-                  <button
-                    onClick={() => onNavClick("reports-closing")}
-                    className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
-                      activeTab === "reports-closing"
-                        ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
-                        : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
-                    }`}
+                  </NavLink>
+                  <NavLink
+                    to={PATH_BY_TAB["reports-closing"]}
+                    end
+                    onClick={onNavSelect}
+                    className={({ isActive }) => subItemCls(isActive)}
                   >
                     End-of-Day Closing
-                  </button>
-                  <button
-                    onClick={() => onNavClick("reports-inventory")}
-                    className={`w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
-                      activeTab === "reports-inventory"
-                        ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
-                        : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
-                    }`}
+                  </NavLink>
+                  <NavLink
+                    to={PATH_BY_TAB["reports-inventory"]}
+                    end
+                    onClick={onNavSelect}
+                    className={({ isActive }) => subItemCls(isActive)}
                   >
                     Closing Inventory
-                  </button>
+                  </NavLink>
                 </div>
               )}
             </div>
           )}
 
           {canAccessTab(role, "audit-logs") && (
-            <button
-              onClick={() => onNavClick("audit-logs")}
-              className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-                activeTab === "audit-logs"
-                  ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                  : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-              }`}
+            <NavLink
+              to={PATH_BY_TAB["audit-logs"]}
+              end
+              onClick={onNavSelect}
+              className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -494,17 +488,15 @@ export default function Sidebar({
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Audit Logs
               </span>
-            </button>
+            </NavLink>
           )}
 
           {canAccessTab(role, "user-management") && (
-            <button
-              onClick={() => onNavClick("user-management")}
-              className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
-                activeTab === "user-management"
-                  ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-                  : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
-              }`}
+            <NavLink
+              to={PATH_BY_TAB["user-management"]}
+              end
+              onClick={onNavSelect}
+              className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -519,7 +511,7 @@ export default function Sidebar({
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Roles
               </span>
-            </button>
+            </NavLink>
           )}
         </nav>
 

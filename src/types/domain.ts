@@ -6,8 +6,6 @@
  */
 
 // ---------- IDs ----------
-export type AppView = "reids" | "chams";
-
 export type ClientId = string;
 export type OrderId = string;
 export type MenuItemId = string;
