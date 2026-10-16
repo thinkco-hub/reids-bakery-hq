@@ -16,10 +16,14 @@ import EndOfDayClosing from "./components/reports/EndOfDayClosing";
 import ClosingInventory from "./components/reports/ClosingInventory";
 import DashboardView from "./components/views/DashboardView";
 import PosView from "./components/views/PosView";
-import OrdersView from "./components/views/OrdersView";
-import ClientsView from "./components/views/ClientsView";
+import OrderDetailRoute from "./components/orders/OrderDetailRoute";
+import OrdersList from "./components/orders/OrdersList";
+import ClientDetailRoute from "./components/clients/ClientDetailRoute";
+import ClientsList from "./components/clients/ClientsList";
 import InventoryView from "./components/views/InventoryView";
-import RecipesView from "./components/views/RecipesView";
+import RecipeDetailRoute from "./components/recipes/RecipeDetailRoute";
+import RecipeEditor from "./components/recipes/RecipeEditor";
+import RecipesList from "./components/recipes/RecipesList";
 import ProductionView from "./components/views/ProductionView";
 import CalendarView from "./components/views/CalendarView";
 import AuditLogsView from "./components/views/AuditLogsView";
@@ -34,14 +38,14 @@ import { useOrders } from "./hooks/useOrders";
 import { useClosing } from "./hooks/useClosing";
 import { usePos } from "./hooks/usePos";
 import { useAuth } from "./hooks/useAuth";
-import { CHAMS_PATH, PATH_BY_TAB } from "./routes";
+import { CHAMS_PATH, PATH_BY_TAB, orderPath } from "./routes";
 import {
   DEFAULT_TAB,
   canAccessIngredients,
   canAccessTab,
 } from "./utils/permissions";
 import { canUseSidebarRail, isPhoneViewport } from "./utils/responsive";
-import type { NavTabId, Order } from "./types/domain";
+import type { NavTabId, Order, RecipeInput } from "./types/domain";
 
 export default function BakeryCommandCenter() {
   // --- AUTH (src/hooks/useAuth.ts) ---
@@ -93,22 +97,14 @@ export default function BakeryCommandCenter() {
   // --- CLIENTS (src/hooks/useClients.ts) ---
   const {
     clients,
-    viewingClient,
-    setViewingClient,
     addClient,
     updateClient,
-    clearViewingClient,
   } = useClients({ currentUser });
   // --- RECIPES / BOM (src/hooks/useRecipes.ts) ---
   const {
     recipes,
     pricingRules,
-    viewingRecipe,
-    setViewingRecipe,
-    isCreatingRecipe,
-    setIsCreatingRecipe,
     saveRecipe,
-    cancelRecipeEdit,
     updatePricingRule,
   } = useRecipes({ currentUser });
 
@@ -129,15 +125,12 @@ export default function BakeryCommandCenter() {
   const ordersState = useOrders({ deductOrderLines: inventory.deductOrderLines, currentUser });
   const {
     orders,
-    viewingOrder,
-    setViewingOrder,
     createOrderFromSale,
     editOrder,
     recordOrderPayment,
     advanceOrderStatus,
     scheduleOrderDelivery,
     markOrderDelivered,
-    clearViewingOrder,
   } = ordersState;
 
   // --- INVENTORY COUNTS, EXPENSES & END-OF-DAY CLOSING (src/hooks/useClosing.ts) ---
@@ -210,32 +203,32 @@ export default function BakeryCommandCenter() {
     (item) => item.qty < item.target
   );
 
-  // --- NAVIGATION HANDLERS (compose navigation + feature-owned resets) ---
-  // Event-driven on purpose: the three navigation paths clear different things,
-  // so a single route-watching effect could only ever express one of them.
-  const resetForNavigation = () => {
-    clearViewingOrder();
-    clearViewingClient();
-    setViewingRecipe(null);
-    setIsCreatingRecipe(false);
-    setIsSidebarOpen(false);
-  };
-
+  // --- NAVIGATION HANDLERS ---
+  // Still event-driven, because there is nothing left to unwind: opening a
+  // record is a navigate() and nothing else, so no route-watching effect could
+  // express more than these two calls already do.
   const handleNavClick = (tab: NavTabId) => {
     if (!canView(tab)) return;
     navigate(PATH_BY_TAB[tab]);
-    resetForNavigation();
+    // The drawer is the one thing navigation still has to close: it is shell
+    // state with no URL of its own.
+    setIsSidebarOpen(false);
   };
 
   const handleViewOrder = (order: Order) => {
-    navigate(PATH_BY_TAB.orders);
-    setViewingOrder(order);
+    navigate(orderPath(order.id));
   };
 
   const goToProductionRuns = () => {
     if (!canView("production-runs")) return;
     navigate(PATH_BY_TAB["production-runs"]);
-    clearViewingOrder();
+  };
+
+  // Both editor routes save and leave for the list. The replace is load-bearing:
+  // without it browser Back walks into an editor that already saved.
+  const saveRecipeAndReturn = (recipe: RecipeInput) => {
+    saveRecipe(recipe);
+    navigate(PATH_BY_TAB.recipes, { replace: true });
   };
 
   // The tab survives logout because the URL does, so hand the address bar back
@@ -328,7 +321,7 @@ export default function BakeryCommandCenter() {
         setIsInventoryExpanded={setIsInventoryExpanded}
         isReportsExpanded={isReportsExpanded}
         setIsReportsExpanded={setIsReportsExpanded}
-        onNavSelect={resetForNavigation}
+        onNavSelect={() => setIsSidebarOpen(false)}
       />
 
       {/* MAIN CONTENT AREA */}
@@ -411,46 +404,69 @@ export default function BakeryCommandCenter() {
               </RequireTab>
             }
           />
-          <Route
-            path="orders"
-            element={
-              <RequireTab role={role} tab="orders">
-                <OrdersView
-                  orders={orders}
-                  clients={clients}
-                  menuInventory={menuInventory}
-                  viewingOrder={viewingOrder}
-                  onViewOrder={setViewingOrder}
-                  onEditOrder={editOrder}
-                  onAdvanceStatus={advanceOrderStatus}
-                  onScheduleDelivery={scheduleOrderDelivery}
-                  onMarkDelivered={markOrderDelivered}
-                  onRecordPayment={recordOrderPayment}
-                  onGoToProduction={goToProductionRuns}
-                />
-              </RequireTab>
-            }
-          />
-          <Route
-            path="clients"
-            element={
-              <RequireTab role={role} tab="clients">
-                <ClientsView
-                  clients={clients}
-                  orders={orders}
-                  viewingClient={viewingClient}
-                  onView={setViewingClient}
-                  onAdd={addClient}
-                  onUpdate={updateClient}
-                  onViewOrder={(order) => {
-                    navigate(PATH_BY_TAB.orders);
-                    setViewingClient(null);
-                    setViewingOrder(order);
-                  }}
-                />
-              </RequireTab>
-            }
-          />
+          <Route path="orders" element={<Outlet />}>
+            <Route
+              index
+              element={
+                <RequireTab role={role} tab="orders">
+                  <OrdersList
+                    orders={orders}
+                    clients={clients}
+                    menuInventory={menuInventory}
+                    onView={(order) => navigate(orderPath(order.id))}
+                  />
+                </RequireTab>
+              }
+            />
+            <Route
+              path=":orderId"
+              element={
+                <RequireTab role={role} tab="orders">
+                  <OrderDetailRoute
+                    orders={orders}
+                    clients={clients}
+                    menuInventory={menuInventory}
+                    onEditOrder={editOrder}
+                    onAdvanceStatus={advanceOrderStatus}
+                    onScheduleDelivery={scheduleOrderDelivery}
+                    onMarkDelivered={markOrderDelivered}
+                    onRecordPayment={recordOrderPayment}
+                    onGoToProduction={goToProductionRuns}
+                    onBack={() => navigate(PATH_BY_TAB.orders)}
+                  />
+                </RequireTab>
+              }
+            />
+          </Route>
+          <Route path="clients" element={<Outlet />}>
+            <Route
+              index
+              element={
+                <RequireTab role={role} tab="clients">
+                  <ClientsList
+                    clients={clients}
+                    orders={orders}
+                    onAdd={addClient}
+                    onUpdate={updateClient}
+                    onView={(client) => navigate(`${PATH_BY_TAB.clients}/${client.id}`)}
+                  />
+                </RequireTab>
+              }
+            />
+            <Route
+              path=":clientId"
+              element={
+                <RequireTab role={role} tab="clients">
+                  <ClientDetailRoute
+                    clients={clients}
+                    orders={orders}
+                    onBack={() => navigate(PATH_BY_TAB.clients)}
+                    onViewOrder={(order) => navigate(orderPath(order.id))}
+                  />
+                </RequireTab>
+              }
+            />
+          </Route>
           <Route path="inventory" element={<Outlet />}>
             <Route
               index
@@ -488,26 +504,53 @@ export default function BakeryCommandCenter() {
               }
             />
           </Route>
-          <Route
-            path="recipes"
-            element={
-              <RequireTab role={role} tab="recipes">
-                <RecipesView
-                  recipes={recipes}
-                  ingredients={ingredients}
-                  menuInventory={menuInventory}
-                  pricingRules={pricingRules}
-                  viewingRecipe={viewingRecipe}
-                  isCreatingRecipe={isCreatingRecipe}
-                  onViewRecipe={setViewingRecipe}
-                  onCreateRecipe={() => setIsCreatingRecipe(true)}
-                  onEditRule={updatePricingRule}
-                  onCancelEdit={cancelRecipeEdit}
-                  onSave={saveRecipe}
-                />
-              </RequireTab>
-            }
-          />
+          <Route path="recipes" element={<Outlet />}>
+            <Route
+              index
+              element={
+                <RequireTab role={role} tab="recipes">
+                  <RecipesList
+                    recipes={recipes}
+                    ingredients={ingredients}
+                    menuInventory={menuInventory}
+                    pricingRules={pricingRules}
+                    onEditRule={updatePricingRule}
+                    onEdit={(recipe) => navigate(`${PATH_BY_TAB.recipes}/${recipe.id}`)}
+                    onCreate={() => navigate(`${PATH_BY_TAB.recipes}/new`)}
+                  />
+                </RequireTab>
+              }
+            />
+            <Route
+              path="new"
+              element={
+                <RequireTab role={role} tab="recipes">
+                  <RecipeEditor
+                    recipe={null}
+                    ingredients={ingredients}
+                    pricingRules={pricingRules}
+                    onCancel={() => navigate(-1)}
+                    onSave={saveRecipeAndReturn}
+                  />
+                </RequireTab>
+              }
+            />
+            <Route
+              path=":recipeId"
+              element={
+                <RequireTab role={role} tab="recipes">
+                  <RecipeDetailRoute
+                    recipes={recipes}
+                    ingredients={ingredients}
+                    pricingRules={pricingRules}
+                    onSave={saveRecipeAndReturn}
+                    onCancel={() => navigate(-1)}
+                    onBack={() => navigate(PATH_BY_TAB.recipes)}
+                  />
+                </RequireTab>
+              }
+            />
+          </Route>
           <Route
             path="production-runs"
             element={

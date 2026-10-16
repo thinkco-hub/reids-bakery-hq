@@ -1,6 +1,7 @@
 import React from "react";
-import OrdersList from "../orders/OrdersList";
-import OrderDetail from "../orders/OrderDetail";
+import { useParams } from "react-router";
+import OrderDetail from "./OrderDetail";
+import RecordNotFound from "../common/RecordNotFound";
 import type {
   Client,
   EditOrderInput,
@@ -12,50 +13,49 @@ import type {
   OrderStatus,
 } from "../../types/domain";
 
-interface OrdersViewProps {
+interface OrderDetailRouteProps {
   orders: Order[];
   clients: Client[];
   menuInventory: MenuItemStock[];
-  viewingOrder: Order | null;
-  onViewOrder: (order: Order | null) => void;
   onEditOrder: (id: OrderId, input: EditOrderInput) => void;
   onAdvanceStatus: (id: OrderId, status: OrderStatus | null) => void;
   onScheduleDelivery: (id: OrderId, input: OrderDeliveryInput) => void;
   onMarkDelivered: (id: OrderId) => void;
   onRecordPayment: (id: OrderId, input: OrderPaymentInput) => void;
   onGoToProduction: () => void;
+  onBack: () => void;
 }
 
-export default function OrdersView({
+/**
+ * `/orders/:orderId` — the detail panel addressed by the record instead of by
+ * app-shell state. The lookup reads the same array the shell already owns, so
+ * wiring a store later changes this line and nothing above it.
+ */
+export default function OrderDetailRoute({
   orders,
   clients,
   menuInventory,
-  viewingOrder,
-  onViewOrder,
   onEditOrder,
   onAdvanceStatus,
   onScheduleDelivery,
   onMarkDelivered,
   onRecordPayment,
   onGoToProduction,
-}: OrdersViewProps) {
-  if (!viewingOrder) {
-    return (
-      <OrdersList
-        orders={orders}
-        clients={clients}
-        menuInventory={menuInventory}
-        onView={onViewOrder}
-      />
-    );
+  onBack,
+}: OrderDetailRouteProps) {
+  const { orderId = "" } = useParams();
+  const order = orders.find((o) => o.id === orderId);
+
+  if (!order) {
+    return <RecordNotFound kind="Order" id={orderId} onBack={onBack} />;
   }
 
   return (
     <OrderDetail
-      order={viewingOrder}
-      client={clients.find((c) => c.id === viewingOrder.clientId)}
+      order={order}
+      client={clients.find((c) => c.id === order.clientId)}
       menuInventory={menuInventory}
-      onBack={() => onViewOrder(null)}
+      onBack={onBack}
       onAdvanceStatus={onAdvanceStatus}
       onScheduleDelivery={onScheduleDelivery}
       onMarkDelivered={onMarkDelivered}

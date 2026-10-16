@@ -14,16 +14,15 @@ interface UseRecipesOptions {
 }
 
 /**
- * Owns the recipes/BOM feature: the recipe list, pricing rules and the state
- * of the recipe editor (viewing an existing recipe or creating a new one).
+ * Owns the recipes/BOM feature: the recipe list and the pricing rules. Whether
+ * the editor is open, and on which recipe, is the router's `/recipes/new` and
+ * `/recipes/:recipeId` routes, not state held here.
  */
 export function useRecipes({ currentUser }: UseRecipesOptions) {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
   const [pricingRules, setPricingRules] = useState<PricingRules>({
     targetMarginPercent: 40,
   });
-  const [viewingRecipe, setViewingRecipe] = useState<Recipe | null>(null);
-  const [isCreatingRecipe, setIsCreatingRecipe] = useState(false);
 
   const saveRecipe = (recipe: RecipeInput) => {
     const exists = recipes.some((r) => r.id === recipe.id);
@@ -35,8 +34,6 @@ export function useRecipes({ currentUser }: UseRecipesOptions) {
       if (exists) return prev.map((r) => (r.id === recipe.id ? (recipe as Recipe) : r));
       return [...prev, { ...recipe, id: savedId }];
     });
-    setViewingRecipe(null);
-    setIsCreatingRecipe(false);
 
     if (currentUser) {
       recordAuditEvent({
@@ -51,11 +48,6 @@ export function useRecipes({ currentUser }: UseRecipesOptions) {
     }
   };
 
-  const cancelRecipeEdit = () => {
-    setViewingRecipe(null);
-    setIsCreatingRecipe(false);
-  };
-
   const updatePricingRule = (data: PricingRuleInput) => {
     setPricingRules((prev) => ({
       ...prev,
@@ -67,12 +59,7 @@ export function useRecipes({ currentUser }: UseRecipesOptions) {
   return {
     recipes,
     pricingRules,
-    viewingRecipe,
-    setViewingRecipe,
-    isCreatingRecipe,
-    setIsCreatingRecipe,
     saveRecipe,
-    cancelRecipeEdit,
     updatePricingRule,
   };
 }

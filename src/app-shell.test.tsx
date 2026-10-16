@@ -191,6 +191,70 @@ describe("nested routes", () => {
   });
 });
 
+describe("order detail routes", () => {
+  it("opens a clicked row at its own URL", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/orders");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Orders" });
+
+    const [firstRow] = screen.getAllByRole("button", { name: "View Order Details" });
+    await user.click(firstRow);
+
+    // The id has to survive as a path segment. /orders/ plus a "#1042" fragment
+    // leaves the list on screen and reads to a cashier as an inert button.
+    expect(pathInAddressBar()).toBe("/orders/%231042");
+    expect(
+      await screen.findByRole("heading", { name: "Order #1042" })
+    ).toBeInTheDocument();
+  });
+
+  it("opens the same record when its URL is loaded cold", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/orders/%231042");
+    await signInAsAdmin(user);
+
+    expect(
+      await screen.findByRole("heading", { name: "Order #1042" })
+    ).toBeInTheDocument();
+  });
+
+  it("names an id this device's list does not have", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/orders/%239999");
+    await signInAsAdmin(user);
+
+    expect(
+      await screen.findByRole("heading", { name: "Order #9999 not found" })
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Back to list" }));
+    expect(pathInAddressBar()).toBe("/orders");
+    expect(await screen.findByRole("heading", { name: "Orders" })).toBeInTheDocument();
+  });
+});
+
+/** The active half of Sidebar's `itemCls`, which NavLink picks per route. */
+const ACTIVE_ITEM = "bg-[#F3B978]/20";
+
+describe("sidebar on a record URL", () => {
+  it("keeps the record's own tab highlighted", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/orders/%231042");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Order #1042" });
+
+    expect(within(sidebar()).getByRole("link", { name: "Orders" }).className).toContain(
+      ACTIVE_ITEM
+    );
+    // Dashboard alone keeps `end`: "/" prefixes every route, so dropping it
+    // there would light Dashboard up from anywhere.
+    expect(within(sidebar()).getByRole("link", { name: "Dashboard" }).className).not.toContain(
+      ACTIVE_ITEM
+    );
+  });
+});
+
 /**
  * The paths a cashier may not open, read off PATH_BY_TAB rather than typed out
  * here. A leaf that was never wrapped has to fail this sweep, and a hand-written
@@ -210,5 +274,36 @@ describe("route access guards", () => {
     // address is read; an unwrapped leaf would sit on its own path and time out.
     await screen.findByRole("heading", { name: "Dashboard" });
     expect(pathInAddressBar()).toBe("/");
+  });
+
+  /**
+   * The sweep above cannot generate these: a detail path is not a tab, so
+   * PATH_BY_TAB structurally misses every one of them. A leaf whose guard was
+   * forgotten would open the record and leave the suite green.
+   */
+  it.each(["/clients/CL-001", "/recipes/B-101", "/recipes/new"])(
+    "a cashier typing %s lands on the dashboard",
+    async (path) => {
+      const user = userEvent.setup();
+      renderShellAt(path);
+      await signInAsCashier(user);
+
+      await screen.findByRole("heading", { name: "Dashboard" });
+      expect(pathInAddressBar()).toBe("/");
+    }
+  );
+
+  // ROLE_TABS.cashier includes "orders", so the order leaf is the one detail
+  // route a cashier reaches. Pinned here because a guard that bounced it would
+  // look identical to a guard that was never written.
+  it("opens an order record for a cashier", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/orders/%231042");
+    await signInAsCashier(user);
+
+    expect(
+      await screen.findByRole("heading", { name: "Order #1042" })
+    ).toBeInTheDocument();
+    expect(pathInAddressBar()).toBe("/orders/%231042");
   });
 });

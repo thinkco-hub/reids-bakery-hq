@@ -6,8 +6,11 @@ import { PATH_BY_TAB, isWithinPath, tabFromPath } from "../routes";
  * Owns application navigation: the tab named by the URL, the off-canvas sidebar
  * drawer state and the window width used by the responsive sidebar and POS ticket.
  *
- * Detail-panel state (viewing an order / client / recipe) is owned by its
- * feature hook and cleared by the app shell when a navigation link is clicked.
+ * Which record is on screen is no longer state at all: `/orders/:orderId`,
+ * `/clients/:clientId` and `/recipes/:recipeId` look it up in the feature arrays.
+ * `tabFromPath` answers null for those URLs and that is deliberate — its only
+ * consumer here is `isPosRoute`, and POS has no detail routes. Nothing should
+ * widen it back to the owning tab, because the tab is not what guards a record.
  */
 export function useNavigation() {
   const { pathname } = useLocation();
