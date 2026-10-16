@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
-import type { AppView, NavTabId } from "../types/domain";
+import { useLocation } from "react-router";
+import { tabFromPath } from "../routes";
 
 /**
- * Owns application navigation: the active view (Reid's HQ vs Chams ledger),
- * the active tab, the off-canvas sidebar drawer state and the window width used
- * by the responsive sidebar and POS ticket.
+ * Owns application navigation: the tab named by the URL, the off-canvas sidebar
+ * drawer state and the window width used by the responsive sidebar and POS ticket.
  *
  * Detail-panel state (viewing an order / client / recipe) is owned by its
- * feature hook and is cleared by the app shell on navigation.
+ * feature hook and cleared by the app shell when a navigation link is clicked.
  */
 export function useNavigation() {
-  const [activeView, setActiveView] = useState<AppView>("reids");
-  const [activeTab, setActiveTab] = useState<NavTabId>("dashboard");
+  const { pathname } = useLocation();
+  const activeTab = tabFromPath(pathname);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isInventoryExpanded, setIsInventoryExpanded] = useState(false);
   const [isReportsExpanded, setIsReportsExpanded] = useState(false);
@@ -26,10 +26,7 @@ export function useNavigation() {
   }, []);
 
   return {
-    activeView,
-    setActiveView,
     activeTab,
-    setActiveTab,
     isSidebarOpen,
     setIsSidebarOpen,
     isInventoryExpanded,
