@@ -275,4 +275,35 @@ describe("route access guards", () => {
     await screen.findByRole("heading", { name: "Dashboard" });
     expect(pathInAddressBar()).toBe("/");
   });
+
+  /**
+   * The sweep above cannot generate these: a detail path is not a tab, so
+   * PATH_BY_TAB structurally misses every one of them. A leaf whose guard was
+   * forgotten would open the record and leave the suite green.
+   */
+  it.each(["/clients/CL-001", "/recipes/B-101", "/recipes/new"])(
+    "a cashier typing %s lands on the dashboard",
+    async (path) => {
+      const user = userEvent.setup();
+      renderShellAt(path);
+      await signInAsCashier(user);
+
+      await screen.findByRole("heading", { name: "Dashboard" });
+      expect(pathInAddressBar()).toBe("/");
+    }
+  );
+
+  // ROLE_TABS.cashier includes "orders", so the order leaf is the one detail
+  // route a cashier reaches. Pinned here because a guard that bounced it would
+  // look identical to a guard that was never written.
+  it("opens an order record for a cashier", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/orders/%231042");
+    await signInAsCashier(user);
+
+    expect(
+      await screen.findByRole("heading", { name: "Order #1042" })
+    ).toBeInTheDocument();
+    expect(pathInAddressBar()).toBe("/orders/%231042");
+  });
 });
