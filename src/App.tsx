@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router";
 import ChamsStockLedger from "./components/chams/ChamsStockLedger";
+import { RequireChams, RequireTab } from "./components/RequireAccess";
 import LoginPage from "./components/auth/LoginPage";
 import Sidebar from "./components/layout/Sidebar";
 import MobileTopBar from "./components/layout/MobileTopBar";
@@ -383,191 +384,236 @@ export default function BakeryCommandCenter() {
           <Route
             index
             element={
-              <DashboardView
-                orders={orders}
-                clients={clients}
-                lowStockAlerts={lowStockAlerts}
-                pendingOrdersCount={pendingOrdersCount}
-                readyOrdersCount={readyOrdersCount}
-                onNavClick={handleNavClick}
-                onViewOrder={handleViewOrder}
-              />
+              <RequireTab role={role} tab="dashboard">
+                <DashboardView
+                  orders={orders}
+                  clients={clients}
+                  lowStockAlerts={lowStockAlerts}
+                  pendingOrdersCount={pendingOrdersCount}
+                  readyOrdersCount={readyOrdersCount}
+                  onNavClick={handleNavClick}
+                  onViewOrder={handleViewOrder}
+                />
+              </RequireTab>
             }
           />
           <Route
             path="pos"
             element={
-              <PosView
-                posCategory={posCategory}
-                setPosCategory={setPosCategory}
-                posSearch={posSearch}
-                setPosSearch={setPosSearch}
-                filteredPosProducts={filteredPosProducts}
-                addToCart={addToCart}
-                cart={cart}
-                adjustCartQty={adjustCartQty}
-                isTicketViewOpen={isTicketViewOpen}
-                openTicketView={openTicketView}
-                closeTicketView={closeTicketView}
-                clearTicket={clearTicket}
-                cartSubtotal={cartSubtotal}
-                cartTax={cartTax}
-                cartTotal={cartTotal}
-                customer={ticketCustomer}
-                onRemoveCustomer={clearTicketCustomer}
-                onAddCustomer={openCustomerPicker}
-                openConfirmModal={openConfirmModal}
-              />
+              <RequireTab role={role} tab="pos">
+                <PosView
+                  posCategory={posCategory}
+                  setPosCategory={setPosCategory}
+                  posSearch={posSearch}
+                  setPosSearch={setPosSearch}
+                  filteredPosProducts={filteredPosProducts}
+                  addToCart={addToCart}
+                  cart={cart}
+                  adjustCartQty={adjustCartQty}
+                  isTicketViewOpen={isTicketViewOpen}
+                  openTicketView={openTicketView}
+                  closeTicketView={closeTicketView}
+                  clearTicket={clearTicket}
+                  cartSubtotal={cartSubtotal}
+                  cartTax={cartTax}
+                  cartTotal={cartTotal}
+                  customer={ticketCustomer}
+                  onRemoveCustomer={clearTicketCustomer}
+                  onAddCustomer={openCustomerPicker}
+                  openConfirmModal={openConfirmModal}
+                />
+              </RequireTab>
             }
           />
           <Route
             path="orders"
             element={
-              <OrdersView
-                orders={orders}
-                clients={clients}
-                menuInventory={menuInventory}
-                viewingOrder={viewingOrder}
-                onViewOrder={setViewingOrder}
-                onEditOrder={editOrder}
-                onAdvanceStatus={advanceOrderStatus}
-                onScheduleDelivery={scheduleOrderDelivery}
-                onMarkDelivered={markOrderDelivered}
-                onRecordPayment={recordOrderPayment}
-                onGoToProduction={goToProductionRuns}
-              />
+              <RequireTab role={role} tab="orders">
+                <OrdersView
+                  orders={orders}
+                  clients={clients}
+                  menuInventory={menuInventory}
+                  viewingOrder={viewingOrder}
+                  onViewOrder={setViewingOrder}
+                  onEditOrder={editOrder}
+                  onAdvanceStatus={advanceOrderStatus}
+                  onScheduleDelivery={scheduleOrderDelivery}
+                  onMarkDelivered={markOrderDelivered}
+                  onRecordPayment={recordOrderPayment}
+                  onGoToProduction={goToProductionRuns}
+                />
+              </RequireTab>
             }
           />
           <Route
             path="clients"
             element={
-              <ClientsView
-                clients={clients}
-                orders={orders}
-                viewingClient={viewingClient}
-                onView={setViewingClient}
-                onAdd={addClient}
-                onUpdate={updateClient}
-                onViewOrder={(order) => {
-                  navigate(PATH_BY_TAB.orders);
-                  setViewingClient(null);
-                  setViewingOrder(order);
-                }}
-              />
+              <RequireTab role={role} tab="clients">
+                <ClientsView
+                  clients={clients}
+                  orders={orders}
+                  viewingClient={viewingClient}
+                  onView={setViewingClient}
+                  onAdd={addClient}
+                  onUpdate={updateClient}
+                  onViewOrder={(order) => {
+                    navigate(PATH_BY_TAB.orders);
+                    setViewingClient(null);
+                    setViewingOrder(order);
+                  }}
+                />
+              </RequireTab>
             }
           />
           <Route path="inventory" element={<Outlet />}>
-            <Route index element={<InventoryView {...inventoryViewProps} />} />
+            <Route
+              index
+              element={
+                <RequireTab role={role} tab="inventory">
+                  <InventoryView {...inventoryViewProps} />
+                </RequireTab>
+              }
+            />
             <Route
               path="closing-count"
               element={
-                <ClosingCountForm
-                  menuInventory={menuInventory}
-                  ingredients={ingredients}
-                  onSubmit={submitClosingCount}
-                  onBack={() => handleNavClick("inventory")}
-                />
+                <RequireTab role={role} tab="inventory-closing-count">
+                  <ClosingCountForm
+                    menuInventory={menuInventory}
+                    ingredients={ingredients}
+                    onSubmit={submitClosingCount}
+                    onBack={() => handleNavClick("inventory")}
+                  />
+                </RequireTab>
               }
             />
             <Route
               path="reconciliation"
               element={
-                <ReconciliationReview
-                  counts={inventoryCounts}
-                  menuInventory={menuInventory}
-                  ingredients={ingredients}
-                  onResolve={resolveInventoryCount}
-                  onApplyAll={applyAllPendingCounts}
-                />
+                <RequireTab role={role} tab="inventory-reconciliation">
+                  <ReconciliationReview
+                    counts={inventoryCounts}
+                    menuInventory={menuInventory}
+                    ingredients={ingredients}
+                    onResolve={resolveInventoryCount}
+                    onApplyAll={applyAllPendingCounts}
+                  />
+                </RequireTab>
               }
             />
           </Route>
           <Route
             path="recipes"
             element={
-              <RecipesView
-                recipes={recipes}
-                ingredients={ingredients}
-                menuInventory={menuInventory}
-                pricingRules={pricingRules}
-                viewingRecipe={viewingRecipe}
-                isCreatingRecipe={isCreatingRecipe}
-                onViewRecipe={setViewingRecipe}
-                onCreateRecipe={() => setIsCreatingRecipe(true)}
-                onEditRule={updatePricingRule}
-                onCancelEdit={cancelRecipeEdit}
-                onSave={saveRecipe}
-              />
+              <RequireTab role={role} tab="recipes">
+                <RecipesView
+                  recipes={recipes}
+                  ingredients={ingredients}
+                  menuInventory={menuInventory}
+                  pricingRules={pricingRules}
+                  viewingRecipe={viewingRecipe}
+                  isCreatingRecipe={isCreatingRecipe}
+                  onViewRecipe={setViewingRecipe}
+                  onCreateRecipe={() => setIsCreatingRecipe(true)}
+                  onEditRule={updatePricingRule}
+                  onCancelEdit={cancelRecipeEdit}
+                  onSave={saveRecipe}
+                />
+              </RequireTab>
             }
           />
           <Route
             path="production-runs"
             element={
-              <ProductionView
-                productionRuns={productionRuns}
-                recipes={recipes}
-                menuInventory={menuInventory}
-                ingredients={ingredients}
-                onSchedule={scheduleProductionRun}
-                onComplete={completeProductionRun}
-                onDelete={deleteProductionRun}
-              />
+              <RequireTab role={role} tab="production-runs">
+                <ProductionView
+                  productionRuns={productionRuns}
+                  recipes={recipes}
+                  menuInventory={menuInventory}
+                  ingredients={ingredients}
+                  onSchedule={scheduleProductionRun}
+                  onComplete={completeProductionRun}
+                  onDelete={deleteProductionRun}
+                />
+              </RequireTab>
             }
           />
-          <Route path="calendar" element={<CalendarView />} />
+          <Route
+            path="calendar"
+            element={
+              <RequireTab role={role} tab="calendar">
+                <CalendarView />
+              </RequireTab>
+            }
+          />
           <Route path="reports" element={<Outlet />}>
             <Route
               index
               element={
-                <ReportsDashboard
-                  sales={sales}
-                  onReprintSale={setReceipt}
-                  onSaveSaleEdit={editSale}
-                />
+                <RequireTab role={role} tab="reports-dashboard">
+                  <ReportsDashboard
+                    sales={sales}
+                    onReprintSale={setReceipt}
+                    onSaveSaleEdit={editSale}
+                  />
+                </RequireTab>
               }
             />
             <Route
               path="closing"
               element={
-                <EndOfDayClosing
-                  sales={sales}
-                  expenses={expenses}
-                  dayClosings={dayClosings}
-                  onAddExpense={addExpense}
-                  onDeleteExpense={deleteExpense}
-                  onCloseDay={closeDay}
-                />
+                <RequireTab role={role} tab="reports-closing">
+                  <EndOfDayClosing
+                    sales={sales}
+                    expenses={expenses}
+                    dayClosings={dayClosings}
+                    onAddExpense={addExpense}
+                    onDeleteExpense={deleteExpense}
+                    onCloseDay={closeDay}
+                  />
+                </RequireTab>
               }
             />
             <Route
               path="inventory"
               element={
-                <ClosingInventory
-                  menuInventory={menuInventory}
-                  ingredients={ingredients}
-                  inventoryCounts={inventoryCounts}
-                />
+                <RequireTab role={role} tab="reports-inventory">
+                  <ClosingInventory
+                    menuInventory={menuInventory}
+                    ingredients={ingredients}
+                    inventoryCounts={inventoryCounts}
+                  />
+                </RequireTab>
               }
             />
           </Route>
-          <Route path="audit-logs" element={<AuditLogsView />} />
+          <Route
+            path="audit-logs"
+            element={
+              <RequireTab role={role} tab="audit-logs">
+                <AuditLogsView />
+              </RequireTab>
+            }
+          />
           <Route
             path="roles"
             element={
-              <UserManagementView
-                users={users}
-                currentUser={currentUser}
-                onChangeRole={updateUserRole}
-              />
+              <RequireTab role={role} tab="user-management">
+                <UserManagementView
+                  users={users}
+                  currentUser={currentUser}
+                  onChangeRole={updateUserRole}
+                />
+              </RequireTab>
             }
           />
         </Route>
         <Route
           path={CHAMS_PATH}
           element={
-            canViewChams ? (
+            <RequireChams role={role}>
               <ChamsStockLedger onSwitchView={() => navigate(PATH_BY_TAB[DEFAULT_TAB])} />
-            ) : null
+            </RequireChams>
           }
         />
         <Route path="*" element={<Navigate to={PATH_BY_TAB[DEFAULT_TAB]} replace />} />
