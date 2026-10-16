@@ -22,6 +22,9 @@ import ClientDetailRoute from "./components/clients/ClientDetailRoute";
 import ClientsList from "./components/clients/ClientsList";
 import InventoryView from "./components/views/InventoryView";
 import RecipesView from "./components/views/RecipesView";
+import RecipeDetailRoute from "./components/recipes/RecipeDetailRoute";
+import RecipeEditor from "./components/recipes/RecipeEditor";
+import RecipesList from "./components/recipes/RecipesList";
 import ProductionView from "./components/views/ProductionView";
 import CalendarView from "./components/views/CalendarView";
 import AuditLogsView from "./components/views/AuditLogsView";
@@ -43,7 +46,7 @@ import {
   canAccessTab,
 } from "./utils/permissions";
 import { canUseSidebarRail, isPhoneViewport } from "./utils/responsive";
-import type { NavTabId, Order } from "./types/domain";
+import type { NavTabId, Order, RecipeInput } from "./types/domain";
 
 export default function BakeryCommandCenter() {
   // --- AUTH (src/hooks/useAuth.ts) ---
@@ -228,6 +231,13 @@ export default function BakeryCommandCenter() {
   const goToProductionRuns = () => {
     if (!canView("production-runs")) return;
     navigate(PATH_BY_TAB["production-runs"]);
+  };
+
+  // Both editor routes save and leave for the list. The replace is load-bearing:
+  // without it browser Back walks into an editor that already saved.
+  const saveRecipeAndReturn = (recipe: RecipeInput) => {
+    saveRecipe(recipe);
+    navigate(PATH_BY_TAB.recipes, { replace: true });
   };
 
   // The tab survives logout because the URL does, so hand the address bar back
@@ -503,26 +513,53 @@ export default function BakeryCommandCenter() {
               }
             />
           </Route>
-          <Route
-            path="recipes"
-            element={
-              <RequireTab role={role} tab="recipes">
-                <RecipesView
-                  recipes={recipes}
-                  ingredients={ingredients}
-                  menuInventory={menuInventory}
-                  pricingRules={pricingRules}
-                  viewingRecipe={viewingRecipe}
-                  isCreatingRecipe={isCreatingRecipe}
-                  onViewRecipe={setViewingRecipe}
-                  onCreateRecipe={() => setIsCreatingRecipe(true)}
-                  onEditRule={updatePricingRule}
-                  onCancelEdit={cancelRecipeEdit}
-                  onSave={saveRecipe}
-                />
-              </RequireTab>
-            }
-          />
+          <Route path="recipes" element={<Outlet />}>
+            <Route
+              index
+              element={
+                <RequireTab role={role} tab="recipes">
+                  <RecipesList
+                    recipes={recipes}
+                    ingredients={ingredients}
+                    menuInventory={menuInventory}
+                    pricingRules={pricingRules}
+                    onEditRule={updatePricingRule}
+                    onEdit={(recipe) => navigate(`${PATH_BY_TAB.recipes}/${recipe.id}`)}
+                    onCreate={() => navigate(`${PATH_BY_TAB.recipes}/new`)}
+                  />
+                </RequireTab>
+              }
+            />
+            <Route
+              path="new"
+              element={
+                <RequireTab role={role} tab="recipes">
+                  <RecipeEditor
+                    recipe={null}
+                    ingredients={ingredients}
+                    pricingRules={pricingRules}
+                    onCancel={() => navigate(-1)}
+                    onSave={saveRecipeAndReturn}
+                  />
+                </RequireTab>
+              }
+            />
+            <Route
+              path=":recipeId"
+              element={
+                <RequireTab role={role} tab="recipes">
+                  <RecipeDetailRoute
+                    recipes={recipes}
+                    ingredients={ingredients}
+                    pricingRules={pricingRules}
+                    onSave={saveRecipeAndReturn}
+                    onCancel={() => navigate(-1)}
+                    onBack={() => navigate(PATH_BY_TAB.recipes)}
+                  />
+                </RequireTab>
+              }
+            />
+          </Route>
           <Route
             path="production-runs"
             element={
