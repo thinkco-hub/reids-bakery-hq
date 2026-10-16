@@ -2,16 +2,9 @@ import React, { useState } from "react";
 import FinishedGoodsTable from "../inventory/FinishedGoodsTable";
 import RawMaterialsTable from "../inventory/RawMaterialsTable";
 import RestockReminders from "../inventory/RestockReminders";
-import ClosingCountForm from "../inventory/ClosingCountForm";
-import ReconciliationReview from "../inventory/ReconciliationReview";
 import type {
-  ClosingCountSubmission,
-  CountResolutionAction,
   IngredientFormData,
   IngredientStock,
-  InventoryCount,
-  InventoryCountId,
-  InventoryTabId,
   MenuItemStock,
   NavTabId,
   RestockCategory,
@@ -20,15 +13,11 @@ import type {
 } from "../../types/domain";
 
 interface InventoryViewProps {
-  activeTab: InventoryTabId;
   menuInventory: MenuItemStock[];
   ingredients: IngredientStock[];
   restockReminders: RestockReminder[];
-  inventoryCounts: InventoryCount[];
   /** Whether the signed-in role may see the Raw Materials (Ingredients) table and the stock toggle. */
   canViewIngredients: boolean;
-  /** Whether the signed-in role may open Reconciliation. */
-  canReconcile: boolean;
   onNavClick: (tab: NavTabId) => void;
   onRestockToProduction: () => void;
   onOpenRestock: (category: RestockCategory, itemId?: string) => void;
@@ -36,22 +25,16 @@ interface InventoryViewProps {
   onUpdateIngredient: (id: string, data: Partial<IngredientStock>) => void;
   onAddReminder: (data: RestockReminderData) => void;
   onToggleReminderDone: (id: string) => void;
-  onSubmitClosingCount: (data: ClosingCountSubmission) => void;
-  onResolveCount: (id: InventoryCountId, action: CountResolutionAction) => void;
-  onApplyAllCounts: () => void;
 }
 
 /** Which stock collection the combined Inventory view is showing. */
 type StockView = "menu" | "raw";
 
 export default function InventoryView({
-  activeTab,
   menuInventory,
   ingredients,
   restockReminders,
-  inventoryCounts,
   canViewIngredients,
-  canReconcile,
   onNavClick,
   onRestockToProduction,
   onOpenRestock,
@@ -59,45 +42,10 @@ export default function InventoryView({
   onUpdateIngredient,
   onAddReminder,
   onToggleReminderDone,
-  onSubmitClosingCount,
-  onResolveCount,
-  onApplyAllCounts,
 }: InventoryViewProps) {
   // Menu Items / Raw Materials toggle (combined main Inventory view)
   const [stockView, setStockView] = useState<StockView>("menu");
 
-  // =========================================================
-  //     VIEW: INVENTORY - CLOSING COUNT (reached via button)
-  // =========================================================
-  if (activeTab === "inventory-closing-count") {
-    return (
-      <ClosingCountForm
-        menuInventory={menuInventory}
-        ingredients={ingredients}
-        onSubmit={onSubmitClosingCount}
-        onBack={() => onNavClick("inventory")}
-      />
-    );
-  }
-
-  // =========================================================
-  //     VIEW: INVENTORY - RECONCILIATION (admin tier only)
-  // =========================================================
-  if (activeTab === "inventory-reconciliation" && canReconcile) {
-    return (
-      <ReconciliationReview
-        counts={inventoryCounts}
-        menuInventory={menuInventory}
-        ingredients={ingredients}
-        onResolve={onResolveCount}
-        onApplyAll={onApplyAllCounts}
-      />
-    );
-  }
-
-  // =========================================================
-  //     VIEW: INVENTORY (combined: toggle + reminders)
-  // =========================================================
   return (
     <div className="space-y-6">
       {/* Header: Menu Items / Raw Materials toggle + Closing Count button */}

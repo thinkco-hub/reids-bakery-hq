@@ -1,9 +1,53 @@
-import { describe, expect, it } from "vitest";
-import { screen, within } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
+import { render, screen, within } from "@testing-library/react";
+import { MemoryRouter, useLocation } from "react-router";
 import userEvent from "@testing-library/user-event";
+import type { UserEvent } from "@testing-library/user-event";
+import App from "./App";
 import { renderShell, signInAsCashier } from "./test/render-shell";
 
 const sidebar = () => screen.getByRole("complementary");
+
+/** The router's own address, printed for the assertions a visible screen cannot make. */
+function PathnameProbe() {
+  const { pathname } = useLocation();
+  return <div data-testid="pathname">{pathname}</div>;
+}
+
+/** renderShell plus the probe, for tests that have to name the URL they landed on. */
+function renderShellAt(path: string) {
+  return render(
+    <MemoryRouter initialEntries={[path]}>
+      <App />
+      <PathnameProbe />
+    </MemoryRouter>
+  );
+}
+
+const pathInAddressBar = () => screen.getByTestId("pathname").textContent;
+
+/** useNavigation reads the width when it mounts, so this runs before rendering. */
+function setViewportWidth(width: number) {
+  Object.defineProperty(window, "innerWidth", {
+    configurable: true,
+    writable: true,
+    value: width,
+  });
+}
+
+afterEach(() => setViewportWidth(1024));
+
+/** Admin is the only tier whose Inventory group has a submenu to expand. */
+async function signInAsAdmin(user: UserEvent) {
+  const password = document.querySelector('input[type="password"]');
+  if (!(password instanceof HTMLInputElement)) throw new Error("No password field");
+
+  const email = screen.getByRole("textbox");
+  await user.clear(email);
+  await user.type(email, "admin@rbc.test");
+  await user.type(password, "admin123");
+  await user.click(screen.getByRole("button", { name: "Log In" }));
+}
 
 /** Sidebar labels stay plain text whether the links are buttons or anchors. */
 async function openTab(user: ReturnType<typeof userEvent.setup>, label: string) {
@@ -74,5 +118,72 @@ describe("sign-out", () => {
       await screen.findByRole("heading", { name: "Dashboard" }, { timeout: 3000 })
     ).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Current Ticket" })).toBeNull();
+  });
+});
+
+describe("nested routes", () => {
+  it("opens the Inventory submenu for a nested route loaded cold", async () => {
+    const user = userEvent.setup();
+    renderShell("/inventory/reconciliation");
+    await signInAsAdmin(user);
+
+    await screen.findByRole("heading", { name: "Inventory Reconciliation" });
+    // Nothing clicked a chevron here: the route is what opened the group.
+    expect(
+      within(sidebar()).getByRole("link", { name: "Reconciliation" })
+    ).toBeInTheDocument();
+  });
+
+  it("takes Closing Count off the stock tables and back, URL and all", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/inventory");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Inventory: Menu Items" });
+
+    await user.click(screen.getByRole("button", { name: "Closing Count" }));
+    expect(
+      await screen.findByRole("heading", { name: "Closing Inventory Count" })
+    ).toBeInTheDocument();
+    expect(pathInAddressBar()).toBe("/inventory/closing-count");
+
+    await user.click(screen.getByRole("button", { name: "Back to Inventory" }));
+    expect(
+      await screen.findByRole("heading", { name: "Inventory: Menu Items" })
+    ).toBeInTheDocument();
+    expect(pathInAddressBar()).toBe("/inventory");
+  });
+
+  it("closes the phone drawer when a nested screen is chosen from it", async () => {
+    const user = userEvent.setup();
+    setViewportWidth(375);
+    renderShellAt("/inventory");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Inventory: Menu Items" });
+
+    await user.click(screen.getByRole("button", { name: "Open navigation" }));
+    await user.click(within(sidebar()).getByRole("link", { name: "Reconciliation" }));
+
+    expect(
+      await screen.findByRole("heading", { name: "Inventory Reconciliation" })
+    ).toBeInTheDocument();
+    expect(pathInAddressBar()).toBe("/inventory/reconciliation");
+    // Off-canvas is the only thing that hides the drawer, so the transform is
+    // the state under test — the submenu link itself stays in the document.
+    expect(sidebar().className).toContain("-translate-x-full");
+  });
+
+  it("keeps a clicked group closed on the very route that would open it", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/inventory");
+    await signInAsAdmin(user);
+
+    await within(sidebar()).findByRole("link", { name: "Reconciliation" });
+    // The second svg in the group header is the chevron: it toggles, it does not navigate.
+    await user.click(
+      within(sidebar()).getByRole("link", { name: "Inventory" }).querySelectorAll("svg")[1]
+    );
+
+    expect(within(sidebar()).queryByRole("link", { name: "Reconciliation" })).toBeNull();
+    expect(pathInAddressBar()).toBe("/inventory");
   });
 });

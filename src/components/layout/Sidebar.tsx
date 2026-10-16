@@ -8,7 +8,7 @@ import {
   canAccessTab,
 } from "../../utils/permissions";
 import { canUseSidebarRail } from "../../utils/responsive";
-import { CHAMS_PATH, PATH_BY_TAB } from "../../routes";
+import { CHAMS_PATH, PATH_BY_TAB, isWithinPath } from "../../routes";
 
 interface SidebarProps {
   currentUser: User;
@@ -17,9 +17,11 @@ interface SidebarProps {
   isSidebarOpen: boolean;
   setIsSidebarOpen: Dispatch<SetStateAction<boolean>>;
   isInventoryExpanded: boolean;
-  setIsInventoryExpanded: Dispatch<SetStateAction<boolean>>;
+  /** null hands the group back to the route it owns. */
+  setIsInventoryExpanded: Dispatch<SetStateAction<boolean | null>>;
   isReportsExpanded: boolean;
-  setIsReportsExpanded: Dispatch<SetStateAction<boolean>>;
+  /** null hands the group back to the route it owns. */
+  setIsReportsExpanded: Dispatch<SetStateAction<boolean | null>>;
   /** Drops the detail panels and closes the drawer when a link is chosen. */
   onNavSelect: () => void;
 }
@@ -66,8 +68,7 @@ export default function Sidebar({
   const reportsPath = PATH_BY_TAB["reports-dashboard"];
   // The Reports header only expands its submenu, it never navigates, so there is
   // no NavLink here to ask whether the group is active.
-  const isReportsActive =
-    pathname === reportsPath || pathname.startsWith(`${reportsPath}/`);
+  const isReportsActive = isWithinPath(reportsPath, pathname);
 
   // --- SIDEBAR RESPONSIVE HELPERS ---
   // Phones and tablets open the sidebar from the hamburger as an off-canvas

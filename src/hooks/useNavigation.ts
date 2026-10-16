@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
-import { tabFromPath } from "../routes";
+import { PATH_BY_TAB, isWithinPath, tabFromPath } from "../routes";
 
 /**
  * Owns application navigation: the tab named by the URL, the off-canvas sidebar
@@ -13,11 +13,18 @@ export function useNavigation() {
   const { pathname } = useLocation();
   const activeTab = tabFromPath(pathname);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isInventoryExpanded, setIsInventoryExpanded] = useState(false);
-  const [isReportsExpanded, setIsReportsExpanded] = useState(false);
+  // null = the group follows the route it owns; a boolean = someone clicked the
+  // header, and that choice outlasts the route it was made on.
+  const [inventoryGroup, setInventoryGroup] = useState<boolean | null>(null);
+  const [reportsGroup, setReportsGroup] = useState<boolean | null>(null);
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth : 1024
   );
+
+  const isInventoryExpanded =
+    inventoryGroup ?? isWithinPath(PATH_BY_TAB.inventory, pathname);
+  const isReportsExpanded =
+    reportsGroup ?? isWithinPath(PATH_BY_TAB["reports-dashboard"], pathname);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -30,9 +37,9 @@ export function useNavigation() {
     isSidebarOpen,
     setIsSidebarOpen,
     isInventoryExpanded,
-    setIsInventoryExpanded,
+    setIsInventoryExpanded: setInventoryGroup,
     isReportsExpanded,
-    setIsReportsExpanded,
+    setIsReportsExpanded: setReportsGroup,
     windowWidth,
   };
 }
