@@ -16,7 +16,6 @@ import EndOfDayClosing from "./components/reports/EndOfDayClosing";
 import ClosingInventory from "./components/reports/ClosingInventory";
 import DashboardView from "./components/views/DashboardView";
 import PosView from "./components/views/PosView";
-import OrdersView from "./components/views/OrdersView";
 import OrderDetailRoute from "./components/orders/OrderDetailRoute";
 import OrdersList from "./components/orders/OrdersList";
 import ClientsView from "./components/views/ClientsView";
@@ -131,15 +130,12 @@ export default function BakeryCommandCenter() {
   const ordersState = useOrders({ deductOrderLines: inventory.deductOrderLines, currentUser });
   const {
     orders,
-    viewingOrder,
-    setViewingOrder,
     createOrderFromSale,
     editOrder,
     recordOrderPayment,
     advanceOrderStatus,
     scheduleOrderDelivery,
     markOrderDelivered,
-    clearViewingOrder,
   } = ordersState;
 
   // --- INVENTORY COUNTS, EXPENSES & END-OF-DAY CLOSING (src/hooks/useClosing.ts) ---
@@ -216,7 +212,6 @@ export default function BakeryCommandCenter() {
   // Event-driven on purpose: the three navigation paths clear different things,
   // so a single route-watching effect could only ever express one of them.
   const resetForNavigation = () => {
-    clearViewingOrder();
     clearViewingClient();
     setViewingRecipe(null);
     setIsCreatingRecipe(false);
@@ -236,7 +231,6 @@ export default function BakeryCommandCenter() {
   const goToProductionRuns = () => {
     if (!canView("production-runs")) return;
     navigate(PATH_BY_TAB["production-runs"]);
-    clearViewingOrder();
   };
 
   // The tab survives logout because the URL does, so hand the address bar back

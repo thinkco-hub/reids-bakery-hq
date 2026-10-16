@@ -59,13 +59,12 @@ interface UseOrdersOptions {
 }
 
 /**
- * Owns the orders feature: the order list and the order detail panel
- * (viewingOrder), including payment recording, status changes, scheduling
- * and delivery.
+ * Owns the orders feature: the order list, including payment recording, status
+ * changes, scheduling and delivery. Which order is on screen is the router's
+ * `/orders/:orderId` route, not state held here.
  */
 export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
-  const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
 
   const logOrderEvent = (
     action: AuditActionType,
@@ -116,9 +115,8 @@ export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
   };
 
   /**
-   * Applies a patch to `orders`, mirroring it into `viewingOrder` if shown.
-   * The patch may be a plain object or a function of the current order so the
-   * two states can never drift apart.
+   * Applies a patch to `orders`. The patch may be a plain object or a function
+   * of the current order, so a caller can reach for a field it has not read.
    */
   const patchOrder = (
     id: OrderId,
@@ -129,7 +127,6 @@ export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
       ...(typeof patch === "function" ? patch(o) : patch),
     });
     setOrders((prev) => prev.map((o) => (o.id === id ? apply(o) : o)));
-    setViewingOrder((prev) => (prev && prev.id === id ? apply(prev) : prev));
   };
 
   /**
@@ -206,18 +203,13 @@ export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
     logOrderEvent("order.delivered", id, `Marked order ${id} delivered`);
   };
 
-  const clearViewingOrder = () => setViewingOrder(null);
-
   return {
     orders,
-    viewingOrder,
-    setViewingOrder,
     createOrderFromSale,
     editOrder,
     recordOrderPayment,
     advanceOrderStatus,
     scheduleOrderDelivery,
     markOrderDelivered,
-    clearViewingOrder,
   };
 }
