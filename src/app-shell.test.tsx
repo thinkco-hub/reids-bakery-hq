@@ -191,6 +191,49 @@ describe("nested routes", () => {
   });
 });
 
+describe("order detail routes", () => {
+  it("opens a clicked row at its own URL", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/orders");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Orders" });
+
+    const [firstRow] = screen.getAllByRole("button", { name: "View Order Details" });
+    await user.click(firstRow);
+
+    // The id has to survive as a path segment. /orders/ plus a "#1042" fragment
+    // leaves the list on screen and reads to a cashier as an inert button.
+    expect(pathInAddressBar()).toBe("/orders/%231042");
+    expect(
+      await screen.findByRole("heading", { name: "Order #1042" })
+    ).toBeInTheDocument();
+  });
+
+  it("opens the same record when its URL is loaded cold", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/orders/%231042");
+    await signInAsAdmin(user);
+
+    expect(
+      await screen.findByRole("heading", { name: "Order #1042" })
+    ).toBeInTheDocument();
+  });
+
+  it("names an id this device's list does not have", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/orders/%239999");
+    await signInAsAdmin(user);
+
+    expect(
+      await screen.findByRole("heading", { name: "Order #9999 not found" })
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Back to list" }));
+    expect(pathInAddressBar()).toBe("/orders");
+    expect(await screen.findByRole("heading", { name: "Orders" })).toBeInTheDocument();
+  });
+});
+
 /**
  * The paths a cashier may not open, read off PATH_BY_TAB rather than typed out
  * here. A leaf that was never wrapped has to fail this sweep, and a hand-written

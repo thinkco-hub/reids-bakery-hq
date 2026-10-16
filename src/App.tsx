@@ -17,6 +17,8 @@ import ClosingInventory from "./components/reports/ClosingInventory";
 import DashboardView from "./components/views/DashboardView";
 import PosView from "./components/views/PosView";
 import OrdersView from "./components/views/OrdersView";
+import OrderDetailRoute from "./components/orders/OrderDetailRoute";
+import OrdersList from "./components/orders/OrdersList";
 import ClientsView from "./components/views/ClientsView";
 import InventoryView from "./components/views/InventoryView";
 import RecipesView from "./components/views/RecipesView";
@@ -34,7 +36,7 @@ import { useOrders } from "./hooks/useOrders";
 import { useClosing } from "./hooks/useClosing";
 import { usePos } from "./hooks/usePos";
 import { useAuth } from "./hooks/useAuth";
-import { CHAMS_PATH, PATH_BY_TAB } from "./routes";
+import { CHAMS_PATH, PATH_BY_TAB, orderPath } from "./routes";
 import {
   DEFAULT_TAB,
   canAccessIngredients,
@@ -228,8 +230,7 @@ export default function BakeryCommandCenter() {
   };
 
   const handleViewOrder = (order: Order) => {
-    navigate(PATH_BY_TAB.orders);
-    setViewingOrder(order);
+    navigate(orderPath(order.id));
   };
 
   const goToProductionRuns = () => {
@@ -411,26 +412,40 @@ export default function BakeryCommandCenter() {
               </RequireTab>
             }
           />
-          <Route
-            path="orders"
-            element={
-              <RequireTab role={role} tab="orders">
-                <OrdersView
-                  orders={orders}
-                  clients={clients}
-                  menuInventory={menuInventory}
-                  viewingOrder={viewingOrder}
-                  onViewOrder={setViewingOrder}
-                  onEditOrder={editOrder}
-                  onAdvanceStatus={advanceOrderStatus}
-                  onScheduleDelivery={scheduleOrderDelivery}
-                  onMarkDelivered={markOrderDelivered}
-                  onRecordPayment={recordOrderPayment}
-                  onGoToProduction={goToProductionRuns}
-                />
-              </RequireTab>
-            }
-          />
+          <Route path="orders" element={<Outlet />}>
+            <Route
+              index
+              element={
+                <RequireTab role={role} tab="orders">
+                  <OrdersList
+                    orders={orders}
+                    clients={clients}
+                    menuInventory={menuInventory}
+                    onView={(order) => navigate(orderPath(order.id))}
+                  />
+                </RequireTab>
+              }
+            />
+            <Route
+              path=":orderId"
+              element={
+                <RequireTab role={role} tab="orders">
+                  <OrderDetailRoute
+                    orders={orders}
+                    clients={clients}
+                    menuInventory={menuInventory}
+                    onEditOrder={editOrder}
+                    onAdvanceStatus={advanceOrderStatus}
+                    onScheduleDelivery={scheduleOrderDelivery}
+                    onMarkDelivered={markOrderDelivered}
+                    onRecordPayment={recordOrderPayment}
+                    onGoToProduction={goToProductionRuns}
+                    onBack={() => navigate(PATH_BY_TAB.orders)}
+                  />
+                </RequireTab>
+              }
+            />
+          </Route>
           <Route
             path="clients"
             element={
@@ -442,11 +457,7 @@ export default function BakeryCommandCenter() {
                   onView={setViewingClient}
                   onAdd={addClient}
                   onUpdate={updateClient}
-                  onViewOrder={(order) => {
-                    navigate(PATH_BY_TAB.orders);
-                    setViewingClient(null);
-                    setViewingOrder(order);
-                  }}
+                  onViewOrder={(order) => navigate(orderPath(order.id))}
                 />
               </RequireTab>
             }
