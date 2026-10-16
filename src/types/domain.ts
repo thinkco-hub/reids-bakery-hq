@@ -431,12 +431,6 @@ export type NavTabId =
   | "user-management";
 
 // ---------- Derived / computed values (utils) ----------
-/** Tabs rendered by the inventory feature view. */
-export type InventoryTabId =
-  | "inventory"
-  | "inventory-closing-count"
-  | "inventory-reconciliation";
-
 /** Tabs rendered by the reports feature view. */
 export type ReportsTabId = "reports-dashboard" | "reports-closing" | "reports-inventory";
 

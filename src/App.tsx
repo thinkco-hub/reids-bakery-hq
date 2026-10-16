@@ -8,6 +8,8 @@ import OrderConfirmationModal from "./components/pos/OrderConfirmationModal";
 import PosCustomerPicker from "./components/pos/PosCustomerPicker";
 import ReceiptModal from "./components/pos/ReceiptModal";
 import RestockModal from "./components/inventory/RestockModal";
+import ClosingCountForm from "./components/inventory/ClosingCountForm";
+import ReconciliationReview from "./components/inventory/ReconciliationReview";
 import DashboardView from "./components/views/DashboardView";
 import PosView from "./components/views/PosView";
 import OrdersView from "./components/views/OrdersView";
@@ -34,7 +36,6 @@ import {
   DEFAULT_TAB,
   canAccessChams,
   canAccessIngredients,
-  canAccessReconciliation,
   canAccessTab,
 } from "./utils/permissions";
 import { canUseSidebarRail, isPhoneViewport } from "./utils/responsive";
@@ -359,9 +360,7 @@ export default function BakeryCommandCenter() {
     menuInventory,
     ingredients,
     restockReminders,
-    inventoryCounts,
     canViewIngredients: !!role && canAccessIngredients(role),
-    canReconcile: !!role && canAccessReconciliation(role),
     onNavClick: handleNavClick,
     onRestockToProduction: goToProductionRuns,
     onOpenRestock: openRestock,
@@ -369,9 +368,6 @@ export default function BakeryCommandCenter() {
     onUpdateIngredient: updateIngredient,
     onAddReminder: addRestockReminder,
     onToggleReminderDone: toggleReminderDone,
-    onSubmitClosingCount: submitClosingCount,
-    onResolveCount: resolveInventoryCount,
-    onApplyAllCounts: applyAllPendingCounts,
   };
 
   const reportsViewProps = {
@@ -472,22 +468,32 @@ export default function BakeryCommandCenter() {
               />
             }
           />
-          <Route
-            path="inventory"
-            element={<InventoryView activeTab="inventory" {...inventoryViewProps} />}
-          />
-          <Route
-            path="inventory/closing-count"
-            element={
-              <InventoryView activeTab="inventory-closing-count" {...inventoryViewProps} />
-            }
-          />
-          <Route
-            path="inventory/reconciliation"
-            element={
-              <InventoryView activeTab="inventory-reconciliation" {...inventoryViewProps} />
-            }
-          />
+          <Route path="inventory" element={<Outlet />}>
+            <Route index element={<InventoryView {...inventoryViewProps} />} />
+            <Route
+              path="closing-count"
+              element={
+                <ClosingCountForm
+                  menuInventory={menuInventory}
+                  ingredients={ingredients}
+                  onSubmit={submitClosingCount}
+                  onBack={() => handleNavClick("inventory")}
+                />
+              }
+            />
+            <Route
+              path="reconciliation"
+              element={
+                <ReconciliationReview
+                  counts={inventoryCounts}
+                  menuInventory={menuInventory}
+                  ingredients={ingredients}
+                  onResolve={resolveInventoryCount}
+                  onApplyAll={applyAllPendingCounts}
+                />
+              }
+            />
+          </Route>
           <Route
             path="recipes"
             element={
