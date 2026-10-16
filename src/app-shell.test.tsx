@@ -234,6 +234,27 @@ describe("order detail routes", () => {
   });
 });
 
+/** The active half of Sidebar's `itemCls`, which NavLink picks per route. */
+const ACTIVE_ITEM = "bg-[#F3B978]/20";
+
+describe("sidebar on a record URL", () => {
+  it("keeps the record's own tab highlighted", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/orders/%231042");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Order #1042" });
+
+    expect(within(sidebar()).getByRole("link", { name: "Orders" }).className).toContain(
+      ACTIVE_ITEM
+    );
+    // Dashboard alone keeps `end`: "/" prefixes every route, so dropping it
+    // there would light Dashboard up from anywhere.
+    expect(within(sidebar()).getByRole("link", { name: "Dashboard" }).className).not.toContain(
+      ACTIVE_ITEM
+    );
+  });
+});
+
 /**
  * The paths a cashier may not open, read off PATH_BY_TAB rather than typed out
  * here. A leaf that was never wrapped has to fail this sweep, and a hand-written

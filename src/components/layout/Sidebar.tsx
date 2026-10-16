@@ -231,7 +231,6 @@ export default function Sidebar({
           {canAccessTab(role, "orders") && (
             <NavLink
               to={PATH_BY_TAB.orders}
-              end
               onClick={onNavSelect}
               className={({ isActive }) => itemCls(isActive)}
             >
@@ -249,7 +248,6 @@ export default function Sidebar({
           {canAccessTab(role, "clients") && (
             <NavLink
               to={PATH_BY_TAB.clients}
-              end
               onClick={onNavSelect}
               className={({ isActive }) => itemCls(isActive)}
             >
@@ -342,7 +340,6 @@ export default function Sidebar({
           {canAccessTab(role, "recipes") && (
             <NavLink
               to={PATH_BY_TAB.recipes}
-              end
               onClick={onNavSelect}
               className={({ isActive }) => itemCls(isActive)}
             >
