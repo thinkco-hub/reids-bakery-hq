@@ -21,7 +21,6 @@ import OrdersList from "./components/orders/OrdersList";
 import ClientDetailRoute from "./components/clients/ClientDetailRoute";
 import ClientsList from "./components/clients/ClientsList";
 import InventoryView from "./components/views/InventoryView";
-import RecipesView from "./components/views/RecipesView";
 import RecipeDetailRoute from "./components/recipes/RecipeDetailRoute";
 import RecipeEditor from "./components/recipes/RecipeEditor";
 import RecipesList from "./components/recipes/RecipesList";
@@ -105,12 +104,7 @@ export default function BakeryCommandCenter() {
   const {
     recipes,
     pricingRules,
-    viewingRecipe,
-    setViewingRecipe,
-    isCreatingRecipe,
-    setIsCreatingRecipe,
     saveRecipe,
-    cancelRecipeEdit,
     updatePricingRule,
   } = useRecipes({ currentUser });
 
@@ -213,8 +207,6 @@ export default function BakeryCommandCenter() {
   // Event-driven on purpose: the three navigation paths clear different things,
   // so a single route-watching effect could only ever express one of them.
   const resetForNavigation = () => {
-    setViewingRecipe(null);
-    setIsCreatingRecipe(false);
     setIsSidebarOpen(false);
   };
 
