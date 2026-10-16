@@ -18,7 +18,6 @@ import DashboardView from "./components/views/DashboardView";
 import PosView from "./components/views/PosView";
 import OrderDetailRoute from "./components/orders/OrderDetailRoute";
 import OrdersList from "./components/orders/OrdersList";
-import ClientsView from "./components/views/ClientsView";
 import ClientDetailRoute from "./components/clients/ClientDetailRoute";
 import ClientsList from "./components/clients/ClientsList";
 import InventoryView from "./components/views/InventoryView";
@@ -96,11 +95,8 @@ export default function BakeryCommandCenter() {
   // --- CLIENTS (src/hooks/useClients.ts) ---
   const {
     clients,
-    viewingClient,
-    setViewingClient,
     addClient,
     updateClient,
-    clearViewingClient,
   } = useClients({ currentUser });
   // --- RECIPES / BOM (src/hooks/useRecipes.ts) ---
   const {
@@ -214,7 +210,6 @@ export default function BakeryCommandCenter() {
   // Event-driven on purpose: the three navigation paths clear different things,
   // so a single route-watching effect could only ever express one of them.
   const resetForNavigation = () => {
-    clearViewingClient();
     setViewingRecipe(null);
     setIsCreatingRecipe(false);
     setIsSidebarOpen(false);
