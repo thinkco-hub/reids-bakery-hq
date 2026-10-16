@@ -52,6 +52,15 @@ export function isWithinPath(path: string, pathname: string): boolean {
   return target === path || target.startsWith(`${path}/`);
 }
 
+/**
+ * The one place an order URL is built. Order ids are minted as `#1042`, and a
+ * bare `#` truncates the URL to path `/orders/` plus a fragment, so the
+ * `:orderId` route would never match. Client and recipe ids are already
+ * URL-safe, which is why this helper is orders-only.
+ */
+export const orderPath = (orderId: string): string =>
+  `/orders/${encodeURIComponent(orderId)}`;
+
 export function isChamsPath(pathname: string): boolean {
   return normalize(pathname) === CHAMS_PATH;
 }

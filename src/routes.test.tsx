@@ -1,7 +1,22 @@
 import { describe, expect, it } from "vitest";
-import { CHAMS_PATH, PATH_BY_TAB, isChamsPath, isWithinPath, tabFromPath } from "./routes";
+import { render, screen } from "@testing-library/react";
+import { MemoryRouter, Route, Routes, useParams } from "react-router";
+import {
+  CHAMS_PATH,
+  PATH_BY_TAB,
+  isChamsPath,
+  isWithinPath,
+  orderPath,
+  tabFromPath,
+} from "./routes";
 import { ALL_ROLES, canAccessTab } from "./utils/permissions";
 import type { NavTabId } from "./types/domain";
+
+/** Echoes the segment the router matched, so a test can read it back decoded. */
+function OrderIdProbe() {
+  const { orderId } = useParams();
+  return <div data-testid="order-id">{orderId}</div>;
+}
 
 const TAB_IDS = Object.keys(PATH_BY_TAB) as NavTabId[];
 
@@ -91,5 +106,25 @@ describe("the path a group owns", () => {
     expect(isWithinPath("/inventory", "/inventory/reconciliation")).toBe(true);
     expect(isWithinPath("/inventory", "/inventory-nope")).toBe(false);
     expect(isWithinPath("/inventory", "/")).toBe(false);
+  });
+});
+
+describe("the path an order is opened at", () => {
+  it("encodes the leading # so it stays part of the path", () => {
+    expect(orderPath("#1042")).toBe("/orders/%231042");
+  });
+
+  it("hands the :orderId route the seeded id back unchanged", () => {
+    render(
+      <MemoryRouter initialEntries={[orderPath("#1042")]}>
+        <Routes>
+          <Route path="orders/:orderId" element={<OrderIdProbe />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    // React Router decodes each matched segment before useParams, so a
+    // `orders.find(o => o.id === orderId)` in a route element still matches.
+    expect(screen.getByTestId("order-id").textContent).toBe("#1042");
   });
 });
