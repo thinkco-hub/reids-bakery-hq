@@ -4,6 +4,9 @@ import { MemoryRouter, useLocation } from "react-router";
 import userEvent from "@testing-library/user-event";
 import type { UserEvent } from "@testing-library/user-event";
 import App from "./App";
+import { PATH_BY_TAB } from "./routes";
+import { canAccessTab } from "./utils/permissions";
+import type { NavTabId } from "./types/domain";
 import { renderShell, signInAsCashier } from "./test/render-shell";
 
 const sidebar = () => screen.getByRole("complementary");
@@ -185,5 +188,27 @@ describe("nested routes", () => {
 
     expect(within(sidebar()).queryByRole("link", { name: "Reconciliation" })).toBeNull();
     expect(pathInAddressBar()).toBe("/inventory");
+  });
+});
+
+/**
+ * The paths a cashier may not open, read off PATH_BY_TAB rather than typed out
+ * here. A leaf that was never wrapped has to fail this sweep, and a hand-written
+ * list would carry the same blind spot as the missing guard.
+ */
+const cashierDeniedPaths = (Object.keys(PATH_BY_TAB) as NavTabId[])
+  .filter((tab) => !canAccessTab("cashier", tab))
+  .map((tab) => PATH_BY_TAB[tab]);
+
+describe("route access guards", () => {
+  it.each(cashierDeniedPaths)("signing in as a cashier off %s lands on the dashboard", async (path) => {
+    const user = userEvent.setup();
+    renderShellAt(path);
+    await signInAsCashier(user);
+
+    // The guard navigates while mounting, so the dashboard is awaited before the
+    // address is read; an unwrapped leaf would sit on its own path and time out.
+    await screen.findByRole("heading", { name: "Dashboard" });
+    expect(pathInAddressBar()).toBe("/");
   });
 });
