@@ -10,6 +10,9 @@ import ReceiptModal from "./components/pos/ReceiptModal";
 import RestockModal from "./components/inventory/RestockModal";
 import ClosingCountForm from "./components/inventory/ClosingCountForm";
 import ReconciliationReview from "./components/inventory/ReconciliationReview";
+import ReportsDashboard from "./components/reports/ReportsDashboard";
+import EndOfDayClosing from "./components/reports/EndOfDayClosing";
+import ClosingInventory from "./components/reports/ClosingInventory";
 import DashboardView from "./components/views/DashboardView";
 import PosView from "./components/views/PosView";
 import OrdersView from "./components/views/OrdersView";
@@ -18,7 +21,6 @@ import InventoryView from "./components/views/InventoryView";
 import RecipesView from "./components/views/RecipesView";
 import ProductionView from "./components/views/ProductionView";
 import CalendarView from "./components/views/CalendarView";
-import ReportsView from "./components/views/ReportsView";
 import AuditLogsView from "./components/views/AuditLogsView";
 import UserManagementView from "./components/views/UserManagementView";
 import { initialPosProducts } from "./data/initialProducts";
@@ -370,20 +372,6 @@ export default function BakeryCommandCenter() {
     onToggleReminderDone: toggleReminderDone,
   };
 
-  const reportsViewProps = {
-    sales,
-    onReprintSale: setReceipt,
-    onSaveSaleEdit: editSale,
-    expenses,
-    dayClosings,
-    onAddExpense: addExpense,
-    onDeleteExpense: deleteExpense,
-    onCloseDay: closeDay,
-    menuInventory,
-    ingredients,
-    inventoryCounts,
-  };
-
   return (
     <div
       className={`flex flex-col ${
@@ -527,18 +515,41 @@ export default function BakeryCommandCenter() {
             }
           />
           <Route path="calendar" element={<CalendarView />} />
-          <Route
-            path="reports"
-            element={<ReportsView activeTab="reports-dashboard" {...reportsViewProps} />}
-          />
-          <Route
-            path="reports/closing"
-            element={<ReportsView activeTab="reports-closing" {...reportsViewProps} />}
-          />
-          <Route
-            path="reports/inventory"
-            element={<ReportsView activeTab="reports-inventory" {...reportsViewProps} />}
-          />
+          <Route path="reports" element={<Outlet />}>
+            <Route
+              index
+              element={
+                <ReportsDashboard
+                  sales={sales}
+                  onReprintSale={setReceipt}
+                  onSaveSaleEdit={editSale}
+                />
+              }
+            />
+            <Route
+              path="closing"
+              element={
+                <EndOfDayClosing
+                  sales={sales}
+                  expenses={expenses}
+                  dayClosings={dayClosings}
+                  onAddExpense={addExpense}
+                  onDeleteExpense={deleteExpense}
+                  onCloseDay={closeDay}
+                />
+              }
+            />
+            <Route
+              path="inventory"
+              element={
+                <ClosingInventory
+                  menuInventory={menuInventory}
+                  ingredients={ingredients}
+                  inventoryCounts={inventoryCounts}
+                />
+              }
+            />
+          </Route>
           <Route path="audit-logs" element={<AuditLogsView />} />
           <Route
             path="roles"

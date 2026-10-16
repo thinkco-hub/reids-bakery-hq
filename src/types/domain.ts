@@ -431,9 +431,6 @@ export type NavTabId =
   | "user-management";
 
 // ---------- Derived / computed values (utils) ----------
-/** Tabs rendered by the reports feature view. */
-export type ReportsTabId = "reports-dashboard" | "reports-closing" | "reports-inventory";
-
 /** Stock level classification (utils/stock). */
 export type StockStatus = "out" | "low" | "ok";
 
