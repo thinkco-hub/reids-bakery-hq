@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CHAMS_PATH, PATH_BY_TAB, isChamsPath, tabFromPath } from "./routes";
+import { CHAMS_PATH, PATH_BY_TAB, isChamsPath, isWithinPath, tabFromPath } from "./routes";
 import { ALL_ROLES, canAccessTab } from "./utils/permissions";
 import type { NavTabId } from "./types/domain";
 
@@ -81,5 +81,15 @@ describe("path <-> NavTabId", () => {
       // Dashboard is the root; every other flat tab is one segment below it.
       expect(PATH_BY_TAB[tab].split("/").filter(Boolean).length).toBeLessThanOrEqual(1);
     }
+  });
+});
+
+describe("the path a group owns", () => {
+  it("draws the boundary at a slash, not at a prefix", () => {
+    expect(isWithinPath("/inventory", "/inventory")).toBe(true);
+    expect(isWithinPath("/inventory", "/inventory/")).toBe(true);
+    expect(isWithinPath("/inventory", "/inventory/reconciliation")).toBe(true);
+    expect(isWithinPath("/inventory", "/inventory-nope")).toBe(false);
+    expect(isWithinPath("/inventory", "/")).toBe(false);
   });
 });

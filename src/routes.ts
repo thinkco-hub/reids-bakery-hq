@@ -43,6 +43,15 @@ export function tabFromPath(pathname: string): NavTabId | null {
   return TAB_BY_PATH[normalize(pathname)] ?? null;
 }
 
+/**
+ * Whether `pathname` is `path` or a route nested under it. "/inventory-nope"
+ * owns nothing under "/inventory", so the boundary is a slash, not a prefix.
+ */
+export function isWithinPath(path: string, pathname: string): boolean {
+  const target = normalize(pathname);
+  return target === path || target.startsWith(`${path}/`);
+}
+
 export function isChamsPath(pathname: string): boolean {
   return normalize(pathname) === CHAMS_PATH;
 }
