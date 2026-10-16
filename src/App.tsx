@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router";
+import React from "react";
+import { Navigate, Outlet, Route, Routes, useNavigate } from "react-router";
 import ChamsStockLedger from "./components/chams/ChamsStockLedger";
 import { RequireChams, RequireTab } from "./components/RequireAccess";
 import LoginPage from "./components/auth/LoginPage";
@@ -34,10 +34,9 @@ import { useOrders } from "./hooks/useOrders";
 import { useClosing } from "./hooks/useClosing";
 import { usePos } from "./hooks/usePos";
 import { useAuth } from "./hooks/useAuth";
-import { CHAMS_PATH, PATH_BY_TAB, isChamsPath } from "./routes";
+import { CHAMS_PATH, PATH_BY_TAB } from "./routes";
 import {
   DEFAULT_TAB,
-  canAccessChams,
   canAccessIngredients,
   canAccessTab,
 } from "./utils/permissions";
@@ -51,7 +50,6 @@ export default function BakeryCommandCenter() {
   // --- ROLE PERMISSIONS (src/utils/permissions.ts) ---
   const role = currentUser?.role;
   const canView = (tab: NavTabId) => !!role && canAccessTab(role, tab);
-  const canViewChams = !!role && canAccessChams(role);
 
   // --- NAVIGATION (src/hooks/useNavigation.ts) ---
   const {
@@ -64,25 +62,13 @@ export default function BakeryCommandCenter() {
     setIsReportsExpanded,
     windowWidth,
   } = useNavigation();
-  const location = useLocation();
   const navigate = useNavigate();
-  const isOnChams = isChamsPath(location.pathname);
 
   // Wide, mouse-driven viewports keep the pinned sidebar rail; phones and tablets
   // (including touch devices that report a desktop viewport) use the hamburger
   // drawer, so the top bar and the drawer have to be gated on the same test.
   const isDesktopRail = canUseSidebarRail(windowWidth);
   const isPosRoute = activeTab === "pos";
-
-  // Send the user somewhere they can access when their role no longer allows the
-  // route they are on (role changed live, or a different user signed in on a stale tab).
-  useEffect(() => {
-    if (!role) return;
-    const forbidden = isOnChams
-      ? !canAccessChams(role)
-      : activeTab !== null && !canAccessTab(role, activeTab);
-    if (forbidden) navigate(PATH_BY_TAB[DEFAULT_TAB], { replace: true });
-  }, [role, isOnChams, activeTab, navigate]);
 
   // --- INVENTORY (src/hooks/useInventory.ts) ---
   const inventory = useInventory({ currentUser });
@@ -353,8 +339,8 @@ export default function BakeryCommandCenter() {
             : "p-4 md:p-8 overflow-y-auto"
         }`}
       >
-        {/* Routes render only when the signed-in role may open the tab named by the URL. */}
-        {activeTab && canView(activeTab) && <Outlet />}
+        {/* Each route guards its own tab; see src/components/RequireAccess.tsx. */}
+        <Outlet />
       </main>
     </>
   );

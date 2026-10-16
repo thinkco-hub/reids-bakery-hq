@@ -7,7 +7,8 @@ import type { NavTabId, UserRole } from "../types/domain";
 /**
  * Route-level access guards. A denied route bounces to the default tab, and
  * every role can open `dashboard` (`ROLE_TABS`), so a denial always lands and
- * cannot loop.
+ * cannot loop. They re-evaluate on every render, so a role changed from the
+ * Roles screen bounces the affected session with no reload.
  *
  * `role` is passed down from App rather than read with `useAuth()` here.
  * `useAuth` is plain `useState`, not a context, so a second instance below the
