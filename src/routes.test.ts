@@ -5,6 +5,22 @@ import type { NavTabId } from "./types/domain";
 
 const TAB_IDS = Object.keys(PATH_BY_TAB) as NavTabId[];
 
+/**
+ * The nested groups. `urlParent` is the tab whose path the children sit under;
+ * `stem` is the key the children share, so the table names its own members
+ * instead of a hand-typed path list.
+ */
+const GROUPS: { urlParent: NavTabId; stem: string; children: number }[] = [
+  { urlParent: "inventory", stem: "inventory", children: 2 },
+  { urlParent: "reports-dashboard", stem: "reports", children: 2 },
+];
+
+function childrenOf(group: (typeof GROUPS)[number]): NavTabId[] {
+  return TAB_IDS.filter(
+    (tab) => tab !== group.urlParent && tab.startsWith(`${group.stem}-`)
+  );
+}
+
 describe("path <-> NavTabId", () => {
   it("gives every tab exactly one path", () => {
     const paths = TAB_IDS.map((tab) => PATH_BY_TAB[tab]);
@@ -46,6 +62,24 @@ describe("path <-> NavTabId", () => {
     expect(PATH_BY_TAB["user-management"]).toBe("/roles");
     for (const role of ALL_ROLES) {
       expect(canAccessTab(role, tabFromPath("/roles")!)).toBe(canAccessTab(role, "user-management"));
+    }
+  });
+
+  it("nests each group's child paths under the group's own path", () => {
+    for (const group of GROUPS) {
+      const members = childrenOf(group);
+      expect(members).toHaveLength(group.children);
+      for (const child of members) {
+        expect(PATH_BY_TAB[child].startsWith(`${PATH_BY_TAB[group.urlParent]}/`)).toBe(true);
+      }
+    }
+  });
+
+  it("leaves every tab outside a group on a path that nests nowhere", () => {
+    const grouped = GROUPS.flatMap((group) => [group.urlParent, ...childrenOf(group)]);
+    for (const tab of TAB_IDS.filter((member) => !grouped.includes(member))) {
+      // Dashboard is the root; every other flat tab is one segment below it.
+      expect(PATH_BY_TAB[tab].split("/").filter(Boolean).length).toBeLessThanOrEqual(1);
     }
   });
 });
