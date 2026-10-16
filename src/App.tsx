@@ -203,17 +203,16 @@ export default function BakeryCommandCenter() {
     (item) => item.qty < item.target
   );
 
-  // --- NAVIGATION HANDLERS (compose navigation + feature-owned resets) ---
-  // Event-driven on purpose: the three navigation paths clear different things,
-  // so a single route-watching effect could only ever express one of them.
-  const resetForNavigation = () => {
-    setIsSidebarOpen(false);
-  };
-
+  // --- NAVIGATION HANDLERS ---
+  // Still event-driven, because there is nothing left to unwind: opening a
+  // record is a navigate() and nothing else, so no route-watching effect could
+  // express more than these two calls already do.
   const handleNavClick = (tab: NavTabId) => {
     if (!canView(tab)) return;
     navigate(PATH_BY_TAB[tab]);
-    resetForNavigation();
+    // The drawer is the one thing navigation still has to close: it is shell
+    // state with no URL of its own.
+    setIsSidebarOpen(false);
   };
 
   const handleViewOrder = (order: Order) => {
@@ -322,7 +321,7 @@ export default function BakeryCommandCenter() {
         setIsInventoryExpanded={setIsInventoryExpanded}
         isReportsExpanded={isReportsExpanded}
         setIsReportsExpanded={setIsReportsExpanded}
-        onNavSelect={resetForNavigation}
+        onNavSelect={() => setIsSidebarOpen(false)}
       />
 
       {/* MAIN CONTENT AREA */}

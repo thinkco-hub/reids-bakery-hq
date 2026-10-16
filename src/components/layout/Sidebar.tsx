@@ -22,7 +22,7 @@ interface SidebarProps {
   isReportsExpanded: boolean;
   /** null hands the group back to the route it owns. */
   setIsReportsExpanded: Dispatch<SetStateAction<boolean | null>>;
-  /** Drops the detail panels and closes the drawer when a link is chosen. */
+  /** Closes the phone drawer once a link is chosen; the URL is the state. */
   onNavSelect: () => void;
 }
 
