@@ -19,6 +19,8 @@ import PosView from "./components/views/PosView";
 import OrderDetailRoute from "./components/orders/OrderDetailRoute";
 import OrdersList from "./components/orders/OrdersList";
 import ClientsView from "./components/views/ClientsView";
+import ClientDetailRoute from "./components/clients/ClientDetailRoute";
+import ClientsList from "./components/clients/ClientsList";
 import InventoryView from "./components/views/InventoryView";
 import RecipesView from "./components/views/RecipesView";
 import ProductionView from "./components/views/ProductionView";
@@ -440,22 +442,35 @@ export default function BakeryCommandCenter() {
               }
             />
           </Route>
-          <Route
-            path="clients"
-            element={
-              <RequireTab role={role} tab="clients">
-                <ClientsView
-                  clients={clients}
-                  orders={orders}
-                  viewingClient={viewingClient}
-                  onView={setViewingClient}
-                  onAdd={addClient}
-                  onUpdate={updateClient}
-                  onViewOrder={(order) => navigate(orderPath(order.id))}
-                />
-              </RequireTab>
-            }
-          />
+          <Route path="clients" element={<Outlet />}>
+            <Route
+              index
+              element={
+                <RequireTab role={role} tab="clients">
+                  <ClientsList
+                    clients={clients}
+                    orders={orders}
+                    onAdd={addClient}
+                    onUpdate={updateClient}
+                    onView={(client) => navigate(`${PATH_BY_TAB.clients}/${client.id}`)}
+                  />
+                </RequireTab>
+              }
+            />
+            <Route
+              path=":clientId"
+              element={
+                <RequireTab role={role} tab="clients">
+                  <ClientDetailRoute
+                    clients={clients}
+                    orders={orders}
+                    onBack={() => navigate(PATH_BY_TAB.clients)}
+                    onViewOrder={(order) => navigate(orderPath(order.id))}
+                  />
+                </RequireTab>
+              }
+            />
+          </Route>
           <Route path="inventory" element={<Outlet />}>
             <Route
               index
