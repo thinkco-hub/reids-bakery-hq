@@ -58,6 +58,7 @@ export default function BakeryCommandCenter() {
   // --- NAVIGATION (src/hooks/useNavigation.ts) ---
   const {
     activeTab,
+    backToList,
     isSidebarOpen,
     setIsSidebarOpen,
     isInventoryExpanded,
@@ -432,7 +433,7 @@ export default function BakeryCommandCenter() {
                     onMarkDelivered={markOrderDelivered}
                     onRecordPayment={recordOrderPayment}
                     onGoToProduction={goToProductionRuns}
-                    onBack={() => navigate(PATH_BY_TAB.orders)}
+                    onBack={() => backToList(PATH_BY_TAB.orders)}
                   />
                 </RequireTab>
               }
@@ -460,7 +461,7 @@ export default function BakeryCommandCenter() {
                   <ClientDetailRoute
                     clients={clients}
                     orders={orders}
-                    onBack={() => navigate(PATH_BY_TAB.clients)}
+                    onBack={() => backToList(PATH_BY_TAB.clients)}
                     onViewOrder={(order) => navigate(orderPath(order.id))}
                   />
                 </RequireTab>
@@ -529,7 +530,7 @@ export default function BakeryCommandCenter() {
                     recipe={null}
                     ingredients={ingredients}
                     pricingRules={pricingRules}
-                    onCancel={() => navigate(-1)}
+                    onCancel={() => backToList(PATH_BY_TAB.recipes)}
                     onSave={saveRecipeAndReturn}
                   />
                 </RequireTab>
@@ -544,8 +545,8 @@ export default function BakeryCommandCenter() {
                     ingredients={ingredients}
                     pricingRules={pricingRules}
                     onSave={saveRecipeAndReturn}
-                    onCancel={() => navigate(-1)}
-                    onBack={() => navigate(PATH_BY_TAB.recipes)}
+                    onCancel={() => backToList(PATH_BY_TAB.recipes)}
+                    onBack={() => backToList(PATH_BY_TAB.recipes)}
                   />
                 </RequireTab>
               }
