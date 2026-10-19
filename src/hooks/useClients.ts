@@ -8,12 +8,11 @@ interface UseClientsOptions {
 }
 
 /**
- * Owns the clients feature: the client list and the client detail panel
- * (viewingClient).
+ * Owns the clients feature: the client list. Which client is on screen is the
+ * router's `/clients/:clientId` route, not state held here.
  */
 export function useClients({ currentUser }: UseClientsOptions) {
   const [clients, setClients] = useState<Client[]>(initialClients);
-  const [viewingClient, setViewingClient] = useState<Client | null>(null);
 
   const logClientEvent = (
     action: "client.created" | "client.updated",
@@ -40,18 +39,12 @@ export function useClients({ currentUser }: UseClientsOptions) {
 
   const updateClient = (id: ClientId, data: Partial<ClientFormData>) => {
     setClients((prev) => prev.map((c) => (c.id === id ? { ...c, ...data } : c)));
-    setViewingClient((prev) => (prev && prev.id === id ? { ...prev, ...data } : prev));
     logClientEvent("client.updated", id, `Updated client ${id}`);
   };
 
-  const clearViewingClient = () => setViewingClient(null);
-
   return {
     clients,
-    viewingClient,
-    setViewingClient,
     addClient,
     updateClient,
-    clearViewingClient,
   };
 }

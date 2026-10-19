@@ -22,7 +22,7 @@ interface SidebarProps {
   isReportsExpanded: boolean;
   /** null hands the group back to the route it owns. */
   setIsReportsExpanded: Dispatch<SetStateAction<boolean | null>>;
-  /** Drops the detail panels and closes the drawer when a link is chosen. */
+  /** Closes the phone drawer once a link is chosen; the URL is the state. */
   onNavSelect: () => void;
 }
 
@@ -231,7 +231,6 @@ export default function Sidebar({
           {canAccessTab(role, "orders") && (
             <NavLink
               to={PATH_BY_TAB.orders}
-              end
               onClick={onNavSelect}
               className={({ isActive }) => itemCls(isActive)}
             >
@@ -249,7 +248,6 @@ export default function Sidebar({
           {canAccessTab(role, "clients") && (
             <NavLink
               to={PATH_BY_TAB.clients}
-              end
               onClick={onNavSelect}
               className={({ isActive }) => itemCls(isActive)}
             >
@@ -342,7 +340,6 @@ export default function Sidebar({
           {canAccessTab(role, "recipes") && (
             <NavLink
               to={PATH_BY_TAB.recipes}
-              end
               onClick={onNavSelect}
               className={({ isActive }) => itemCls(isActive)}
             >
