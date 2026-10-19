@@ -453,3 +453,70 @@ describe("route access guards", () => {
     expect(pathInAddressBar()).toBe("/orders/%231042");
   });
 });
+
+/**
+ * The splat used to be a root-level `<Navigate replace>`, so a typo teleported
+ * staff to Dashboard before they could read their own URL. These pin the four
+ * things the screen replaces or must not disturb.
+ */
+describe("unknown route", () => {
+  it("names the mistyped path, stays on it, and exits through its own link", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/ordres");
+    await signInAsAdmin(user);
+
+    expect(
+      await screen.findByRole("heading", { name: "Page not found" })
+    ).toBeInTheDocument();
+    // Scoped to the content area: the PathnameProbe prints the same string, and
+    // an unscoped query cannot tell the screen's own naming from the probe's.
+    expect(within(screen.getByRole("main")).getByText("/ordres")).toBeInTheDocument();
+
+    // The assertion that pins the redirect's removal: the address bar still
+    // holds what was typed, so the screen can name it.
+    expect(pathInAddressBar()).toBe("/ordres");
+
+    await user.click(screen.getByRole("link", { name: "Go to Dashboard" }));
+    expect(pathInAddressBar()).toBe("/");
+    expect(await screen.findByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
+  });
+
+  it("keeps the shell on the page around the screen", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/ordres");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Page not found" });
+
+    expect(sidebar()).toBeInTheDocument();
+  });
+
+  /**
+   * A static segment outranks a splat in React Router's match ranking, so the
+   * guarded `/roles` leaf still owns the URL. Prove it: rendering a denied tab
+   * as a not-found screen would tell a cashier which routes exist behind their
+   * role.
+   */
+  it("bounces a cashier off /roles instead of calling it missing", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/roles");
+    await signInAsCashier(user);
+
+    await screen.findByRole("heading", { name: "Dashboard" });
+    expect(pathInAddressBar()).toBe("/");
+    expect(screen.queryByRole("heading", { name: "Page not found" })).not.toBeInTheDocument();
+  });
+
+  it("does not swallow the Chams ledger, which outranks the splat", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/chams");
+    await signInAsAdmin(user);
+
+    // The rail sidebar is the only Chams branding at a tablet width: the <h1>
+    // sits in the drawer top bar, which the rail viewport does not render.
+    expect(
+      await screen.findByRole("button", { name: /Chams Ledger/ })
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Page not found" })).not.toBeInTheDocument();
+    expect(pathInAddressBar()).toBe("/chams");
+  });
+});

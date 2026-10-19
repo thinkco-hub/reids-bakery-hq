@@ -1,7 +1,8 @@
 import React from "react";
-import { Navigate, Outlet, Route, Routes, useNavigate } from "react-router";
+import { Outlet, Route, Routes, useNavigate } from "react-router";
 import ChamsStockLedger from "./components/chams/ChamsStockLedger";
 import { RequireChams, RequireTab } from "./components/RequireAccess";
+import UnknownRoute from "./components/common/UnknownRoute";
 import LoginPage from "./components/auth/LoginPage";
 import Sidebar from "./components/layout/Sidebar";
 import MobileTopBar from "./components/layout/MobileTopBar";
@@ -637,6 +638,10 @@ export default function BakeryCommandCenter() {
               </RequireTab>
             }
           />
+          {/* Inside the layout so the sidebar and header survive a bad URL, and
+              not behind RequireTab: no tab is involved, and a guard would bounce
+              this back to the redirect this route replaces. */}
+          <Route path="*" element={<UnknownRoute />} />
         </Route>
         <Route
           path={CHAMS_PATH}
@@ -646,7 +651,6 @@ export default function BakeryCommandCenter() {
             </RequireChams>
           }
         />
-        <Route path="*" element={<Navigate to={PATH_BY_TAB[DEFAULT_TAB]} replace />} />
       </Routes>
     </div>
   );
