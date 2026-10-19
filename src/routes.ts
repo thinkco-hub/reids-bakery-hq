@@ -38,7 +38,12 @@ function normalize(pathname: string): string {
   return pathname !== "/" && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
 }
 
-/** The tab owning a path, or null for the Chams ledger and unknown paths. */
+/**
+ * The tab owning a path, by exact lookup. Null for the Chams ledger, for a record
+ * URL like `/orders/%231042`, and for an unknown path. Do not widen it to a
+ * longest match: Dashboard owns `/`, so every typo would resolve to it and the
+ * catch-all route would stop being reachable.
+ */
 export function tabFromPath(pathname: string): NavTabId | null {
   return TAB_BY_PATH[normalize(pathname)] ?? null;
 }

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router";
 import { PATH_BY_TAB, isWithinPath, tabFromPath } from "../routes";
 
 /**
@@ -14,6 +14,10 @@ import { PATH_BY_TAB, isWithinPath, tabFromPath } from "../routes";
  */
 export function useNavigation() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  // The URL this browser session started on. Everything behind it was pushed by
+  // the app and can be popped; everything at it has nothing behind it.
+  const entryPath = useRef(pathname);
   const activeTab = tabFromPath(pathname);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   // null = the group follows the route it owns; a boolean = someone clicked the
@@ -35,8 +39,22 @@ export function useNavigation() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  /**
+   * Leaves a record URL for the list that owns it. Popping is right when the app
+   * pushed the record onto history, and wrong when the record *is* the entry
+   * point — a typed or bookmarked id — because popping there leaves the app.
+   */
+  const backToList = (listPath: string) => {
+    if (pathname === entryPath.current) {
+      navigate(listPath);
+      return;
+    }
+    navigate(-1);
+  };
+
   return {
     activeTab,
+    backToList,
     isSidebarOpen,
     setIsSidebarOpen,
     isInventoryExpanded,
