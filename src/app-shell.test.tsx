@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { render, screen, within } from "@testing-library/react";
-import { MemoryRouter, useLocation } from "react-router";
+import { MemoryRouter, useLocation, useNavigate } from "react-router";
 import userEvent from "@testing-library/user-event";
 import type { UserEvent } from "@testing-library/user-event";
 import App from "./App";
@@ -17,12 +17,23 @@ function PathnameProbe() {
   return <div data-testid="pathname">{pathname}</div>;
 }
 
-/** renderShell plus the probe, for tests that have to name the URL they landed on. */
-function renderShellAt(path: string) {
+/** Presses the browser's Back, the one move the app itself cannot make for the user. */
+function PopProbe() {
+  const navigate = useNavigate();
+  return <button onClick={() => navigate(-1)}>Browser back</button>;
+}
+
+/**
+ * renderShell plus the probes, for tests that have to name the URL they landed
+ * on. `behind` seeds history before the start point, which is what lets a test
+ * tell a pop from a push.
+ */
+function renderShellAt(path: string, behind: string[] = []) {
   return render(
-    <MemoryRouter initialEntries={[path]}>
+    <MemoryRouter initialEntries={[...behind, path]} initialIndex={behind.length}>
       <App />
       <PathnameProbe />
+      <PopProbe />
     </MemoryRouter>
   );
 }
@@ -237,6 +248,10 @@ describe("order detail routes", () => {
 /** The active half of Sidebar's `itemCls`, which NavLink picks per route. */
 const ACTIVE_ITEM = "bg-[#F3B978]/20";
 
+/** The record panel's own breadcrumb, which sits beside other buttons of its name. */
+const panelBack = (label: string) =>
+  within(screen.getByRole("main")).getByRole("button", { name: label });
+
 describe("sidebar on a record URL", () => {
   it("keeps the record's own tab highlighted", async () => {
     const user = userEvent.setup();
@@ -252,6 +267,137 @@ describe("sidebar on a record URL", () => {
     expect(within(sidebar()).getByRole("link", { name: "Dashboard" }).className).not.toContain(
       ACTIVE_ITEM
     );
+  });
+});
+
+describe("record dismissal", () => {
+  it("pops a record back to its list, so browser Back does not re-open it", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/orders", ["/"]);
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Orders" });
+
+    const [firstRow] = screen.getAllByRole("button", { name: "View Order Details" });
+    await user.click(firstRow);
+    expect(pathInAddressBar()).toBe("/orders/%231042");
+
+    await user.click(panelBack("Orders"));
+    expect(pathInAddressBar()).toBe("/orders");
+
+    // A push would leave the record on the history stack, so Back would land on
+    // the order this test has already dismissed.
+    await user.click(screen.getByRole("button", { name: "Browser back" }));
+    expect(pathInAddressBar()).toBe("/");
+    expect(await screen.findByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
+  });
+
+  /**
+   * A typed or bookmarked record is the first entry in the stack, so there is
+   * nothing to pop: leaving it has to be a navigation to the list, or the
+   * dismissal walks out of the app and the reload signs the staff member out.
+   */
+  it("lands a cold-loaded record on its list instead of out of the app", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/orders/%231042");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Order #1042" });
+
+    await user.click(panelBack("Orders"));
+    expect(pathInAddressBar()).toBe("/orders");
+    expect(await screen.findByRole("heading", { name: "Orders" })).toBeInTheDocument();
+  });
+});
+
+describe("client record routes", () => {
+  it("opens a clicked client at its own URL", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/clients");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Clients" });
+
+    const [firstClient] = screen.getAllByRole("button", { name: "View" });
+    await user.click(firstClient);
+
+    expect(pathInAddressBar()).toBe("/clients/CL-001");
+    expect(await screen.findByRole("heading", { name: "Cafe Luna" })).toBeInTheDocument();
+  });
+
+  it("opens the same client when its URL is loaded cold", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/clients/CL-001");
+    await signInAsAdmin(user);
+
+    expect(await screen.findByRole("heading", { name: "Cafe Luna" })).toBeInTheDocument();
+    expect(screen.getByText("09171234567")).toBeInTheDocument();
+  });
+
+  /** Plan Verification 6, the Phase 4 half: the click-through out of a record. */
+  it("reaches an order from inside a client and pops back to that client", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/clients/CL-001");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Cafe Luna" });
+
+    await user.click(screen.getByText("#1042"));
+    expect(pathInAddressBar()).toBe("/orders/%231042");
+    expect(await screen.findByRole("heading", { name: "Order #1042" })).toBeInTheDocument();
+
+    await user.click(panelBack("Orders"));
+    expect(pathInAddressBar()).toBe("/clients/CL-001");
+    expect(await screen.findByRole("heading", { name: "Cafe Luna" })).toBeInTheDocument();
+  });
+});
+
+describe("recipe record routes", () => {
+  it("opens the editor on the recipe its URL names", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/recipes/B-101");
+    await signInAsAdmin(user);
+
+    expect(await screen.findByText("Edit Recipe")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Butter Croissants")).toBeInTheDocument();
+  });
+
+  it("opens an empty editor on the new recipe path", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/recipes");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Recipes / BOM" });
+
+    await user.click(screen.getByRole("button", { name: "+ New Recipe" }));
+    expect(pathInAddressBar()).toBe("/recipes/new");
+    expect(await screen.findByText("New Recipe")).toBeInTheDocument();
+  });
+
+  it("saves onto the list and leaves the saved editor off the history stack", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/recipes", ["/"]);
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Recipes / BOM" });
+
+    const [firstRecipe] = screen.getAllByRole("button", { name: "Edit" });
+    await user.click(firstRecipe);
+    expect(pathInAddressBar()).toBe("/recipes/B-101");
+
+    await user.click(screen.getByRole("button", { name: "Save Recipe" }));
+    expect(pathInAddressBar()).toBe("/recipes");
+
+    // The save replaced the editor entry. A push would put Back on a form that
+    // has already been saved.
+    await user.click(screen.getByRole("button", { name: "Browser back" }));
+    expect(pathInAddressBar()).toBe("/recipes");
+    expect(await screen.findByRole("heading", { name: "Recipes / BOM" })).toBeInTheDocument();
+  });
+
+  it("cancels a cold-loaded editor onto the list rather than out of the app", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/recipes/new");
+    await signInAsAdmin(user);
+    await screen.findByText("New Recipe");
+
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(pathInAddressBar()).toBe("/recipes");
+    expect(await screen.findByRole("heading", { name: "Recipes / BOM" })).toBeInTheDocument();
   });
 });
 
