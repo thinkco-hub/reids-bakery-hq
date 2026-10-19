@@ -456,8 +456,8 @@ describe("route access guards", () => {
 
 /**
  * The splat used to be a root-level `<Navigate replace>`, so a typo teleported
- * staff to Dashboard before they could read their own URL. These pin the four
- * things the screen replaces or must not disturb.
+ * staff to Dashboard before they could read their own URL. These pin what the
+ * screen replaces and the neighbours it must not disturb.
  */
 describe("unknown route", () => {
   it("names the mistyped path, stays on it, and exits through its own link", async () => {
@@ -518,5 +518,24 @@ describe("unknown route", () => {
     ).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Page not found" })).not.toBeInTheDocument();
     expect(pathInAddressBar()).toBe("/chams");
+  });
+
+  /**
+   * The crash boundary sits above the shell, so a screen that renders normally
+   * must never be handed to it: the boundary hides the very path this screen
+   * exists to read back. RecordNotFound has the same rule and already has a
+   * test of its own.
+   */
+  it("leaves an unmatched path to this screen, not to the crash screen", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/ordres");
+    await signInAsAdmin(user);
+
+    expect(
+      await screen.findByRole("heading", { name: "Page not found" })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "Something went wrong" })
+    ).not.toBeInTheDocument();
   });
 });
