@@ -110,9 +110,21 @@ export function getRevenueByPaymentMethod(sales: Sale[]): RevenueByPaymentMethod
   return Array.from(map.entries()).map(([method, revenue]) => ({ method, revenue }));
 }
 
-function csvEscape(value: unknown): string {
+/**
+ * One cell of a downloaded CSV, escaped for both writers.
+ *
+ * A downloaded file is forwarded and reopened in whatever the recipient has, and
+ * a cell that begins with = + - @ — or with that after a leading tab or space —
+ * is offered to the spreadsheet engine as a formula. The apostrophe makes the
+ * reader treat it as text. Cells that are simply a number keep their spelling:
+ * prefixing `-12` would turn a negative quantity into text and drop it out of
+ * every total the recipient draws over that column.
+ */
+export function csvEscape(value: unknown): string {
   const str = String(value ?? "");
-  return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+  const isFormulaShape = /^[ \t]*[=+\-@]/.test(str) && !/^[+-]?\d+(?:\.\d+)?$/.test(str);
+  const guarded = isFormulaShape ? `'${str}` : str;
+  return /[",\n]/.test(guarded) ? `"${guarded.replace(/"/g, '""')}"` : guarded;
 }
 
 export function salesToCSV(sales: Sale[]): string {

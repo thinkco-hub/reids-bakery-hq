@@ -11,6 +11,7 @@ import type {
   StockItem,
 } from "../types/domain";
 import { computeDiscrepancy } from "./counts";
+import { csvEscape } from "./sales";
 
 // ---- Date helpers (ISO "YYYY-MM-DD" keys, computed in local time) ----
 
@@ -183,11 +184,6 @@ export function computeClosingInventory(
 }
 
 // ---- CSV export ----
-
-function csvEscape(value: unknown): string {
-  const str = String(value ?? "");
-  return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
-}
 
 export function closingInventoryToCSV(result: ClosingInventoryReport): string {
   const header: unknown[] = [
