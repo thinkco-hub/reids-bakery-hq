@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { computeDiscrepancy } from "../utils/counts";
+import { isPayableAmount } from "../utils/orders";
 import { initialInventoryCounts } from "../data/initialInventory";
 import { recordAuditEvent } from "../utils/auditLog";
 import type {
@@ -134,6 +135,9 @@ export function useClosing({ applyCountedQty, applyPendingCounts, currentUser }:
 
   // --- EXPENSES & END-OF-DAY CLOSING (FR-8.1) ---
   const addExpense = (data: ExpenseData) => {
+    // The bound lives here, not in the form: the closing totals and the audit
+    // entry below both take the amount as given.
+    if (!isPayableAmount(data.amount)) return;
     const id: ExpenseId = `EXP-${String(expenses.length + 1).padStart(4, "0")}`;
     setExpenses((prev) => [...prev, { id, ...data }]);
     logClosingEvent("closing.expense_added", "Expense", id, `Added expense ${id} (${data.description}: ${data.amount})`);
