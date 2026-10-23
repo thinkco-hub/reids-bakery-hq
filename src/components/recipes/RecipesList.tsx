@@ -11,6 +11,8 @@ import type {
 interface RecipesListProps {
   recipes: Recipe[];
   ingredients: IngredientStock[];
+  /** COGS and the price suggested from it are unit costs seen sideways, so they travel with that grant. */
+  canViewIngredientCosts: boolean;
   menuInventory: MenuItemStock[];
   pricingRules: PricingRules;
   onEditRule: (data: PricingRuleInput) => void;
@@ -21,19 +23,23 @@ interface RecipesListProps {
 export default function RecipesList({
   recipes,
   ingredients,
+  canViewIngredientCosts,
   menuInventory,
   pricingRules,
   onEditRule,
   onEdit,
   onCreate,
 }: RecipesListProps) {
+  const columnCount = canViewIngredientCosts ? 7 : 5;
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
           <h2 className="text-3xl font-bold text-[#121212]">Recipes / BOM</h2>
           <p className="text-gray-500 mt-1">
-            One recipe per menu item, with live cost and suggested pricing.
+            {canViewIngredientCosts
+              ? "One recipe per menu item, with live cost and suggested pricing."
+              : "One recipe per menu item."}
           </p>
         </div>
         <button
@@ -70,8 +76,12 @@ export default function RecipesList({
                 <th className="px-6 py-4">Recipe</th>
                 <th className="px-6 py-4">Linked Menu Item</th>
                 <th className="px-6 py-4">Yield</th>
-                <th className="px-6 py-4 text-right">COGS / Unit</th>
-                <th className="px-6 py-4 text-right">Suggested Price</th>
+                {canViewIngredientCosts && (
+                  <>
+                    <th className="px-6 py-4 text-right">COGS / Unit</th>
+                    <th className="px-6 py-4 text-right">Suggested Price</th>
+                  </>
+                )}
                 <th className="px-6 py-4 text-right">Actual Price</th>
                 <th className="px-4 py-4 text-center">Action</th>
               </tr>
@@ -79,16 +89,20 @@ export default function RecipesList({
             <tbody className="divide-y divide-gray-200 text-sm">
               {recipes.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={columnCount} className="px-6 py-8 text-center text-gray-500">
                     No recipes yet. Create one to see live COGS and pricing.
                   </td>
                 </tr>
               ) : (
                 recipes.map((recipe) => {
-                  const { costPerUnit } = computeRecipeCost(recipe, ingredients);
-                  const price = suggestedPrice(costPerUnit, pricingRules.targetMarginPercent);
                   const menuItem = menuInventory.find((m) => m.id === recipe.id);
                   const actualPrice = recipe.price;
+                  const costPerUnit = canViewIngredientCosts
+                    ? computeRecipeCost(recipe, ingredients).costPerUnit
+                    : 0;
+                  const price = canViewIngredientCosts
+                    ? suggestedPrice(costPerUnit, pricingRules.targetMarginPercent)
+                    : 0;
                   const delta = actualPrice - price;
                   return (
                     <tr key={recipe.id} className="hover:bg-gray-50/50 transition-colors">
@@ -97,25 +111,31 @@ export default function RecipesList({
                       <td className="px-6 py-4 text-gray-600">
                         {recipe.yieldQty} {recipe.yieldUnit}
                       </td>
-                      <td className="px-6 py-4 text-right font-medium text-gray-900">
-                        ₱{costPerUnit.toFixed(2)}
-                      </td>
-                      <td className="px-6 py-4 text-right font-bold text-[#F17D0C]">
-                        ₱{price.toFixed(2)}
-                      </td>
+                      {canViewIngredientCosts && (
+                        <>
+                          <td className="px-6 py-4 text-right font-medium text-gray-900">
+                            ₱{costPerUnit.toFixed(2)}
+                          </td>
+                          <td className="px-6 py-4 text-right font-bold text-[#F17D0C]">
+                            ₱{price.toFixed(2)}
+                          </td>
+                        </>
+                      )}
                       <td className="px-6 py-4 text-right">
                         <div>
                           <span className="font-bold text-gray-900">₱{actualPrice.toFixed(2)}</span>
-                          <span
-                            className={`ml-2 text-xs font-bold px-1.5 py-0.5 rounded ${
-                              delta >= 0
-                                ? "bg-green-50 text-green-600"
-                                : "bg-red-50 text-red-600"
-                            }`}
-                          >
-                            {delta >= 0 ? "+" : ""}
-                            ₱{delta.toFixed(2)}
-                          </span>
+                          {canViewIngredientCosts && (
+                            <span
+                              className={`ml-2 text-xs font-bold px-1.5 py-0.5 rounded ${
+                                delta >= 0
+                                  ? "bg-green-50 text-green-600"
+                                  : "bg-red-50 text-red-600"
+                              }`}
+                            >
+                              {delta >= 0 ? "+" : ""}
+                              ₱{delta.toFixed(2)}
+                            </span>
+                          )}
                         </div>
                       </td>
                       <td className="px-4 py-4 text-center">

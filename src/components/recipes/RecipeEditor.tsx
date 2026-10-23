@@ -21,6 +21,8 @@ const CATEGORY_OPTIONS: PosItemCategory[] = ["Pastries", "Bread", "Cakes", "Drin
 interface RecipeEditorProps {
   recipe: Recipe | null;
   ingredients: IngredientStock[];
+  /** The bill of materials needs an ingredient's identity, not its cost, so the cost panel is gated separately. */
+  canViewIngredientCosts: boolean;
   pricingRules: PricingRules;
   onCancel: () => void;
   onSave: (recipe: RecipeInput) => void;
@@ -35,7 +37,14 @@ type RecipeEditorForm = Omit<RecipeInput, "yieldQty" | "ingredients" | "price" |
   ingredients: Array<{ ingredientId: string; qty: string | number; unit: string }>;
 };
 
-export default function RecipeEditor({ recipe, ingredients, pricingRules, onCancel, onSave }: RecipeEditorProps) {
+export default function RecipeEditor({
+  recipe,
+  ingredients,
+  canViewIngredientCosts,
+  pricingRules,
+  onCancel,
+  onSave,
+}: RecipeEditorProps) {
   const isNew = !recipe;
   const [form, setForm] = useState<RecipeEditorForm>(() =>
     recipe
@@ -313,54 +322,57 @@ export default function RecipeEditor({ recipe, ingredients, pricingRules, onCanc
           </div>
 
           <div className="lg:col-span-1 flex flex-col gap-6 lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)]">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 lg:min-h-0 lg:overflow-y-auto">
-              <h3 className="text-lg font-bold text-[#121212] mb-4">Live Cost Summary</h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between text-gray-600 font-medium">
-                  <span>Total Batch Cost</span>
-                  <span className="text-gray-900">₱{totalCost.toFixed(2)}</span>
+            {/* Both figures in this card come from ingredient unit costs. */}
+            {canViewIngredientCosts && (
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 lg:min-h-0 lg:overflow-y-auto">
+                <h3 className="text-lg font-bold text-[#121212] mb-4">Live Cost Summary</h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between text-gray-600 font-medium">
+                    <span>Total Batch Cost</span>
+                    <span className="text-gray-900">₱{totalCost.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-600 font-medium border-b border-gray-200 pb-3">
+                    <span>Cost per Unit</span>
+                    <span className="text-gray-900">₱{costPerUnit.toFixed(2)}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-gray-600 font-medium border-b border-gray-200 pb-3">
-                  <span>Cost per Unit</span>
-                  <span className="text-gray-900">₱{costPerUnit.toFixed(2)}</span>
-                </div>
-              </div>
 
-              <div className="mt-5 pt-5 border-t border-gray-200">
-                <h4 className="text-sm font-bold text-[#121212] mb-3">
-                  Suggested Prices <span className="text-gray-400 font-normal">(customizable margin)</span>
-                </h4>
-                <div className="space-y-3">
-                  {marginTiers.map((margin, idx) => {
-                    const tierPrice = suggestedPrice(costPerUnit, margin);
-                    return (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between gap-3 bg-[#FDF9F3] border border-[#F3B978]/60 rounded-lg px-3 py-2.5"
-                      >
-                        <div>
-                          <p className="text-xs font-bold text-[#562D07]/70 uppercase tracking-wide">
-                            {TIER_LABELS[idx]}
-                          </p>
-                          <div className="flex items-center gap-1 mt-1">
-                            <input
-                              type="number"
-                              min="0"
-                              max="95"
-                              value={margin}
-                              onChange={(e) => updateMarginTier(idx, e.target.value)}
-                              className="w-14 px-1.5 py-1 border border-gray-300 rounded text-xs font-bold text-gray-800 text-right focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none"
-                            />
-                            <span className="text-xs text-gray-500 font-medium">% margin</span>
+                <div className="mt-5 pt-5 border-t border-gray-200">
+                  <h4 className="text-sm font-bold text-[#121212] mb-3">
+                    Suggested Prices <span className="text-gray-400 font-normal">(customizable margin)</span>
+                  </h4>
+                  <div className="space-y-3">
+                    {marginTiers.map((margin, idx) => {
+                      const tierPrice = suggestedPrice(costPerUnit, margin);
+                      return (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between gap-3 bg-[#FDF9F3] border border-[#F3B978]/60 rounded-lg px-3 py-2.5"
+                        >
+                          <div>
+                            <p className="text-xs font-bold text-[#562D07]/70 uppercase tracking-wide">
+                              {TIER_LABELS[idx]}
+                            </p>
+                            <div className="flex items-center gap-1 mt-1">
+                              <input
+                                type="number"
+                                min="0"
+                                max="95"
+                                value={margin}
+                                onChange={(e) => updateMarginTier(idx, e.target.value)}
+                                className="w-14 px-1.5 py-1 border border-gray-300 rounded text-xs font-bold text-gray-800 text-right focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none"
+                              />
+                              <span className="text-xs text-gray-500 font-medium">% margin</span>
+                            </div>
                           </div>
+                          <span className="text-lg font-bold text-[#F17D0C]">₱{tierPrice.toFixed(2)}</span>
                         </div>
-                        <span className="text-lg font-bold text-[#F17D0C]">₱{tierPrice.toFixed(2)}</span>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <div className="flex gap-3 lg:shrink-0">
               <button
