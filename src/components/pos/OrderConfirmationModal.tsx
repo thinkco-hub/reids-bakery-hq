@@ -1,5 +1,6 @@
 import React from "react";
-import { PAYMENT_METHODS, toContactDigits } from "../../utils/orders";
+import { TicketCustomerFields } from "./TicketCustomerInput";
+import { PAYMENT_METHODS } from "../../utils/orders";
 import type { CartItem, ConfirmModalState, ISODate, SaleType } from "../../types/domain";
 
 const SALE_TYPES: SaleType[] = ["Walk-in", "Order"];
@@ -113,34 +114,13 @@ export default function OrderConfirmationModal({
           </div>
         </div>
 
-        <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Customer Name
-            </label>
-            <input
-              type="text"
-              placeholder="Enter customer name..."
-              value={modal.customerName}
-              onChange={(e) => onFieldChange("customerName", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Customer Contact
-            </label>
-            <input
-              type="tel"
-              inputMode="numeric"
-              placeholder="09XXXXXXXXX"
-              value={modal.customerContact}
-              onChange={(e) =>
-                onFieldChange("customerContact", toContactDigits(e.target.value))
-              }
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
-            />
-          </div>
+        <div className="mb-6">
+          <TicketCustomerFields
+            name={modal.customerName}
+            contact={modal.customerContact}
+            onNameChange={(value) => onFieldChange("customerName", value)}
+            onContactChange={(value) => onFieldChange("customerContact", value)}
+          />
         </div>
 
         {modal.saleType === "Order" && (

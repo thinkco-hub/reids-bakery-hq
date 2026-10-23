@@ -8,6 +8,7 @@ import Sidebar from "./components/layout/Sidebar";
 import MobileTopBar from "./components/layout/MobileTopBar";
 import OrderConfirmationModal from "./components/pos/OrderConfirmationModal";
 import PosCustomerPicker from "./components/pos/PosCustomerPicker";
+import TicketCustomerInput from "./components/pos/TicketCustomerInput";
 import ReceiptModal from "./components/pos/ReceiptModal";
 import RestockModal from "./components/inventory/RestockModal";
 import ClosingCountForm from "./components/inventory/ClosingCountForm";
@@ -284,16 +285,26 @@ export default function BakeryCommandCenter() {
       {/* RECEIPT MODAL (extracted to src/components/pos/ReceiptModal.tsx) */}
       {receipt && <ReceiptModal receipt={receipt} onClose={() => setReceipt(null)} />}
 
-      {/* ADD CUSTOMER TO TICKET (reached from the phone ticket bar and the ticket panel) */}
-      {isCustomerPickerOpen && (
-        <PosCustomerPicker
-          clients={clients}
-          attached={ticketCustomer}
-          onClose={closeCustomerPicker}
-          onAttach={attachTicketCustomer}
-          onCreateClient={addClient}
-        />
-      )}
+      {/* ADD CUSTOMER TO TICKET (reached from the phone ticket bar and the ticket panel)
+          RequireAccess cannot guard this one: the overlay is a sibling of the
+          outlet, not inside it, so the roster is gated here on the same tab the
+          sidebar uses. A role without it types the customer instead. */}
+      {isCustomerPickerOpen &&
+        (canView("clients") ? (
+          <PosCustomerPicker
+            clients={clients}
+            attached={ticketCustomer}
+            onClose={closeCustomerPicker}
+            onAttach={attachTicketCustomer}
+            onCreateClient={addClient}
+          />
+        ) : (
+          <TicketCustomerInput
+            attached={ticketCustomer}
+            onClose={closeCustomerPicker}
+            onAttach={attachTicketCustomer}
+          />
+        ))}
 
       {/* TOP BAR — drawer layouts only (phone and tablet) */}
       {!isDesktopRail && (
