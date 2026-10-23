@@ -99,6 +99,17 @@ describe("app shell state identity", () => {
       screen.getByLabelText("Cancel and return to the ticket")
     ).toBeInTheDocument();
 
+    // The cashier has no Clients tab, so the roster and its create button are
+    // not offered at the counter — the ticket takes a typed name instead.
+    expect(
+      screen.getByRole("heading", { name: "Add customer to ticket" })
+    ).toBeInTheDocument();
+    const ticketName = screen.getByPlaceholderText("Enter customer name...");
+    expect(ticketName).toBeInTheDocument();
+    expect(screen.queryByLabelText("Search customers")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Add new customer" })).toBeNull();
+    await user.type(ticketName, "Ampara Catering");
+
     await openTab(user, "Orders");
     expect(screen.getByRole("heading", { name: "Orders" })).toBeInTheDocument();
     expect(screen.queryByText("Current Ticket")).toBeNull();
@@ -112,6 +123,34 @@ describe("app shell state identity", () => {
     expect(
       screen.getByLabelText("Cancel and return to the ticket")
     ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Enter customer name...")).toHaveValue(
+      "Ampara Catering"
+    );
+
+    await user.click(screen.getByRole("button", { name: "Save to ticket" }));
+    expect(screen.queryByPlaceholderText("Enter customer name...")).toBeNull();
+    expect(screen.getByText("Ampara Catering")).toBeInTheDocument();
+    // The ticket owns the name; no client record was created for it.
+    expect(within(sidebar()).queryByText("Clients")).toBeNull();
+  });
+
+  /**
+   * The same overlay for a role that does own the Clients tab still reads the
+   * roster. Without it the assertion above would pass on a picker that had been
+   * replaced for everybody.
+   */
+  it("gives a role with the Clients tab the customer roster at the counter", async () => {
+    const user = userEvent.setup();
+    renderShell();
+    await signInAsAdmin(user);
+    await screen.findByText("Point of Sale");
+
+    await openTab(user, "Point of Sale");
+    await user.click(screen.getByRole("button", { name: "Add customer" }));
+
+    expect(screen.getByLabelText("Search customers")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add new customer" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Save to ticket" })).toBeNull();
   });
 });
 

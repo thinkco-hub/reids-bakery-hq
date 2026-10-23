@@ -77,6 +77,15 @@ export function computeAmountDue(order: Order): number {
   return Math.max(0, computeOrderTotal(order) - (order.amountPaid || 0));
 }
 
+/**
+ * The money a mutation accepts: a positive, finite amount that does not exceed
+ * `max`, the ceiling the caller owns (an order's outstanding balance; an
+ * expense has none). Hooks enforce it; forms only mirror it for the user.
+ */
+export function isPayableAmount(value: number, max = Number.POSITIVE_INFINITY): boolean {
+  return Number.isFinite(value) && value > 0 && value <= max;
+}
+
 export function getPaymentStatus(order: Order): PaymentStatus {
   const amountPaid = order.amountPaid || 0;
   if (amountPaid <= 0) return "Unpaid";

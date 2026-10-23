@@ -2,7 +2,12 @@ import { useState } from "react";
 import { initialOrders } from "../data/initialOrders";
 import { recordAuditEvent } from "../utils/auditLog";
 import { buildEditHistoryEntry, diffField, diffLines } from "../utils/editHistory";
-import { isValidCustomerContact } from "../utils/orders";
+import {
+  computeAmountDue,
+  computeOrderTotal,
+  isPayableAmount,
+  isValidCustomerContact,
+} from "../utils/orders";
 import type {
   AuditActionType,
   ClientId,
@@ -170,9 +175,14 @@ export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
   };
 
   const recordOrderPayment = (id: OrderId, { method, amount }: OrderPaymentInput) => {
+    const order = orders.find((o) => o.id === id);
+    if (!order) return;
+    // This hook, not the form, owns the payment bound: every caller reaches the
+    // mutation directly and the audit log below records whatever it is given.
+    if (!isPayableAmount(amount, computeAmountDue(order))) return;
     patchOrder(id, (o) => ({
       paymentMethod: method,
-      amountPaid: (o.amountPaid || 0) + amount,
+      amountPaid: Math.min((o.amountPaid || 0) + amount, computeOrderTotal(o)),
     }));
     logOrderEvent("order.payment_recorded", id, `Recorded payment of ${amount} (${method}) on order ${id}`);
   };

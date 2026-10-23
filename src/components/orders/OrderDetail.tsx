@@ -118,7 +118,9 @@ function RecordPaymentModal({
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const parsed = parseFloat(amount);
-    if (!method || isNaN(parsed) || parsed <= 0) return;
+    // Presentation only, so the form cannot offer a figure the mutation will
+    // refuse; useOrders.recordOrderPayment holds the invariant.
+    if (!method || !Number.isFinite(parsed) || parsed <= 0 || parsed > amountDue) return;
     onRecord({ method, amount: parsed });
     onClose();
   };
@@ -150,6 +152,7 @@ function RecordPaymentModal({
             <input
               type="number"
               min="0.01"
+              max={amountDue.toFixed(2)}
               step="0.01"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}

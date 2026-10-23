@@ -8,6 +8,7 @@ import Sidebar from "./components/layout/Sidebar";
 import MobileTopBar from "./components/layout/MobileTopBar";
 import OrderConfirmationModal from "./components/pos/OrderConfirmationModal";
 import PosCustomerPicker from "./components/pos/PosCustomerPicker";
+import TicketCustomerInput from "./components/pos/TicketCustomerInput";
 import ReceiptModal from "./components/pos/ReceiptModal";
 import RestockModal from "./components/inventory/RestockModal";
 import ClosingCountForm from "./components/inventory/ClosingCountForm";
@@ -55,6 +56,7 @@ export default function BakeryCommandCenter() {
   // --- ROLE PERMISSIONS (src/utils/permissions.ts) ---
   const role = currentUser?.role;
   const canView = (tab: NavTabId) => !!role && canAccessTab(role, tab);
+  const canViewIngredients = !!role && canAccessIngredients(role);
 
   // --- NAVIGATION (src/hooks/useNavigation.ts) ---
   const {
@@ -95,6 +97,14 @@ export default function BakeryCommandCenter() {
     restockItems,
     isRestockConfirmDisabled,
   } = inventory;
+
+  // Raw-material stock reaches every screen through one projection, and its
+  // default is no rows: a screen added later cannot disclose unit costs by
+  // forgetting to ask. The full array stays with the admin-tier Reconciliation
+  // screen and with the two tools that need an ingredient's identity to do their
+  // job — production runs and the recipe editor — where the money derived from
+  // unit cost is suppressed by canViewIngredientCosts instead.
+  const visibleIngredients = canViewIngredients ? ingredients : [];
 
   // --- CLIENTS (src/hooks/useClients.ts) ---
   const {
@@ -201,7 +211,7 @@ export default function BakeryCommandCenter() {
     (o) => o.status === "Pending"
   ).length;
   const readyOrdersCount = orders.filter((o) => o.status === "Ready").length;
-  const lowStockAlerts = [...menuInventory, ...ingredients].filter(
+  const lowStockAlerts = [...menuInventory, ...visibleIngredients].filter(
     (item) => item.qty < item.target
   );
 
@@ -284,16 +294,26 @@ export default function BakeryCommandCenter() {
       {/* RECEIPT MODAL (extracted to src/components/pos/ReceiptModal.tsx) */}
       {receipt && <ReceiptModal receipt={receipt} onClose={() => setReceipt(null)} />}
 
-      {/* ADD CUSTOMER TO TICKET (reached from the phone ticket bar and the ticket panel) */}
-      {isCustomerPickerOpen && (
-        <PosCustomerPicker
-          clients={clients}
-          attached={ticketCustomer}
-          onClose={closeCustomerPicker}
-          onAttach={attachTicketCustomer}
-          onCreateClient={addClient}
-        />
-      )}
+      {/* ADD CUSTOMER TO TICKET (reached from the phone ticket bar and the ticket panel)
+          RequireAccess cannot guard this one: the overlay is a sibling of the
+          outlet, not inside it, so the roster is gated here on the same tab the
+          sidebar uses. A role without it types the customer instead. */}
+      {isCustomerPickerOpen &&
+        (canView("clients") ? (
+          <PosCustomerPicker
+            clients={clients}
+            attached={ticketCustomer}
+            onClose={closeCustomerPicker}
+            onAttach={attachTicketCustomer}
+            onCreateClient={addClient}
+          />
+        ) : (
+          <TicketCustomerInput
+            attached={ticketCustomer}
+            onClose={closeCustomerPicker}
+            onAttach={attachTicketCustomer}
+          />
+        ))}
 
       {/* TOP BAR — drawer layouts only (phone and tablet) */}
       {!isDesktopRail && (
@@ -342,9 +362,9 @@ export default function BakeryCommandCenter() {
 
   const inventoryViewProps = {
     menuInventory,
-    ingredients,
+    ingredients: visibleIngredients,
     restockReminders,
-    canViewIngredients: !!role && canAccessIngredients(role),
+    canViewIngredients,
     onNavClick: handleNavClick,
     onRestockToProduction: goToProductionRuns,
     onOpenRestock: openRestock,
@@ -484,7 +504,7 @@ export default function BakeryCommandCenter() {
                 <RequireTab role={role} tab="inventory-closing-count">
                   <ClosingCountForm
                     menuInventory={menuInventory}
-                    ingredients={ingredients}
+                    ingredients={visibleIngredients}
                     onSubmit={submitClosingCount}
                     onBack={() => handleNavClick("inventory")}
                   />
@@ -513,7 +533,8 @@ export default function BakeryCommandCenter() {
                 <RequireTab role={role} tab="recipes">
                   <RecipesList
                     recipes={recipes}
-                    ingredients={ingredients}
+                    ingredients={visibleIngredients}
+                    canViewIngredientCosts={canViewIngredients}
                     menuInventory={menuInventory}
                     pricingRules={pricingRules}
                     onEditRule={updatePricingRule}
@@ -530,6 +551,7 @@ export default function BakeryCommandCenter() {
                   <RecipeEditor
                     recipe={null}
                     ingredients={ingredients}
+                    canViewIngredientCosts={canViewIngredients}
                     pricingRules={pricingRules}
                     onCancel={() => backToList(PATH_BY_TAB.recipes)}
                     onSave={saveRecipeAndReturn}
@@ -544,6 +566,7 @@ export default function BakeryCommandCenter() {
                   <RecipeDetailRoute
                     recipes={recipes}
                     ingredients={ingredients}
+                    canViewIngredientCosts={canViewIngredients}
                     pricingRules={pricingRules}
                     onSave={saveRecipeAndReturn}
                     onCancel={() => backToList(PATH_BY_TAB.recipes)}
@@ -611,7 +634,7 @@ export default function BakeryCommandCenter() {
                 <RequireTab role={role} tab="reports-inventory">
                   <ClosingInventory
                     menuInventory={menuInventory}
-                    ingredients={ingredients}
+                    ingredients={visibleIngredients}
                     inventoryCounts={inventoryCounts}
                   />
                 </RequireTab>
