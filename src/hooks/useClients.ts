@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { initialClients } from "../data/initialClients";
 import { recordAuditEvent } from "../utils/auditLog";
+import { canAccessTab } from "../utils/permissions";
 import type { Client, ClientFormData, ClientId, User } from "../types/domain";
 
 interface UseClientsOptions {
@@ -32,6 +33,10 @@ export function useClients({ currentUser }: UseClientsOptions) {
   };
 
   const addClient = (data: ClientFormData) => {
+    // Re-checked here, not only at the overlay that offers it, the way useAuth
+    // re-checks canAssignRole: a hidden picker is presentation, and the client
+    // collection is the thing being written.
+    if (!currentUser || !canAccessTab(currentUser.role, "clients")) return;
     const id: ClientId = `CL-${String(clients.length + 1).padStart(3, "0")}`;
     setClients((prev) => [...prev, { id, ...data }]);
     logClientEvent("client.created", id, `Added client ${id} (${data.name})`);
