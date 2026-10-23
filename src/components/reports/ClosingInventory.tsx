@@ -231,7 +231,11 @@ export default function ClosingInventory({ menuInventory, ingredients, inventory
         </button>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
+      <div
+        className={`grid grid-cols-2 gap-3 md:gap-4 mb-6 ${
+          ingredients.length > 0 ? "lg:grid-cols-4" : "lg:grid-cols-3"
+        }`}
+      >
         <StatCard
           label="Total Closing Stock Value"
           value={`₱${summary.totalValue.toFixed(2)}`}
@@ -242,11 +246,15 @@ export default function ClosingInventory({ menuInventory, ingredients, inventory
           value={`₱${summary.menuValue.toFixed(2)}`}
           sub={`${menuInventory.length} item(s)`}
         />
-        <StatCard
-          label="Raw Materials Value"
-          value={`₱${summary.ingredientValue.toFixed(2)}`}
-          sub={`${ingredients.length} item(s)`}
-        />
+        {/* A role without the ingredient grant is handed no raw-material rows,
+            so its total value would be a ₱0.00 invented for the layout. */}
+        {ingredients.length > 0 && (
+          <StatCard
+            label="Raw Materials Value"
+            value={`₱${summary.ingredientValue.toFixed(2)}`}
+            sub={`${ingredients.length} item(s)`}
+          />
+        )}
         <StatCard
           label="Net Count Discrepancy"
           value={`${summary.netDiscrepancyQty > 0 ? "+" : ""}${summary.netDiscrepancyQty} unit(s)`}
@@ -260,11 +268,13 @@ export default function ClosingInventory({ menuInventory, ingredients, inventory
         rows={result.menuRows}
         emptyText="No menu items to report."
       />
-      <ClosingSection
-        title="Raw Materials"
-        rows={result.ingredientRows}
-        emptyText="No raw materials to report."
-      />
+      {ingredients.length > 0 && (
+        <ClosingSection
+          title="Raw Materials"
+          rows={result.ingredientRows}
+          emptyText="No raw materials to report."
+        />
+      )}
 
       <p className="text-xs text-gray-400 leading-relaxed mt-2">
         Closing Qty is taken from the latest physical count on or before {period.end} (submitted via

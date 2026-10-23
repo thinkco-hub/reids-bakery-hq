@@ -110,4 +110,13 @@ describe("feature-level access", () => {
       expect(canAccessIngredients(role)).toBe(canAccessReconciliation(role));
     }
   });
+
+  /**
+   * The set the App ingredient projection fails closed on, named rather than
+   * derived: R&D builds recipes but does not hold the cost grant, and if that
+   * ever changes the projection follows this predicate, not a copy of it.
+   */
+  it("grants Ingredients to the admin tier only", () => {
+    expect(ALL_ROLES.filter(canAccessIngredients)).toEqual(["admin", "super_admin"]);
+  });
 });

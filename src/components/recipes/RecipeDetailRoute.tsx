@@ -7,6 +7,7 @@ import type { IngredientStock, PricingRules, Recipe, RecipeInput } from "../../t
 interface RecipeDetailRouteProps {
   recipes: Recipe[];
   ingredients: IngredientStock[];
+  canViewIngredientCosts: boolean;
   pricingRules: PricingRules;
   onSave: (recipe: RecipeInput) => void;
   onCancel: () => void;
@@ -17,6 +18,7 @@ interface RecipeDetailRouteProps {
 export default function RecipeDetailRoute({
   recipes,
   ingredients,
+  canViewIngredientCosts,
   pricingRules,
   onSave,
   onCancel,
@@ -33,6 +35,7 @@ export default function RecipeDetailRoute({
     <RecipeEditor
       recipe={recipe}
       ingredients={ingredients}
+      canViewIngredientCosts={canViewIngredientCosts}
       pricingRules={pricingRules}
       onCancel={onCancel}
       onSave={onSave}

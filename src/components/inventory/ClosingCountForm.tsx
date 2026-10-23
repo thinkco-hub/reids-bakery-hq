@@ -127,7 +127,7 @@ export default function ClosingCountForm({ menuInventory, ingredients, onSubmit,
       <header className="mb-6 md:mb-8">
         <h2 className="text-2xl md:text-3xl font-bold text-[#562D07]">Closing Inventory Count</h2>
         <p className="text-[#562D07]/70 mt-1 font-medium text-sm md:text-base">
-          End-of-day physical count — menu items and raw materials. Enter what you physically counted;
+          End-of-day physical count. Enter what you physically counted;
           system stock is only compared afterward during reconciliation.
         </p>
       </header>
@@ -159,13 +159,17 @@ export default function ClosingCountForm({ menuInventory, ingredients, onSubmit,
           counts={menuCounts}
           onUpdate={updateMenuCount}
         />
-        <CountSection
-          title="Raw Materials"
-          icon="🛒"
-          items={ingredients}
-          counts={ingredientCounts}
-          onUpdate={updateIngredientCount}
-        />
+        {/* The shell hands roles without the ingredient grant an empty
+            projection, so this section would be a header over no rows. */}
+        {ingredients.length > 0 && (
+          <CountSection
+            title="Raw Materials"
+            icon="🛒"
+            items={ingredients}
+            counts={ingredientCounts}
+            onUpdate={updateIngredientCount}
+          />
+        )}
 
         <button
           type="submit"
