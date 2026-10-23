@@ -99,13 +99,17 @@ export default function InventoryView({
         />
       )}
 
-      {/* Restock Reminders live in the main Inventory view */}
-      <RestockReminders
-        ingredients={ingredients}
-        reminders={restockReminders}
-        onAdd={onAddReminder}
-        onToggleDone={onToggleReminderDone}
-      />
+      {/* Restock Reminders live in the main Inventory view. They name raw
+          materials and offer an ingredient picker, so they follow the same
+          grant as the table above. */}
+      {canViewIngredients && (
+        <RestockReminders
+          ingredients={ingredients}
+          reminders={restockReminders}
+          onAdd={onAddReminder}
+          onToggleDone={onToggleReminderDone}
+        />
+      )}
     </div>
   );
 }
