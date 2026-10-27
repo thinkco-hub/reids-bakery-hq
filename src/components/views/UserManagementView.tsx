@@ -1,5 +1,6 @@
 import { useState } from "react";
 import SelectField from "../common/SelectField";
+import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
 import { ALL_ROLES, ROLE_LABELS, canAssignRole, canManageRoles } from "../../utils/permissions";
 import type { RoleChangeResult, UserActiveResult } from "../../hooks/useAuth";
 import type { User, UserId, UserRole } from "../../types/domain";
@@ -23,6 +24,7 @@ export default function UserManagementView({
   onSetActive,
 }: UserManagementViewProps) {
   const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [pendingDeactivate, setPendingDeactivate] = useState<User | null>(null);
   const mayManage = canManageRoles(currentUser.role);
 
   const activeUsers = users.filter((u) => u.active);
@@ -148,7 +150,11 @@ export default function UserManagementView({
                       </td>
                       <td className="px-6 py-4">
                         <button
-                          onClick={() => handleSetActive(user, !user.active)}
+                          onClick={() =>
+                            user.active
+                              ? setPendingDeactivate(user)
+                              : handleSetActive(user, true)
+                          }
                           disabled={!mayManage || user.id === currentUser.id}
                           title={
                             !mayManage
@@ -174,6 +180,19 @@ export default function UserManagementView({
           </table>
         </div>
       </div>
+
+      {pendingDeactivate && (
+        <DeleteConfirmDialog
+          title="Deactivate this account?"
+          message={`Deactivating ${pendingDeactivate.name} (${pendingDeactivate.email}) blocks their sign-in until the account is reactivated. The account and its audit history are kept.`}
+          confirmLabel="Deactivate"
+          onConfirm={() => {
+            handleSetActive(pendingDeactivate, false);
+            setPendingDeactivate(null);
+          }}
+          onCancel={() => setPendingDeactivate(null)}
+        />
+      )}
     </div>
   );
 }
