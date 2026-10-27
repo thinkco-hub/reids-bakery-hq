@@ -371,6 +371,8 @@ export type AuditActionType =
   | "auth.login.lockout"
   | "auth.logout"
   | "user.role_changed"
+  | "user.deactivated"
+  | "user.reactivated"
   | "sale.completed"
   | "sale.edited"
   | "order.created"

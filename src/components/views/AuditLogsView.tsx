@@ -10,6 +10,8 @@ const ACTION_LABELS: Record<AuditActionType, string> = {
   "auth.login.lockout": "Login lockout",
   "auth.logout": "Logout",
   "user.role_changed": "User role changed",
+  "user.deactivated": "Account deactivated",
+  "user.reactivated": "Account reactivated",
   "sale.completed": "POS sale completed",
   "sale.edited": "Sale details edited",
   "order.created": "Order created",

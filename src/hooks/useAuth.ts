@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { initialUsers } from "../data/initialUsers";
 import { verifyPassword } from "../utils/auth";
 import { recordAuditEvent } from "../utils/auditLog";
-import { ALL_ROLES, canAssignRole, roleLabel } from "../utils/permissions";
+import { ALL_ROLES, canAssignRole, canManageRoles, roleLabel } from "../utils/permissions";
 import type { LoginCredentials, User, UserId, UserRole } from "../types/domain";
 
 const ATTEMPTS_STORAGE_KEY = "bakery.loginAttempts";
@@ -28,6 +28,7 @@ function loadAttempts(): AttemptsByEmail {
 
 export type LoginResult = { ok: true } | { ok: false; error: string };
 export type RoleChangeResult = { ok: true } | { ok: false; error: string };
+export type UserActiveResult = { ok: true } | { ok: false; error: string };
 
 type RoleOverrides = Record<UserId, UserRole>;
 
@@ -53,13 +54,13 @@ function loadUsers(): User[] {
 }
 
 /**
- * Owns login/logout, per-email rate limiting and user role changes. There is
- * no persisted session — currentUser always starts null, so a page refresh
- * returns to the login page. The rate-limit record IS persisted
- * (localStorage), and exposed live via getLockedUntil so the UI reflects an
- * in-progress lockout immediately after a refresh, not just after the next
- * submit. Role changes are persisted the same way, as overrides on top of
- * the seed users.
+ * Owns login/logout, per-email rate limiting, user role changes and account
+ * activation. There is no persisted session — currentUser always starts null,
+ * so a page refresh returns to the login page. The rate-limit record IS
+ * persisted (localStorage), and exposed live via getLockedUntil so the UI
+ * reflects an in-progress lockout immediately after a refresh, not just after
+ * the next submit. Role changes are persisted the same way, as overrides on
+ * top of the seed users.
  */
 export function useAuth() {
   const [users, setUsers] = useState<User[]>(loadUsers);
@@ -187,5 +188,37 @@ export function useAuth() {
     return { ok: true };
   };
 
-  return { users, currentUser, login, logout, getLockedUntil, updateUserRole };
+  /** Activates or deactivates a user's account on behalf of the signed-in user. */
+  const setUserActive = (userId: UserId, active: boolean): UserActiveResult => {
+    if (!currentUser) return { ok: false, error: "You must be signed in." };
+    const target = users.find((u) => u.id === userId);
+    if (!target) return { ok: false, error: "User not found." };
+    if (target.active === active) return { ok: true };
+
+    if (!canManageRoles(currentUser.role)) {
+      return { ok: false, error: "You don't have permission to change account status." };
+    }
+    if (!active && currentUser.id === userId) {
+      return { ok: false, error: "You cannot deactivate your own account." };
+    }
+    const activeSuperAdmins = users.filter((u) => u.active && u.role === "super_admin");
+    if (!active && target.role === "super_admin" && activeSuperAdmins.length <= 1) {
+      return { ok: false, error: "There must be at least one Super Admin." };
+    }
+
+    setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, active } : u)));
+
+    recordAuditEvent({
+      userId: currentUser.id,
+      userName: currentUser.name,
+      userRole: currentUser.role,
+      action: active ? "user.reactivated" : "user.deactivated",
+      entityType: "User",
+      entityId: userId,
+      details: `${active ? "Reactivated" : "Deactivated"} ${target.name}'s account`,
+    });
+    return { ok: true };
+  };
+
+  return { users, currentUser, login, logout, getLockedUntil, updateUserRole, setUserActive };
 }
