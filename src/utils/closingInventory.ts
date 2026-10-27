@@ -47,6 +47,11 @@ export function getWeekRange(anchorISO: ISODate): DateRange {
   return { start: toISODate(start), end: toISODate(end) };
 }
 
+// A day period is the single date itself.
+export function getDayRange(anchorISO: ISODate): DateRange {
+  return { start: anchorISO, end: anchorISO };
+}
+
 export function getMonthRange(monthKey: MonthKey): DateRange {
   const [y, m] = monthKey.split("-").map(Number);
   return {
@@ -59,6 +64,12 @@ export function shiftWeekRange(range: DateRange, delta: number): DateRange {
   const start = parseISODate(range.start);
   start.setDate(start.getDate() + delta * 7);
   return getWeekRange(toISODate(start));
+}
+
+export function shiftDayRange(range: DateRange, delta: number): DateRange {
+  const d = parseISODate(range.start);
+  d.setDate(d.getDate() + delta);
+  return getDayRange(toISODate(d));
 }
 
 export function shiftMonthKey(key: MonthKey, delta: number): MonthKey {
@@ -83,6 +94,15 @@ export function formatMonthLabel(key: MonthKey): string {
   const [y, m] = key.split("-").map(Number);
   return new Date(y, m - 1, 1).toLocaleDateString("en-US", {
     month: "long",
+    year: "numeric",
+  });
+}
+
+export function formatDayLabel(iso: ISODate): string {
+  return parseISODate(iso).toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
     year: "numeric",
   });
 }

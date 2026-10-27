@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ScheduleRunModal from "./ScheduleRunModal";
 import RunDetailModal from "./RunDetailModal";
 import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
+import { SearchIcon } from "../icons";
 import { getRunStatus, RUN_STATUS_LABELS } from "../../utils/production";
 import type {
   IngredientStock,
@@ -46,6 +47,7 @@ export default function ProductionRunsList({
   onDelete,
 }: ProductionRunsListProps) {
   const [statusFilter, setStatusFilter] = useState<"all" | ProductionRunDisposition>("all");
+  const [search, setSearch] = useState("");
   const [isScheduling, setIsScheduling] = useState(false);
   const [selectedRunId, setSelectedRunId] = useState<ProductionRunId | null>(null);
   const [pendingDelete, setPendingDelete] = useState<ProductionRun | null>(null);
@@ -69,8 +71,19 @@ export default function ProductionRunsList({
     counts[status] += 1;
   });
 
-  const filtered =
-    statusFilter === "all" ? withStatus : withStatus.filter((entry) => entry.status === statusFilter);
+  const query = search.toLowerCase();
+  const filtered = withStatus.filter((entry) => {
+    const { recipe, status } = entry;
+    if (statusFilter !== "all" && status !== statusFilter) return false;
+    if (!search) return true;
+    const menuItemName = recipe
+      ? menuInventory.find((m) => m.id === recipe.id)?.name ?? ""
+      : "";
+    return (
+      (recipe?.name ?? "").toLowerCase().includes(query) ||
+      menuItemName.toLowerCase().includes(query)
+    );
+  });
 
   const sorted = [...filtered].sort((a, b) => a.run.plannedDate.localeCompare(b.run.plannedDate));
 
@@ -175,6 +188,21 @@ export default function ProductionRunsList({
             </button>
           );
         })}
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-lg p-2 mb-6 flex shadow-sm">
+        <div className="relative flex-1 w-full">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <SearchIcon className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
+            placeholder="Search recipe or menu item..."
+          />
+        </div>
       </div>
 
       {groupedByDate.length === 0 ? (

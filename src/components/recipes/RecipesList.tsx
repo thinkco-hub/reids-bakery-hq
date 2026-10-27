@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { computeRecipeCost, suggestedPrice } from "../../utils/pricing";
+import { SearchIcon } from "../icons";
 import type {
   IngredientStock,
   MenuItemStock,
@@ -30,7 +31,17 @@ export default function RecipesList({
   onEdit,
   onCreate,
 }: RecipesListProps) {
+  const [search, setSearch] = useState("");
   const columnCount = canViewIngredientCosts ? 7 : 5;
+
+  const query = search.toLowerCase();
+  const filtered = recipes.filter((recipe) => {
+    const menuItemName = menuInventory.find((m) => m.id === recipe.id)?.name ?? "";
+    return (
+      recipe.name.toLowerCase().includes(query) ||
+      menuItemName.toLowerCase().includes(query)
+    );
+  });
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
@@ -68,6 +79,21 @@ export default function RecipesList({
         </div>
       </div>
 
+      <div className="bg-white border border-gray-200 rounded-lg p-2 mb-4 flex shadow-sm">
+        <div className="relative flex-1 w-full">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <SearchIcon className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
+            placeholder="Search recipe or menu item..."
+          />
+        </div>
+      </div>
+
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto w-full">
           <table className="w-full text-left border-collapse min-w-[760px]">
@@ -93,8 +119,14 @@ export default function RecipesList({
                     No recipes yet. Create one to see live COGS and pricing.
                   </td>
                 </tr>
+              ) : filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={columnCount} className="px-6 py-8 text-center text-gray-500">
+                    No recipes match your search.
+                  </td>
+                </tr>
               ) : (
-                recipes.map((recipe) => {
+                filtered.map((recipe) => {
                   const menuItem = menuInventory.find((m) => m.id === recipe.id);
                   const actualPrice = recipe.price;
                   const costPerUnit = canViewIngredientCosts

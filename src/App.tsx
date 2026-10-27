@@ -51,7 +51,8 @@ import type { NavTabId, Order, RecipeInput } from "./types/domain";
 
 export default function BakeryCommandCenter() {
   // --- AUTH (src/hooks/useAuth.ts) ---
-  const { users, currentUser, login, logout, getLockedUntil, updateUserRole } = useAuth();
+  const { users, currentUser, login, logout, getLockedUntil, updateUserRole, setUserActive } =
+    useAuth();
 
   // --- ROLE PERMISSIONS (src/utils/permissions.ts) ---
   const role = currentUser?.role;
@@ -366,8 +367,8 @@ export default function BakeryCommandCenter() {
     restockReminders,
     canViewIngredients,
     onNavClick: handleNavClick,
-    onRestockToProduction: goToProductionRuns,
     onOpenRestock: openRestock,
+    onScheduleRun: goToProductionRuns,
     onAddIngredient: addIngredient,
     onUpdateIngredient: updateIngredient,
     onAddReminder: addRestockReminder,
@@ -657,6 +658,7 @@ export default function BakeryCommandCenter() {
                   users={users}
                   currentUser={currentUser}
                   onChangeRole={updateUserRole}
+                  onSetActive={setUserActive}
                 />
               </RequireTab>
             }

@@ -371,6 +371,8 @@ export type AuditActionType =
   | "auth.login.lockout"
   | "auth.logout"
   | "user.role_changed"
+  | "user.deactivated"
+  | "user.reactivated"
   | "sale.completed"
   | "sale.edited"
   | "order.created"
@@ -618,7 +620,7 @@ export interface LedgerRow {
   restocked: number;
   spoilage: number;
   sold: number;
-  profit: number;
+  revenue: number;
   remainingCalculated: number;
   remainingReported: number | null;
   discrepancy: number | null;
