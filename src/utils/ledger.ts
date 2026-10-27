@@ -137,8 +137,8 @@ export function buildLedgerRow(
       ? null
       : computeDiscrepancy(remainingReported, remainingCalculated);
 
-  // FR-3.9.6: profit = sold quantity x standardized selling price
-  const profit = sold * (product.sellingPrice || 0);
+  // FR-3.9.6: revenue = sold quantity x standardized selling price
+  const revenue = sold * (product.sellingPrice || 0);
 
   return {
     branchId: branch.id,
@@ -151,7 +151,7 @@ export function buildLedgerRow(
     restocked,
     spoilage,
     sold,
-    profit,
+    revenue,
     remainingCalculated,
     remainingReported,
     discrepancy,
@@ -181,7 +181,7 @@ export function buildLedgerForMonth(
   return rows;
 }
 
-export function computeBranchProfitForMonth(
+export function computeBranchRevenueForMonth(
   branch: ChamsBranch,
   products: ChamsProduct[],
   month: MonthKey,
@@ -191,7 +191,7 @@ export function computeBranchProfitForMonth(
 ): number {
   return products
     .map((product) => buildLedgerRow(branch, product, month, beginnings, movements, counts))
-    .reduce((sum, row) => sum + row.profit, 0);
+    .reduce((sum, row) => sum + row.revenue, 0);
 }
 
 export function getBranchProductMonths(

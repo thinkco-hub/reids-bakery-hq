@@ -620,7 +620,7 @@ export interface LedgerRow {
   restocked: number;
   spoilage: number;
   sold: number;
-  profit: number;
+  revenue: number;
   remainingCalculated: number;
   remainingReported: number | null;
   discrepancy: number | null;
