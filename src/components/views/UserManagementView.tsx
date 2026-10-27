@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SelectField from "../common/SelectField";
 import { ALL_ROLES, ROLE_LABELS, canAssignRole, canManageRoles } from "../../utils/permissions";
 import type { RoleChangeResult, UserActiveResult } from "../../hooks/useAuth";
@@ -11,12 +11,10 @@ interface UserManagementViewProps {
   onSetActive: (userId: UserId, active: boolean) => UserActiveResult;
 }
 
-interface Toast {
+interface Feedback {
   type: "success" | "error";
   message: string;
 }
-
-const TOAST_MS = 4000;
 
 export default function UserManagementView({
   users,
@@ -24,21 +22,14 @@ export default function UserManagementView({
   onChangeRole,
   onSetActive,
 }: UserManagementViewProps) {
-  const [toast, setToast] = useState<Toast | null>(null);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
   const mayManage = canManageRoles(currentUser.role);
 
   const activeUsers = users.filter((u) => u.active);
 
-  // A new toast object restarts the dismissal timer; the old one is replaced.
-  useEffect(() => {
-    if (!toast) return;
-    const timer = setTimeout(() => setToast(null), TOAST_MS);
-    return () => clearTimeout(timer);
-  }, [toast]);
-
   const handleChange = (user: User, newRole: UserRole) => {
     const result = onChangeRole(user.id, newRole);
-    setToast(
+    setFeedback(
       result.ok
         ? { type: "success", message: `${user.name} is now ${ROLE_LABELS[newRole]}.` }
         : { type: "error", message: result.error }
@@ -47,7 +38,7 @@ export default function UserManagementView({
 
   const handleSetActive = (user: User, active: boolean) => {
     const result = onSetActive(user.id, active);
-    setToast(
+    setFeedback(
       result.ok
         ? {
             type: "success",
@@ -60,14 +51,26 @@ export default function UserManagementView({
   };
 
   return (
-    <>
-      <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
+    <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8">
         <h2 className="text-3xl font-bold text-[#121212]">Roles</h2>
         <p className="text-gray-500 mt-1">
           Assign roles and manage account status. A role controls which views a user can open.
         </p>
       </header>
+
+      {feedback && (
+        <div
+          role={feedback.type === "error" ? "alert" : "status"}
+          className={`mb-4 px-4 py-3 rounded-lg text-sm font-medium border ${
+            feedback.type === "error"
+              ? "bg-red-50 text-red-600 border-red-200"
+              : "bg-green-50 text-green-700 border-green-200"
+          }`}
+        >
+          {feedback.message}
+        </div>
+      )}
 
       <p className="text-sm text-gray-500 mb-3">
         {activeUsers.length} active {activeUsers.length === 1 ? "user" : "users"}
@@ -171,20 +174,6 @@ export default function UserManagementView({
           </table>
         </div>
       </div>
-      </div>
-
-      {toast && (
-        <div
-          role={toast.type === "error" ? "alert" : "status"}
-          className={`fixed bottom-4 right-4 z-[100] max-w-sm px-4 py-3 rounded-lg text-sm font-medium border shadow-lg animate-fadeIn ${
-            toast.type === "error"
-              ? "bg-red-50 text-red-600 border-red-200"
-              : "bg-green-50 text-green-700 border-green-200"
-          }`}
-        >
-          {toast.message}
-        </div>
-      )}
-    </>
+    </div>
   );
 }
