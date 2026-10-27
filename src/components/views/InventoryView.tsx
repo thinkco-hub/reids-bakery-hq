@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import FinishedGoodsTable from "../inventory/FinishedGoodsTable";
 import RawMaterialsTable from "../inventory/RawMaterialsTable";
+import RestockChoiceModal from "../inventory/RestockChoiceModal";
 import RestockReminders from "../inventory/RestockReminders";
 import type {
   IngredientFormData,
@@ -19,8 +20,8 @@ interface InventoryViewProps {
   /** Whether the signed-in role may see the Raw Materials (Ingredients) table and the stock toggle. */
   canViewIngredients: boolean;
   onNavClick: (tab: NavTabId) => void;
-  onRestockToProduction: () => void;
   onOpenRestock: (category: RestockCategory, itemId?: string) => void;
+  onScheduleRun: () => void;
   onAddIngredient: (data: IngredientFormData) => void;
   onUpdateIngredient: (id: string, data: Partial<IngredientStock>) => void;
   onAddReminder: (data: RestockReminderData) => void;
@@ -36,8 +37,8 @@ export default function InventoryView({
   restockReminders,
   canViewIngredients,
   onNavClick,
-  onRestockToProduction,
   onOpenRestock,
+  onScheduleRun,
   onAddIngredient,
   onUpdateIngredient,
   onAddReminder,
@@ -45,6 +46,9 @@ export default function InventoryView({
 }: InventoryViewProps) {
   // Menu Items / Raw Materials toggle (combined main Inventory view)
   const [stockView, setStockView] = useState<StockView>("menu");
+  // The finished-goods + Restock button opens a choice first: bake it (a run
+  // consumes ingredients) or record stock that arrived outside a run.
+  const [restockChoice, setRestockChoice] = useState<MenuItemStock | null>(null);
 
   return (
     <div className="space-y-6">
@@ -87,8 +91,9 @@ export default function InventoryView({
       {stockView === "menu" ? (
         <FinishedGoodsTable
           menuInventory={menuInventory}
-          // Restock routes to Production Runs — replenish finished goods by scheduling a run
-          onRestock={onRestockToProduction}
+          onRestock={(id: string) =>
+            setRestockChoice(menuInventory.find((m) => m.id === id) ?? null)
+          }
         />
       ) : (
         <RawMaterialsTable
@@ -96,6 +101,22 @@ export default function InventoryView({
           onRestock={(id: string) => onOpenRestock("ingredient", id)}
           onAdd={onAddIngredient}
           onUpdate={onUpdateIngredient}
+        />
+      )}
+
+      {restockChoice && (
+        <RestockChoiceModal
+          itemName={restockChoice.name}
+          onDirectRestock={() => {
+            const id = restockChoice.id;
+            setRestockChoice(null);
+            onOpenRestock("menu", id);
+          }}
+          onScheduleRun={() => {
+            setRestockChoice(null);
+            onScheduleRun();
+          }}
+          onClose={() => setRestockChoice(null)}
         />
       )}
 
