@@ -366,7 +366,6 @@ export default function BakeryCommandCenter() {
     restockReminders,
     canViewIngredients,
     onNavClick: handleNavClick,
-    onRestockToProduction: goToProductionRuns,
     onOpenRestock: openRestock,
     onAddIngredient: addIngredient,
     onUpdateIngredient: updateIngredient,

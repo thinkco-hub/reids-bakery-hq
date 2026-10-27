@@ -19,7 +19,6 @@ interface InventoryViewProps {
   /** Whether the signed-in role may see the Raw Materials (Ingredients) table and the stock toggle. */
   canViewIngredients: boolean;
   onNavClick: (tab: NavTabId) => void;
-  onRestockToProduction: () => void;
   onOpenRestock: (category: RestockCategory, itemId?: string) => void;
   onAddIngredient: (data: IngredientFormData) => void;
   onUpdateIngredient: (id: string, data: Partial<IngredientStock>) => void;
@@ -36,7 +35,6 @@ export default function InventoryView({
   restockReminders,
   canViewIngredients,
   onNavClick,
-  onRestockToProduction,
   onOpenRestock,
   onAddIngredient,
   onUpdateIngredient,
@@ -87,8 +85,7 @@ export default function InventoryView({
       {stockView === "menu" ? (
         <FinishedGoodsTable
           menuInventory={menuInventory}
-          // Restock routes to Production Runs — replenish finished goods by scheduling a run
-          onRestock={onRestockToProduction}
+          onRestock={(id: string) => onOpenRestock("menu", id)}
         />
       ) : (
         <RawMaterialsTable
