@@ -94,7 +94,7 @@ export default function LedgerHistory({ branches, products, beginnings, movement
                 <th className="px-5 py-4 text-right">Restocked</th>
                 <th className="px-5 py-4 text-right">Spoilage</th>
                 <th className="px-5 py-4 text-right">Sold</th>
-                <th className="px-5 py-4 text-right">Profit</th>
+                <th className="px-5 py-4 text-right">Revenue</th>
                 <th className="px-5 py-4 text-right">Remaining (Calc.)</th>
                 <th className="px-5 py-4 text-right">Remaining (Reported)</th>
                 <th className="px-5 py-4">Discrepancy</th>
@@ -108,7 +108,7 @@ export default function LedgerHistory({ branches, products, beginnings, movement
                   <td className="px-5 py-4 text-right text-gray-600">{r.restocked}</td>
                   <td className="px-5 py-4 text-right text-gray-600">{r.spoilage}</td>
                   <td className="px-5 py-4 text-right text-gray-600">{r.sold}</td>
-                  <td className="px-5 py-4 text-right text-green-700 font-medium">₱{r.profit.toFixed(2)}</td>
+                  <td className="px-5 py-4 text-right text-green-700 font-medium">₱{r.revenue.toFixed(2)}</td>
                   <td className="px-5 py-4 text-right font-semibold text-gray-900">{r.remainingCalculated}</td>
                   <td className="px-5 py-4 text-right text-gray-600">
                     {r.countSubmitted ? r.remainingReported : <span className="text-gray-300">—</span>}

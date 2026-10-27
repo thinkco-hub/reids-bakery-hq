@@ -20,7 +20,7 @@ const INITIAL_BRANCHES: ChamsBranch[] = [
   { id: "BR-03", name: "Chams Mandaue" },
 ];
 
-// FR-3.9.6: sellingPrice is the standardized price used for profit = sold x price.
+// FR-3.9.6: sellingPrice is the standardized price used for revenue = sold x price.
 const SIOPAO_PRODUCTS: ChamsProduct[] = [
   { id: "PORK", name: "Pork Siopao", sellingPrice: 25 },
   { id: "BEEF", name: "Beef Siopao", sellingPrice: 28 },

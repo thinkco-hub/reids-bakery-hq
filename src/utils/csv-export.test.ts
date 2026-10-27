@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { closingInventoryToCSV, computeClosingInventory } from "./closingInventory";
+import {
+  closingInventoryToCSV,
+  computeClosingInventory,
+  formatDayLabel,
+  getDayRange,
+  shiftDayRange,
+} from "./closingInventory";
 import { csvEscape, salesToCSV } from "./sales";
-import type { IngredientStock, MenuItemStock, Sale } from "../types/domain";
+import type { IngredientStock, InventoryCount, MenuItemStock, Sale } from "../types/domain";
 
 const MENU: MenuItemStock[] = [
   {
@@ -106,5 +112,58 @@ describe("CSV formula-prefix guard", () => {
       .split("\n")[1]
       .split(",");
     expect(shortage[shortage.length - 1]).toBe("-12");
+  });
+});
+
+const dailyCounts: InventoryCount[] = [
+  {
+    id: "C-1",
+    itemId: "B-101",
+    itemType: "menu",
+    date: "2026-10-24",
+    systemQty: 10,
+    countedQty: 8,
+    discrepancy: -2,
+    status: "resolved",
+  },
+  {
+    id: "C-2",
+    itemId: "B-101",
+    itemType: "menu",
+    date: "2026-10-25",
+    systemQty: 10,
+    countedQty: 6,
+    discrepancy: -4,
+    status: "resolved",
+  },
+];
+
+describe("daily closing inventory (FR-3.8.3)", () => {
+  it("bounds a single-day period at that date on both sides", () => {
+    expect(getDayRange("2026-10-25")).toEqual({ start: "2026-10-25", end: "2026-10-25" });
+    expect(shiftDayRange({ start: "2026-10-25", end: "2026-10-25" }, -1).start).toBe("2026-10-24");
+    expect(shiftDayRange({ start: "2026-10-31", end: "2026-10-31" }, 1).start).toBe("2026-11-01");
+  });
+
+  it("labels the day period", () => {
+    expect(formatDayLabel("2026-10-25")).toContain("Oct 25, 2026");
+  });
+
+  /**
+   * A day view is the count log narrowed to that date: the day-before count
+   * supplies neither the closing qty nor the period discrepancy.
+   */
+  it("counts only counts dated inside the day", () => {
+    const day = computeClosingInventory(
+      { start: "2026-10-25", end: "2026-10-25" },
+      MENU,
+      INGREDIENTS,
+      dailyCounts
+    );
+    expect(day.rows[0].closingQty).toBe(6);
+    expect(day.rows[0].discrepancyQty).toBe(-4);
+    const cells = closingInventoryToCSV(day).split("\n")[1].split(",");
+    expect(cells[5]).toBe("6");
+    expect(cells[cells.length - 1]).toBe("-4");
   });
 });

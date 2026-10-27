@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import RevenueByDayChart from "./RevenueByDayChart";
 import SellerBarList from "./SellerBarList";
 import EditSaleModal from "./EditSaleModal";
+import { SearchIcon } from "../icons";
 import {
   DATE_PRESETS,
   getPresetRange,
@@ -14,7 +15,14 @@ import {
   salesToCSV,
   downloadCSV,
 } from "../../utils/sales";
-import type { DatePresetId, EditSaleInput, Sale, SaleId } from "../../types/domain";
+import type {
+  DatePresetId,
+  EditSaleInput,
+  PaymentMethod,
+  RevenueByPaymentMethod,
+  Sale,
+  SaleId,
+} from "../../types/domain";
 
 function StatCard({
   label,
@@ -33,6 +41,70 @@ function StatCard({
   );
 }
 
+const METHOD_COLORS: Record<PaymentMethod, string> = {
+  Cash: "#F17D0C",
+  GCash: "#3B5BA5",
+  "Bank Transfer": "#562D07",
+  Card: "#94A3B8",
+};
+
+/** Donut of the payment split (FR-3.8.2) — inline SVG, no chart dependency. */
+function PaymentDonut({ data }: { data: RevenueByPaymentMethod[] }) {
+  const total = data.reduce((sum, m) => sum + m.revenue, 0);
+  const radius = 42;
+  const circumference = 2 * Math.PI * radius;
+  const segments = data.reduce<
+    { list: Array<RevenueByPaymentMethod & { fraction: number; dash: number; offset: number }>; offset: number }
+  >(
+    (acc, m) => {
+      const fraction = total > 0 ? m.revenue / total : 0;
+      const dash = fraction * circumference;
+      return {
+        list: [...acc.list, { ...m, fraction, dash, offset: acc.offset }],
+        offset: acc.offset + dash,
+      };
+    },
+    { list: [], offset: 0 }
+  ).list;
+
+  return (
+    <div className="flex items-center gap-5 md:gap-6">
+      <svg viewBox="0 0 120 120" className="w-32 h-32 md:w-36 md:h-36 -rotate-90 shrink-0">
+        <circle cx="60" cy="60" r={radius} fill="none" stroke="#F3F4F6" strokeWidth="16" />
+        {segments.map((s) => (
+          <circle
+            key={s.method}
+            cx="60"
+            cy="60"
+            r={radius}
+            fill="none"
+            stroke={METHOD_COLORS[s.method]}
+            strokeWidth="16"
+            strokeDasharray={`${s.dash} ${circumference - s.dash}`}
+            strokeDashoffset={-s.offset}
+          >
+            <title>{`${s.method}: ₱${s.revenue.toFixed(2)}`}</title>
+          </circle>
+        ))}
+      </svg>
+      <ul className="text-sm space-y-1.5">
+        {segments.map((s) => (
+          <li key={s.method} className="flex items-center gap-2">
+            <span
+              className="inline-block w-3 h-3 rounded-sm shrink-0"
+              style={{ backgroundColor: METHOD_COLORS[s.method] }}
+            />
+            <span className="text-gray-600">{s.method}</span>
+            <span className="font-semibold text-gray-900">
+              {Math.round(s.fraction * 100)}%
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 interface ReportsDashboardProps {
   sales: Sale[];
   onReprintSale?: (sale: Sale) => void;
@@ -43,6 +115,7 @@ export default function ReportsDashboard({ sales, onReprintSale, onSaveSaleEdit 
   const [preset, setPreset] = useState<DatePresetId | "custom">("month");
   const [customStart, setCustomStart] = useState("");
   const [customEnd, setCustomEnd] = useState("");
+  const [logSearch, setLogSearch] = useState("");
   const [editingSale, setEditingSale] = useState<Sale | null>(null);
 
   const range = useMemo(() => {
@@ -59,6 +132,14 @@ export default function ReportsDashboard({ sales, onReprintSale, onSaveSaleEdit 
   const worstSellers = useMemo(() => getWorstSellers(filteredSales, 5), [filteredSales]);
   const revenueByDay = useMemo(() => getRevenueByDay(filteredSales), [filteredSales]);
   const byPaymentMethod = useMemo(() => getRevenueByPaymentMethod(filteredSales), [filteredSales]);
+
+  const query = logSearch.toLowerCase();
+  const logRows = filteredSales.filter(
+    (sale) =>
+      !logSearch ||
+      sale.id.toLowerCase().includes(query) ||
+      sale.customerName.toLowerCase().includes(query)
+  );
 
   const handleExport = () => {
     const csv = salesToCSV(filteredSales);
@@ -168,20 +249,35 @@ export default function ReportsDashboard({ sales, onReprintSale, onSaveSaleEdit 
         {byPaymentMethod.length === 0 ? (
           <p className="text-sm text-gray-400">No transactions in this range.</p>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {byPaymentMethod.map((m) => (
-              <div key={m.method} className="text-center p-4 bg-gray-50 rounded-xl">
-                <p className="text-xs font-medium text-gray-500 mb-1">{m.method}</p>
-                <p className="text-lg font-bold text-[#121212]">₱{m.revenue.toFixed(2)}</p>
-              </div>
-            ))}
+          <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+            <PaymentDonut data={byPaymentMethod} />
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 flex-1">
+              {byPaymentMethod.map((m) => (
+                <div key={m.method} className="text-center p-4 bg-gray-50 rounded-xl">
+                  <p className="text-xs font-medium text-gray-500 mb-1">{m.method}</p>
+                  <p className="text-lg font-bold text-[#121212]">₱{m.revenue.toFixed(2)}</p>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-5 border-b border-gray-100">
+        <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <h3 className="text-lg font-bold text-[#121212]">Sales Log</h3>
+          <div className="relative sm:w-72">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <SearchIcon className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              value={logSearch}
+              onChange={(e) => setLogSearch(e.target.value)}
+              className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 outline-none focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C]"
+              placeholder="Search sale # or customer..."
+            />
+          </div>
         </div>
         <div className="overflow-x-auto w-full">
           <table className="w-full text-left border-collapse min-w-[760px]">
@@ -198,14 +294,14 @@ export default function ReportsDashboard({ sales, onReprintSale, onSaveSaleEdit 
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 text-sm">
-              {filteredSales.length === 0 ? (
+              {logRows.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
-                    No sales found in the selected range.
+                    {logSearch ? "No sales match your search." : "No sales found in the selected range."}
                   </td>
                 </tr>
               ) : (
-                filteredSales.map((sale) => (
+                logRows.map((sale) => (
                   <tr key={sale.id} className="hover:bg-gray-50/50">
                     <td className="px-6 py-3 font-medium text-gray-900">
                       {sale.id}

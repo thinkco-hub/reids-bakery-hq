@@ -1,6 +1,7 @@
-import React from "react";
-import { formatMonthLabel, shiftMonthKey, buildLedgerForMonth, computeBranchProfitForMonth } from "../../utils/ledger";
+import React, { useState } from "react";
+import { formatMonthLabel, shiftMonthKey, buildLedgerForMonth, computeBranchRevenueForMonth } from "../../utils/ledger";
 import { discrepancyLabel } from "../../utils/counts";
+import { SearchIcon } from "../icons";
 import type {
   ChamsBeginning,
   ChamsBranch,
@@ -18,18 +19,24 @@ export default function LedgerView({ branches, products, beginnings, movements, 
   month: string;
   onMonthChange: (month: string) => void;
 }) {
+  const [search, setSearch] = useState("");
   const rows = buildLedgerForMonth(branches, products, month, beginnings, movements, counts).sort(
     (a, b) => a.branchName.localeCompare(b.branchName) || a.productName.localeCompare(b.productName)
   );
   const flaggedCount = rows.filter((r) => r.flagged).length;
   const notSubmittedCount = rows.filter((r) => !r.countSubmitted).length;
   const totalRemaining = rows.reduce((sum, r) => sum + r.remainingCalculated, 0);
-  const totalProfit = rows.reduce((sum, r) => sum + r.profit, 0);
+  const totalRevenue = rows.reduce((sum, r) => sum + r.revenue, 0);
 
-  const branchProfits = branches.map((branch) => ({
+  const branchRevenues = branches.map((branch) => ({
     branch,
-    profit: computeBranchProfitForMonth(branch, products, month, beginnings, movements, counts),
+    revenue: computeBranchRevenueForMonth(branch, products, month, beginnings, movements, counts),
   }));
+
+  const query = search.toLowerCase();
+  const visibleRows = rows.filter(
+    (r) => r.branchName.toLowerCase().includes(query) || r.productName.toLowerCase().includes(query)
+  );
 
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
@@ -77,8 +84,8 @@ export default function LedgerView({ branches, products, beginnings, movements, 
           <p className="text-xl md:text-2xl font-bold text-[#1B2A4A]">{totalRemaining}</p>
         </div>
         <div className="bg-white p-4 md:p-5 rounded-2xl border border-green-100 shadow-sm">
-          <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">Total Profit</p>
-          <p className="text-xl md:text-2xl font-bold text-green-600">₱{totalProfit.toFixed(2)}</p>
+          <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">Total Revenue</p>
+          <p className="text-xl md:text-2xl font-bold text-green-600">₱{totalRevenue.toFixed(2)}</p>
         </div>
       </div>
 
@@ -90,14 +97,29 @@ export default function LedgerView({ branches, products, beginnings, movements, 
       )}
 
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
-        <h3 className="text-lg font-bold text-[#1B2A4A] mb-4">Profit by Branch</h3>
+        <h3 className="text-lg font-bold text-[#1B2A4A] mb-4">Revenue by Branch</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {branchProfits.map(({ branch, profit }) => (
+          {branchRevenues.map(({ branch, revenue }) => (
             <div key={branch.id} className="text-center p-4 bg-gray-50 rounded-xl">
               <p className="text-xs font-medium text-gray-500 mb-1">{branch.name}</p>
-              <p className="text-lg font-bold text-[#1B2A4A]">₱{profit.toFixed(2)}</p>
+              <p className="text-lg font-bold text-[#1B2A4A]">₱{revenue.toFixed(2)}</p>
             </div>
           ))}
+        </div>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-lg p-2 mb-4 shadow-sm">
+        <div className="relative flex-1 w-full">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <SearchIcon className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
+            placeholder="Search branch or siopao type..."
+          />
         </div>
       </div>
 
@@ -112,14 +134,21 @@ export default function LedgerView({ branches, products, beginnings, movements, 
                 <th className="px-5 py-4 text-right">Restocked</th>
                 <th className="px-5 py-4 text-right">Spoilage</th>
                 <th className="px-5 py-4 text-right">Sold</th>
-                <th className="px-5 py-4 text-right">Profit</th>
+                <th className="px-5 py-4 text-right">Revenue</th>
                 <th className="px-5 py-4 text-right">Remaining (Calc.)</th>
                 <th className="px-5 py-4 text-right">Remaining (Reported)</th>
                 <th className="px-5 py-4">Discrepancy</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 text-sm">
-              {rows.map((r) => (
+              {visibleRows.length === 0 ? (
+                <tr>
+                  <td colSpan={10} className="px-5 py-8 text-center text-gray-500">
+                    No ledger rows match your search.
+                  </td>
+                </tr>
+              ) : (
+                visibleRows.map((r) => (
                 <tr
                   key={`${r.branchId}-${r.productId}`}
                   className={`hover:bg-gray-50/50 transition-colors ${r.flagged ? "bg-red-50/40" : ""}`}
@@ -130,7 +159,7 @@ export default function LedgerView({ branches, products, beginnings, movements, 
                   <td className="px-5 py-4 text-right text-gray-600">{r.restocked}</td>
                   <td className="px-5 py-4 text-right text-gray-600">{r.spoilage}</td>
                   <td className="px-5 py-4 text-right text-gray-600">{r.sold}</td>
-                  <td className="px-5 py-4 text-right text-green-700 font-medium">₱{r.profit.toFixed(2)}</td>
+                  <td className="px-5 py-4 text-right text-green-700 font-medium">₱{r.revenue.toFixed(2)}</td>
                   <td className="px-5 py-4 text-right font-semibold text-gray-900">{r.remainingCalculated}</td>
                   <td className="px-5 py-4 text-right text-gray-600">
                     {r.countSubmitted ? r.remainingReported : <span className="text-gray-300">—</span>}
@@ -151,7 +180,8 @@ export default function LedgerView({ branches, products, beginnings, movements, 
                     )}
                   </td>
                 </tr>
-              ))}
+                ))
+              )}
             </tbody>
           </table>
         </div>
