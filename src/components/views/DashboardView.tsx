@@ -2,11 +2,14 @@ import React from "react";
 import OrderStatusBadge from "../orders/OrderStatusBadge";
 import { CalendarIcon } from "../icons";
 import { computeOrderTotal } from "../../utils/orders";
-import type { Client, NavTabId, Order, Quantity } from "../../types/domain";
+import { getRevenueByDay } from "../../utils/sales";
+import type { Client, NavTabId, Order, Quantity, Sale } from "../../types/domain";
 
 interface DashboardViewProps {
   orders: Order[];
   clients: Client[];
+  /** The sale ledger, so Today's Revenue matches the Reports screens. */
+  sales: Sale[];
   /** Merged finished-goods and raw-material stock below target. */
   lowStockAlerts: Array<{
     id: string;
@@ -25,6 +28,7 @@ interface DashboardViewProps {
 export default function DashboardView({
   orders,
   clients,
+  sales,
   lowStockAlerts,
   pendingOrdersCount,
   readyOrdersCount,
@@ -36,6 +40,20 @@ export default function DashboardView({
     day: "numeric",
     year: "numeric",
   });
+
+  const today = new Date();
+  const todayKey = today.toISOString().slice(0, 10);
+  const yesterday = new Date(today);
+  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+  const yesterdayKey = yesterday.toISOString().slice(0, 10);
+  const revenueByDay = getRevenueByDay(sales);
+  const revenueOn = (date: string) =>
+    revenueByDay.find((entry) => entry.date === date)?.revenue ?? 0;
+  const todayRevenue = revenueOn(todayKey);
+  const yesterdayRevenue = revenueOn(yesterdayKey);
+  // No previous day to compare against means no percentage, not 0%.
+  const revenueChangePercent =
+    yesterdayRevenue > 0 ? ((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100 : null;
 
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
@@ -52,7 +70,45 @@ export default function DashboardView({
         </div>
       </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+        <div className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100">
+          <div className="flex justify-between items-start mb-4">
+            <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            {revenueChangePercent !== null && (
+              <span
+                title="Versus yesterday"
+                className={`text-xs font-bold px-2 py-1 rounded-full ${
+                  revenueChangePercent >= 0
+                    ? "text-green-500 bg-green-50"
+                    : "text-red-500 bg-red-50"
+                }`}
+              >
+                {revenueChangePercent >= 0 ? "+" : ""}
+                {revenueChangePercent.toFixed(1)}%
+              </span>
+            )}
+          </div>
+          <h3 className="text-gray-500 text-sm font-medium mb-1">
+            Today's Revenue
+          </h3>
+          <p className="text-2xl font-bold text-[#121212]">
+            ₱{todayRevenue.toFixed(2)}
+          </p>
+        </div>
         <div className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100">
           <div className="flex justify-between items-start mb-4">
             <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
