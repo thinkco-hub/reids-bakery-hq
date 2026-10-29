@@ -392,6 +392,7 @@ export default function BakeryCommandCenter() {
                 <DashboardView
                   orders={orders}
                   clients={clients}
+                  sales={sales}
                   lowStockAlerts={lowStockAlerts}
                   pendingOrdersCount={pendingOrdersCount}
                   readyOrdersCount={readyOrdersCount}

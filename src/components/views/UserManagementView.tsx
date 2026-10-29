@@ -1,6 +1,7 @@
 import { useState } from "react";
 import SelectField from "../common/SelectField";
 import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
+import { SearchIcon } from "../icons";
 import { ALL_ROLES, ROLE_LABELS, canAssignRole, canManageRoles } from "../../utils/permissions";
 import type { RoleChangeResult, UserActiveResult } from "../../hooks/useAuth";
 import type { User, UserId, UserRole } from "../../types/domain";
@@ -25,9 +26,20 @@ export default function UserManagementView({
 }: UserManagementViewProps) {
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [pendingDeactivate, setPendingDeactivate] = useState<User | null>(null);
+  const [search, setSearch] = useState("");
   const mayManage = canManageRoles(currentUser.role);
 
   const activeUsers = users.filter((u) => u.active);
+
+  const query = search.trim().toLowerCase();
+  const filteredUsers = query
+    ? users.filter(
+        (user) =>
+          user.name.toLowerCase().includes(query) ||
+          user.email.toLowerCase().includes(query) ||
+          ROLE_LABELS[user.role].toLowerCase().includes(query)
+      )
+    : users;
 
   const handleChange = (user: User, newRole: UserRole) => {
     const result = onChangeRole(user.id, newRole);
@@ -75,8 +87,25 @@ export default function UserManagementView({
       )}
 
       <p className="text-sm text-gray-500 mb-3">
-        {activeUsers.length} active {activeUsers.length === 1 ? "user" : "users"}
+        {query
+          ? `${filteredUsers.length} of ${users.length} ${users.length === 1 ? "user" : "users"} shown`
+          : `${activeUsers.length} active ${activeUsers.length === 1 ? "user" : "users"}`}
       </p>
+
+      <div className="bg-white border border-gray-200 rounded-lg p-2 mb-4 flex shadow-sm">
+        <div className="relative flex-1 w-full">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <SearchIcon className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
+            placeholder="Search name, email or role..."
+          />
+        </div>
+      </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto w-full">
@@ -97,8 +126,14 @@ export default function UserManagementView({
                     No users.
                   </td>
                 </tr>
+              ) : filteredUsers.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                    No users match your search.
+                  </td>
+                </tr>
               ) : (
-                users.map((user) => {
+                filteredUsers.map((user) => {
                   const options = ALL_ROLES.map((role) => ({
                     role,
                     allowed:
