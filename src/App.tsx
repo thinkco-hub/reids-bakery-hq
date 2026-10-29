@@ -45,6 +45,7 @@ import {
   DEFAULT_TAB,
   canAccessIngredients,
   canAccessTab,
+  canViewRecipeCosts,
 } from "./utils/permissions";
 import { canUseSidebarRail, isPhoneViewport } from "./utils/responsive";
 import type { NavTabId, Order, RecipeInput } from "./types/domain";
@@ -58,6 +59,7 @@ export default function BakeryCommandCenter() {
   const role = currentUser?.role;
   const canView = (tab: NavTabId) => !!role && canAccessTab(role, tab);
   const canViewIngredients = !!role && canAccessIngredients(role);
+  const canViewIngredientCosts = !!role && canViewRecipeCosts(role);
 
   // --- NAVIGATION (src/hooks/useNavigation.ts) ---
   const {
@@ -536,7 +538,7 @@ export default function BakeryCommandCenter() {
                   <RecipesList
                     recipes={recipes}
                     ingredients={visibleIngredients}
-                    canViewIngredientCosts={canViewIngredients}
+                    canViewIngredientCosts={canViewIngredientCosts}
                     menuInventory={menuInventory}
                     pricingRules={pricingRules}
                     onEditRule={updatePricingRule}
@@ -553,7 +555,7 @@ export default function BakeryCommandCenter() {
                   <RecipeEditor
                     recipe={null}
                     ingredients={ingredients}
-                    canViewIngredientCosts={canViewIngredients}
+                    canViewIngredientCosts={canViewIngredientCosts}
                     pricingRules={pricingRules}
                     onCancel={() => backToList(PATH_BY_TAB.recipes)}
                     onSave={saveRecipeAndReturn}
@@ -568,7 +570,7 @@ export default function BakeryCommandCenter() {
                   <RecipeDetailRoute
                     recipes={recipes}
                     ingredients={ingredients}
-                    canViewIngredientCosts={canViewIngredients}
+                    canViewIngredientCosts={canViewIngredientCosts}
                     pricingRules={pricingRules}
                     onSave={saveRecipeAndReturn}
                     onCancel={() => backToList(PATH_BY_TAB.recipes)}
