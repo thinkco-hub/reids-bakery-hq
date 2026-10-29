@@ -6,6 +6,7 @@ import {
   canAccessIngredients,
   canAccessReconciliation,
   canAccessTab,
+  canViewRecipeCosts,
 } from "./permissions";
 import type { NavTabId, UserRole } from "../types/domain";
 
@@ -39,7 +40,6 @@ const ALLOWED_TABS: Record<UserRole, NavTabId[]> = {
   cashier: ["dashboard", "pos", "orders", "calendar"],
   kitchen: [
     "dashboard",
-    "pos",
     "orders",
     "recipes",
     "production-runs",
@@ -48,7 +48,6 @@ const ALLOWED_TABS: Record<UserRole, NavTabId[]> = {
   ],
   sales_marketing: [
     "dashboard",
-    "pos",
     "orders",
     "clients",
     "production-runs",
@@ -61,7 +60,6 @@ const ALLOWED_TABS: Record<UserRole, NavTabId[]> = {
   ],
   research_development: [
     "dashboard",
-    "pos",
     "orders",
     "clients",
     "inventory",
@@ -69,9 +67,6 @@ const ALLOWED_TABS: Record<UserRole, NavTabId[]> = {
     "recipes",
     "production-runs",
     "calendar",
-    "reports-dashboard",
-    "reports-closing",
-    "reports-inventory",
   ],
   admin: TAB_IDS,
   super_admin: TAB_IDS,
@@ -97,26 +92,34 @@ describe("canAccessTab", () => {
 });
 
 describe("feature-level access", () => {
-  it("grants Chams to the admin tier and Research and Development only", () => {
-    expect(ALL_ROLES.filter(canAccessChams)).toEqual(["research_development", "admin", "super_admin"]);
+  it("grants Chams to Sales and Marketing and the admin tier only", () => {
+    expect(ALL_ROLES.filter(canAccessChams)).toEqual(["sales_marketing", "admin", "super_admin"]);
   });
 
   it("grants Reconciliation to the admin tier only", () => {
     expect(ALL_ROLES.filter(canAccessReconciliation)).toEqual(["admin", "super_admin"]);
   });
 
-  it("follows Reconciliation for Ingredients", () => {
-    for (const role of ALL_ROLES) {
-      expect(canAccessIngredients(role)).toBe(canAccessReconciliation(role));
-    }
+  /**
+   * The set the App ingredient projection fails closed on. Kitchen sees the
+   * rows because FR-3.1.1 gives the Head of Kitchen unit cost as an editable
+   * field; Sales is deliberately absent despite holding the inventory tab, so
+   * the cost-entry form stays out of reach.
+   */
+  it("grants Ingredients to Kitchen, R&D and the admin tier", () => {
+    expect(ALL_ROLES.filter(canAccessIngredients)).toEqual([
+      "kitchen",
+      "research_development",
+      "admin",
+      "super_admin",
+    ]);
   });
 
-  /**
-   * The set the App ingredient projection fails closed on, named rather than
-   * derived: R&D builds recipes but does not hold the cost grant, and if that
-   * ever changes the projection follows this predicate, not a copy of it.
-   */
-  it("grants Ingredients to the admin tier only", () => {
-    expect(ALL_ROLES.filter(canAccessIngredients)).toEqual(["admin", "super_admin"]);
+  it("grants recipe costs to R&D and the admin tier", () => {
+    expect(ALL_ROLES.filter(canViewRecipeCosts)).toEqual([
+      "research_development",
+      "admin",
+      "super_admin",
+    ]);
   });
 });

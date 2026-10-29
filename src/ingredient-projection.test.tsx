@@ -93,33 +93,37 @@ describe("ingredient projection", () => {
     }
   );
 
-  /** Kitchen and R&D keep the recipes tab; what they lose is the money derived from unit costs. */
-  it.each(["kitchen", "research_development"] as UserRole[])(
-    "hides recipe cost from %s",
-    async (role) => {
-      const user = userEvent.setup();
-      await openAs(user, role, PATH_BY_TAB.recipes, () =>
-        screen.findByRole("heading", { name: "Recipes / BOM" })
-      );
-      expect(screen.queryByText("COGS / Unit")).not.toBeInTheDocument();
-      expect(screen.queryByText("Suggested Price")).not.toBeInTheDocument();
-      // The recipe is still listed under both its own name and its menu item.
-      expect(screen.getAllByText("Butter Croissants").length).toBeGreaterThan(0);
-    }
-  );
+  /** Kitchen keeps the recipes tab, but not the money derived from unit costs. */
+  it("hides recipe cost from kitchen", async () => {
+    const user = userEvent.setup();
+    await openAs(user, "kitchen", PATH_BY_TAB.recipes, () =>
+      screen.findByRole("heading", { name: "Recipes / BOM" })
+    );
+    expect(screen.queryByText("COGS / Unit")).not.toBeInTheDocument();
+    expect(screen.queryByText("Suggested Price")).not.toBeInTheDocument();
+    // The recipe is still listed under both its own name and its menu item.
+    expect(screen.getAllByText("Butter Croissants").length).toBeGreaterThan(0);
+  });
 
-  it.each(["kitchen", "research_development"] as UserRole[])(
-    "hides the live cost panel from %s but keeps the bill of materials",
-    async (role) => {
-      const user = userEvent.setup();
-      await openAs(user, role, `${PATH_BY_TAB.recipes}/new`, () =>
-        screen.findByRole("heading", { name: "Recipe Details" })
-      );
-      expect(screen.queryByText("Live Cost Summary")).not.toBeInTheDocument();
-      expect(screen.queryByText("Suggested Prices")).not.toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "+ Add Ingredient" })).toBeInTheDocument();
-    }
-  );
+  /** FR-3.2.3: R&D owns recipe costing, so the COGS columns are its grant. */
+  it("shows COGS to research and development", async () => {
+    const user = userEvent.setup();
+    await openAs(user, "research_development", PATH_BY_TAB.recipes, () =>
+      screen.findByRole("heading", { name: "Recipes / BOM" })
+    );
+    expect(screen.getByText("COGS / Unit")).toBeInTheDocument();
+    expect(screen.getByText("Suggested Price")).toBeInTheDocument();
+  });
+
+  it("hides the live cost panel from kitchen but keeps the bill of materials", async () => {
+    const user = userEvent.setup();
+    await openAs(user, "kitchen", `${PATH_BY_TAB.recipes}/new`, () =>
+      screen.findByRole("heading", { name: "Recipe Details" })
+    );
+    expect(screen.queryByText("Live Cost Summary")).not.toBeInTheDocument();
+    expect(screen.queryByText("Suggested Prices")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "+ Add Ingredient" })).toBeInTheDocument();
+  });
 
   /**
    * The control that keeps the sweeps above honest: a projection that blanked
