@@ -1,6 +1,12 @@
 import React from "react";
 import { createPortal } from "react-dom";
-import { computeBatches, computeRequiredIngredients, isRunFeasible } from "../../utils/production";
+import {
+  computeBatches,
+  computeRequiredIngredients,
+  getRunStatus,
+  isRunFeasible,
+} from "../../utils/production";
+import { RUN_STATUS_BADGE_CLASSES, RUN_STATUS_LABELS } from "../../utils/status";
 import type { IngredientStock, ProductionRun, ProductionRunId, Recipe } from "../../types/domain";
 
 interface RunDetailModalProps {
@@ -18,6 +24,7 @@ export default function RunDetailModal({ run, recipe, ingredients, onClose, onCo
   const feasible = isRunFeasible(run, recipe, ingredients);
   const actualYield = batches * (Number(recipe.yieldQty) || 0);
   const isCompleted = run.status === "completed";
+  const status = getRunStatus(run, recipe, ingredients);
 
   // Portalled to <body>: <main> is `relative z-10`, which caps this overlay's z-[100] below the mobile top bar's z-30.
   return createPortal(
@@ -29,19 +36,11 @@ export default function RunDetailModal({ run, recipe, ingredients, onClose, onCo
         <div className="flex-1 min-h-0 overflow-y-auto p-6 md:p-8">
           <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mb-1">
             <h2 className="min-w-0 text-lg md:text-2xl font-bold text-[#121212]">{recipe.name}</h2>
-            {isCompleted ? (
-              <span className="shrink-0 whitespace-nowrap px-3 py-1 rounded-full border border-green-300 bg-green-50 text-green-700 text-xs font-bold">
-                Completed
-              </span>
-            ) : feasible ? (
-              <span className="shrink-0 whitespace-nowrap px-3 py-1 rounded-full border border-blue-300 bg-blue-50 text-blue-700 text-xs font-bold">
-                Scheduled
-              </span>
-            ) : (
-              <span className="shrink-0 whitespace-nowrap px-3 py-1 rounded-full border border-red-300 bg-red-50 text-red-700 text-xs font-bold">
-                Insufficient Stock
-              </span>
-            )}
+            <span
+              className={`shrink-0 whitespace-nowrap px-3 py-1 rounded-full border text-xs font-bold ${RUN_STATUS_BADGE_CLASSES[status]}`}
+            >
+              {RUN_STATUS_LABELS[status]}
+            </span>
           </div>
           <p className="text-gray-500 text-sm mb-6">Planned {run.plannedDate}</p>
 

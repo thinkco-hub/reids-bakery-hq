@@ -5,6 +5,7 @@ import EditOrderModal from "./EditOrderModal";
 import EditHistoryList from "../common/EditHistoryList";
 import SelectField from "../common/SelectField";
 import { CalendarIcon } from "../icons";
+import { MONEY_SYMBOL, formatMoney } from "../../utils/money";
 import {
   computeAmountDue,
   computeOrderTotal,
@@ -159,7 +160,7 @@ function RecordPaymentModal({
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
               required
             />
-            <p className="text-xs text-gray-400 mt-1">Amount due: ₱{amountDue.toFixed(2)}</p>
+            <p className="text-xs text-gray-400 mt-1">Amount due: {formatMoney(amountDue)}</p>
           </div>
         </div>
         <div className="flex gap-3 mt-8">
@@ -392,10 +393,10 @@ export default function OrderDetail({
             <p className="text-xs font-bold text-gray-800 mb-4 tracking-wide">Total Amount</p>
             <div className="flex items-center">
               <div className="w-12 h-12 rounded-full bg-[#ffb74d] text-white flex items-center justify-center mr-4">
-                <span className="text-2xl font-bold font-serif">₱</span>
+                <span className="text-2xl font-bold font-serif">{MONEY_SYMBOL}</span>
               </div>
               <div>
-                <p className="text-base font-bold text-[#121212]">₱{total.toFixed(2)}</p>
+                <p className="text-base font-bold text-[#121212]">{formatMoney(total)}</p>
               </div>
             </div>
           </div>
@@ -425,9 +426,9 @@ export default function OrderDetail({
                       </div>
                     </td>
                     <td className="py-4 text-center text-gray-700">{line.qty}</td>
-                    <td className="py-4 text-right text-gray-700">₱{line.unitPrice.toFixed(2)}</td>
+                    <td className="py-4 text-right text-gray-700">{formatMoney(line.unitPrice)}</td>
                     <td className="py-4 text-right font-semibold text-gray-900">
-                      ₱{(line.qty * line.unitPrice).toFixed(2)}
+                      {formatMoney(line.qty * line.unitPrice)}
                     </td>
                   </tr>
                 ))}
@@ -438,7 +439,7 @@ export default function OrderDetail({
             <div className="w-64 space-y-3 text-sm">
               <div className="flex justify-between font-bold text-base pt-2">
                 <span className="text-gray-800">Total Amount</span>
-                <span className="text-gray-900">₱{total.toFixed(2)}</span>
+                <span className="text-gray-900">{formatMoney(total)}</span>
               </div>
             </div>
           </div>
@@ -541,11 +542,11 @@ export default function OrderDetail({
             </div>
             <div className="flex justify-between items-center border-b border-gray-100 pb-3">
               <span className="text-gray-500 font-medium">Amount Paid</span>
-              <span className="text-gray-900 font-medium text-xs text-right">₱{(order.amountPaid || 0).toFixed(2)}</span>
+              <span className="text-gray-900 font-medium text-xs text-right">{formatMoney(order.amountPaid || 0)}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-500 font-medium">Amount Due</span>
-              <span className="text-gray-900 font-medium text-xs text-right">₱{amountDue.toFixed(2)}</span>
+              <span className="text-gray-900 font-medium text-xs text-right">{formatMoney(amountDue)}</span>
             </div>
           </div>
         </div>

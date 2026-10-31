@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { recordAuditEvent } from "../utils/auditLog";
+import { todayISO } from "../utils/dates";
 import { buildEditHistoryEntry, diffField, diffLines } from "../utils/editHistory";
+import { formatMoney } from "../utils/money";
 import { isValidCustomerContact, toContactDigits } from "../utils/orders";
 import type {
   CartItem,
@@ -92,12 +94,7 @@ export function usePos({
   const cartTotal = cartSubtotal + cartTax;
   /** Units ringing up, so repeats of one product count as the cashier rang them. */
   const cartQty = cart.reduce((sum, item) => sum + item.qty, 0);
-  // Local calendar date (not UTC) so "today" matches the cashier's clock — in UTC+8,
-  // toISOString() is still yesterday between 00:00 and 08:00.
-  const now = new Date();
-  const todayISO = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(
-    now.getDate()
-  ).padStart(2, "0")}`;
+  const today = todayISO();
 
   // --- CART ACTIONS ---
   const addToCart = (product: PosProduct) => {
@@ -161,7 +158,7 @@ export function usePos({
     // (also enforced by isConfirmOrderDisabled).
     if (!isValidCustomerContact(confirmModal.customerContact)) return;
     // An Order must be delivered after today (also enforced by isConfirmOrderDisabled).
-    if (isOrder && !(confirmModal.deliveryDate > todayISO)) return;
+    if (isOrder && !(confirmModal.deliveryDate > today)) return;
     const sale: Sale = {
       id: `SALE-${String(sales.length + 1).padStart(4, "0")}`,
       type: confirmModal.saleType,
@@ -174,7 +171,7 @@ export function usePos({
       tax: cartTax,
       total: cartTotal,
       // Only Orders carry a delivery date; walk-ins are handed over today.
-      deliveryDate: isOrder && confirmModal.deliveryDate ? confirmModal.deliveryDate : todayISO,
+      deliveryDate: isOrder && confirmModal.deliveryDate ? confirmModal.deliveryDate : today,
       notes: confirmModal.notes.trim(),
       createdAt: new Date().toISOString(),
     };
@@ -187,7 +184,7 @@ export function usePos({
         action: "sale.completed",
         entityType: "Sale",
         entityId: sale.id,
-        details: `${sale.type} sale ${sale.id} completed (${sale.items.length} line${sale.items.length === 1 ? "" : "s"}, ₱${sale.total.toFixed(2)}, ${sale.paymentMethod})`,
+        details: `${sale.type} sale ${sale.id} completed (${sale.items.length} line${sale.items.length === 1 ? "" : "s"}, ${formatMoney(sale.total)}, ${sale.paymentMethod})`,
       });
     }
     if (isOrder) {
@@ -290,7 +287,7 @@ export function usePos({
     !confirmModal.paymentMethod ||
     !confirmModal.customerName.trim() ||
     !isValidCustomerContact(confirmModal.customerContact) ||
-    (confirmModal.saleType === "Order" && !(confirmModal.deliveryDate > todayISO));
+    (confirmModal.saleType === "Order" && !(confirmModal.deliveryDate > today));
 
   return {
     posCategory,
@@ -325,7 +322,7 @@ export function usePos({
     sales,
     receipt,
     setReceipt,
-    todayISO,
+    todayISO: today,
     isConfirmOrderDisabled,
   };
 }

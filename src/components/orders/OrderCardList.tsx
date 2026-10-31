@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import SelectField from "../common/SelectField";
 import OrderStatusBadge from "./OrderStatusBadge";
 import PaymentStatusBadge from "./PaymentStatusBadge";
+import { formatMoney } from "../../utils/money";
 import { computeOrderTotal, getPaymentStatus, hasShortfall } from "../../utils/orders";
 import type { MenuItemStock, Order } from "../../types/domain";
 
@@ -107,7 +108,7 @@ function OrderCard({ order, clientName, menuInventory, expanded, onToggle, onVie
             <p className="text-xs text-gray-400 font-mono mt-0.5">{order.id}</p>
           </div>
           <p className="text-lg font-bold text-gray-900 whitespace-nowrap tabular-nums [font-feature-settings:'tnum']">
-            ₱{computeOrderTotal(order).toFixed(2)}
+            {formatMoney(computeOrderTotal(order))}
           </p>
         </div>
         {/* Line 2: State badges + labeled secondary info. */}
@@ -149,7 +150,7 @@ function OrderCard({ order, clientName, menuInventory, expanded, onToggle, onVie
                 <div key={`${item.menuItemId}-${i}`} className="flex justify-between gap-4 py-2 pl-4">
                   <dt className="text-gray-500 truncate">{name}</dt>
                   <dd className="text-gray-800 tabular-nums [font-feature-settings:'tnum'] whitespace-nowrap">
-                    {item.qty} × ₱{item.unitPrice.toFixed(2)}
+                    {item.qty} × {formatMoney(item.unitPrice)}
                   </dd>
                 </div>
               );
@@ -157,7 +158,7 @@ function OrderCard({ order, clientName, menuInventory, expanded, onToggle, onVie
             <div className="flex justify-between gap-4 py-2">
               <dt className="text-gray-500">Amount paid</dt>
               <dd className="text-gray-800 tabular-nums [font-feature-settings:'tnum']">
-                ₱{(order.amountPaid || 0).toFixed(2)}
+                {formatMoney(order.amountPaid || 0)}
               </dd>
             </div>
             {order.deliveryDate && (

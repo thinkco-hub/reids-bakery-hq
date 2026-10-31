@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import EditHistoryList from "../common/EditHistoryList";
 import SelectField from "../common/SelectField";
 import type { FormEvent } from "react";
+import { formatMoney } from "../../utils/money";
 import { isValidCustomerContact, toContactDigits } from "../../utils/orders";
 import type { Client, EditOrderInput, MenuItemStock, Order, OrderItem } from "../../types/domain";
 
@@ -139,7 +140,7 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
                     )}
                     {menuInventory.map((m) => (
                       <option key={m.id} value={m.id}>
-                        {m.name} (₱{m.price})
+                        {m.name} ({formatMoney(m.price)})
                       </option>
                     ))}
                   </SelectField>

@@ -1,5 +1,6 @@
 import React from "react";
 import OrderStatusBadge from "../orders/OrderStatusBadge";
+import { formatMoney } from "../../utils/money";
 import { computeOrderTotal } from "../../utils/orders";
 import type { Client, Order } from "../../types/domain";
 
@@ -91,7 +92,7 @@ export default function ClientDetail({ client, orders, onBack, onViewOrder }: Cl
                       <OrderStatusBadge status={order.status} />
                     </td>
                     <td className="px-5 py-4 text-right font-medium text-gray-900">
-                      ₱{computeOrderTotal(order).toFixed(2)}
+                      {formatMoney(computeOrderTotal(order))}
                     </td>
                   </tr>
                 ))

@@ -3,6 +3,7 @@ import OrderCardList from "./OrderCardList";
 import OrderStatusBadge from "./OrderStatusBadge";
 import PaymentStatusBadge from "./PaymentStatusBadge";
 import { SearchIcon } from "../icons";
+import { formatMoney } from "../../utils/money";
 import { computeOrderTotal, getPaymentStatus, hasShortfall, ORDER_STATUSES } from "../../utils/orders";
 import type { Client, MenuItemStock, Order, OrderStatus } from "../../types/domain";
 
@@ -146,7 +147,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
                         <PaymentStatusBadge status={getPaymentStatus(order)} />
                       </td>
                       <td className="px-6 py-4 font-medium text-gray-900">
-                        ₱{computeOrderTotal(order).toFixed(2)}
+                        {formatMoney(computeOrderTotal(order))}
                       </td>
                       <td className="px-4 py-4 text-center">
                         <button

@@ -1,5 +1,10 @@
 import React, { useState } from "react";
 import { discrepancyLabel } from "../../utils/counts";
+import {
+  COUNT_RESOLUTION_LABELS,
+  COUNT_STATUS_BADGE_CLASSES,
+  COUNT_STATUS_LABELS,
+} from "../../utils/status";
 import type {
   CountResolutionAction,
   IngredientStock,
@@ -146,12 +151,18 @@ export default function ReconciliationReview({
                     </td>
                     <td className="px-6 py-4 text-gray-600">
                       {c.status === "pending" ? (
-                        <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded-full">
-                          Pending
+                        <span
+                          className={`text-xs font-bold px-2 py-1 rounded-full ${COUNT_STATUS_BADGE_CLASSES.pending}`}
+                        >
+                          {COUNT_STATUS_LABELS.pending}
                         </span>
                       ) : (
-                        <span className="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-full capitalize">
-                          {c.resolution}
+                        <span
+                          className={`text-xs font-bold px-2 py-1 rounded-full ${COUNT_STATUS_BADGE_CLASSES.resolved}`}
+                        >
+                          {c.resolution
+                            ? COUNT_RESOLUTION_LABELS[c.resolution]
+                            : COUNT_STATUS_LABELS.resolved}
                         </span>
                       )}
                     </td>

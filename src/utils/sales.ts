@@ -11,9 +11,10 @@ import type {
   Sale,
   SalesSummary,
 } from "../types/domain";
+import { addDaysISO, formatDateTime, toISODate } from "./dates";
 
 export function saleDateKey(sale: Sale): ISODate {
-  return sale.createdAt.slice(0, 10);
+  return toISODate(new Date(sale.createdAt));
 }
 
 export function filterSalesByRange(
@@ -41,16 +42,13 @@ export function getPresetRange(
   preset: DatePresetId,
   today: Date = new Date()
 ): DateFilterRange {
-  const end = today.toISOString().slice(0, 10);
+  const end = toISODate(today);
   if (preset === "all") return { start: "", end: "" };
   if (preset === "today") return { start: end, end };
 
-  const start = new Date(today);
-  if (preset === "week") start.setDate(start.getDate() - 6);
-  else if (preset === "month") start.setDate(start.getDate() - 29);
-  else return { start: "", end: "" };
-
-  return { start: start.toISOString().slice(0, 10), end };
+  if (preset === "week") return { start: addDaysISO(end, -6), end };
+  if (preset === "month") return { start: addDaysISO(end, -29), end };
+  return { start: "", end: "" };
 }
 
 export function computeSalesSummary(sales: Sale[]): SalesSummary {
@@ -141,7 +139,7 @@ export function salesToCSV(sales: Sale[]): string {
   ];
   const rows = sales.map((sale): unknown[] => [
     sale.id,
-    new Date(sale.createdAt).toLocaleString(),
+    formatDateTime(sale.createdAt),
     sale.type,
     sale.customerName,
     sale.paymentMethod,

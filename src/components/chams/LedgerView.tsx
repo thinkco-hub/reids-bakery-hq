@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { formatMonthLabel, shiftMonthKey, buildLedgerForMonth, computeBranchRevenueForMonth } from "../../utils/ledger";
+import { formatMonthLabel, shiftMonthKey } from "../../utils/dates";
+import { buildLedgerForMonth, computeBranchRevenueForMonth } from "../../utils/ledger";
+import { formatMoney } from "../../utils/money";
 import { discrepancyLabel } from "../../utils/counts";
 import { SearchIcon } from "../icons";
 import type {
@@ -85,7 +87,7 @@ export default function LedgerView({ branches, products, beginnings, movements, 
         </div>
         <div className="bg-white p-4 md:p-5 rounded-2xl border border-green-100 shadow-sm">
           <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">Total Revenue</p>
-          <p className="text-xl md:text-2xl font-bold text-green-600">₱{totalRevenue.toFixed(2)}</p>
+          <p className="text-xl md:text-2xl font-bold text-green-600">{formatMoney(totalRevenue)}</p>
         </div>
       </div>
 
@@ -102,7 +104,7 @@ export default function LedgerView({ branches, products, beginnings, movements, 
           {branchRevenues.map(({ branch, revenue }) => (
             <div key={branch.id} className="text-center p-4 bg-gray-50 rounded-xl">
               <p className="text-xs font-medium text-gray-500 mb-1">{branch.name}</p>
-              <p className="text-lg font-bold text-[#1B2A4A]">₱{revenue.toFixed(2)}</p>
+              <p className="text-lg font-bold text-[#1B2A4A]">{formatMoney(revenue)}</p>
             </div>
           ))}
         </div>
@@ -159,7 +161,7 @@ export default function LedgerView({ branches, products, beginnings, movements, 
                   <td className="px-5 py-4 text-right text-gray-600">{r.restocked}</td>
                   <td className="px-5 py-4 text-right text-gray-600">{r.spoilage}</td>
                   <td className="px-5 py-4 text-right text-gray-600">{r.sold}</td>
-                  <td className="px-5 py-4 text-right text-green-700 font-medium">₱{r.revenue.toFixed(2)}</td>
+                  <td className="px-5 py-4 text-right text-green-700 font-medium">{formatMoney(r.revenue)}</td>
                   <td className="px-5 py-4 text-right font-semibold text-gray-900">{r.remainingCalculated}</td>
                   <td className="px-5 py-4 text-right text-gray-600">
                     {r.countSubmitted ? r.remainingReported : <span className="text-gray-300">—</span>}

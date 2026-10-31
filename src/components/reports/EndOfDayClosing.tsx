@@ -1,12 +1,10 @@
 import React, { useMemo, useState } from "react";
 import { computeDailyClosing } from "../../utils/closing";
+import { todayISO } from "../../utils/dates";
+import { formatMoney } from "../../utils/money";
 import { getRevenueByPaymentMethod } from "../../utils/sales";
 import type { FormEvent } from "react";
 import type { DayClosing, Expense, ExpenseData, ExpenseId, Sale, DayClosingData } from "../../types/domain";
-
-function todayISO() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 interface EndOfDayClosingProps {
   sales: Sale[];
@@ -72,7 +70,7 @@ export default function EndOfDayClosing({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
           <p className="text-sm font-semibold text-green-700">
-            {date} is already closed — net profit ₱{alreadyClosed.netProfit.toFixed(2)}, closed at{" "}
+            {date} is already closed — net profit {formatMoney(alreadyClosed.netProfit)}, closed at{" "}
             {new Date(alreadyClosed.closedAt).toLocaleTimeString()}.
           </p>
         </div>
@@ -81,18 +79,18 @@ export default function EndOfDayClosing({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
           <p className="text-gray-500 text-sm font-medium mb-1">Gross Sales</p>
-          <p className="text-2xl font-bold text-[#121212]">₱{closing.grossSales.toFixed(2)}</p>
+          <p className="text-2xl font-bold text-[#121212]">{formatMoney(closing.grossSales)}</p>
           <p className="text-xs text-gray-400 mt-1">{closing.daySales.length} transaction(s)</p>
         </div>
         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
           <p className="text-gray-500 text-sm font-medium mb-1">Total Expenses</p>
-          <p className="text-2xl font-bold text-red-500">₱{closing.totalExpenses.toFixed(2)}</p>
+          <p className="text-2xl font-bold text-red-500">{formatMoney(closing.totalExpenses)}</p>
           <p className="text-xs text-gray-400 mt-1">{closing.dayExpenses.length} entr{closing.dayExpenses.length === 1 ? "y" : "ies"}</p>
         </div>
         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
           <p className="text-gray-500 text-sm font-medium mb-1">Net Profit</p>
           <p className={`text-2xl font-bold ${closing.netProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
-            ₱{closing.netProfit.toFixed(2)}
+            {formatMoney(closing.netProfit)}
           </p>
         </div>
       </div>
@@ -104,7 +102,7 @@ export default function EndOfDayClosing({
             {paymentBreakdown.map((m) => (
               <div key={m.method} className="text-center p-4 bg-gray-50 rounded-xl">
                 <p className="text-xs font-medium text-gray-500 mb-1">{m.method}</p>
-                <p className="text-lg font-bold text-[#121212]">₱{m.revenue.toFixed(2)}</p>
+                <p className="text-lg font-bold text-[#121212]">{formatMoney(m.revenue)}</p>
               </div>
             ))}
           </div>
@@ -149,7 +147,7 @@ export default function EndOfDayClosing({
               <li key={exp.id} className="py-3 flex justify-between items-center text-sm">
                 <span className="text-gray-700">{exp.description}</span>
                 <div className="flex items-center gap-3">
-                  <span className="font-semibold text-gray-900">₱{Number(exp.amount).toFixed(2)}</span>
+                  <span className="font-semibold text-gray-900">{formatMoney(Number(exp.amount))}</span>
                   {!alreadyClosed && (
                     <button
                       onClick={() => onDeleteExpense(exp.id)}
@@ -173,7 +171,7 @@ export default function EndOfDayClosing({
           onClick={handleCloseDay}
           className="w-full py-3.5 rounded-xl text-white font-bold shadow-lg bg-[#F17D0C] hover:bg-[#d86b06] transition-colors"
         >
-          Close {date} — Lock In Net Profit of ₱{closing.netProfit.toFixed(2)}
+          Close {date} — Lock In Net Profit of {formatMoney(closing.netProfit)}
         </button>
       )}
 
@@ -199,10 +197,10 @@ export default function EndOfDayClosing({
                   .map((c) => (
                     <tr key={c.id} className="hover:bg-gray-50/50">
                       <td className="px-6 py-3 font-medium text-gray-900">{c.date}</td>
-                      <td className="px-6 py-3 text-right text-gray-700">₱{c.grossSales.toFixed(2)}</td>
-                      <td className="px-6 py-3 text-right text-red-500">₱{c.totalExpenses.toFixed(2)}</td>
+                      <td className="px-6 py-3 text-right text-gray-700">{formatMoney(c.grossSales)}</td>
+                      <td className="px-6 py-3 text-right text-red-500">{formatMoney(c.totalExpenses)}</td>
                       <td className={`px-6 py-3 text-right font-semibold ${c.netProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
-                        ₱{c.netProfit.toFixed(2)}
+                        {formatMoney(c.netProfit)}
                       </td>
                     </tr>
                   ))}

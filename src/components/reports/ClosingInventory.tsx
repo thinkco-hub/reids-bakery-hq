@@ -13,9 +13,9 @@ import {
   formatDayLabel,
   formatWeekLabel,
   formatMonthLabel,
-  computeClosingInventory,
-  closingInventoryToCSV,
-} from "../../utils/closingInventory";
+} from "../../utils/dates";
+import { formatMoney } from "../../utils/money";
+import { computeClosingInventory, closingInventoryToCSV } from "../../utils/closingInventory";
 import type {
   ClosingInventoryRow,
   IngredientStock,
@@ -124,9 +124,9 @@ function ClosingSection({
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-3 text-right text-gray-600">₱{row.unitValue.toFixed(2)}</td>
+                  <td className="px-6 py-3 text-right text-gray-600">{formatMoney(row.unitValue)}</td>
                   <td className="px-6 py-3 text-right font-semibold text-gray-900">
-                    ₱{row.closingValue.toFixed(2)}
+                    {formatMoney(row.closingValue)}
                   </td>
                   <td className="px-6 py-3">
                     <DiscrepancyBadge row={row} />
@@ -269,20 +269,20 @@ export default function ClosingInventory({ menuInventory, ingredients, inventory
       >
         <StatCard
           label="Total Closing Stock Value"
-          value={`₱${summary.totalValue.toFixed(2)}`}
+          value={formatMoney(summary.totalValue)}
           accent="text-[#F17D0C]"
         />
         <StatCard
           label="Menu Items Value"
-          value={`₱${summary.menuValue.toFixed(2)}`}
+          value={formatMoney(summary.menuValue)}
           sub={`${menuInventory.length} item(s)`}
         />
         {/* A role without the ingredient grant is handed no raw-material rows,
-            so its total value would be a ₱0.00 invented for the layout. */}
+            so its total value would be a zero-peso figure invented for the layout. */}
         {ingredients.length > 0 && (
           <StatCard
             label="Raw Materials Value"
-            value={`₱${summary.ingredientValue.toFixed(2)}`}
+            value={formatMoney(summary.ingredientValue)}
             sub={`${ingredients.length} item(s)`}
           />
         )}
@@ -290,7 +290,7 @@ export default function ClosingInventory({ menuInventory, ingredients, inventory
           label="Net Count Discrepancy"
           value={`${summary.netDiscrepancyQty > 0 ? "+" : ""}${summary.netDiscrepancyQty} unit(s)`}
           accent={discrepancyAccent}
-          sub={`≈ ₱${summary.netDiscrepancyValue.toFixed(2)} · ${summary.countedItems} counted / ${summary.systemItems} system`}
+          sub={`≈ ${formatMoney(summary.netDiscrepancyValue)} · ${summary.countedItems} counted / ${summary.systemItems} system`}
         />
       </div>
 

@@ -3,6 +3,8 @@ import RevenueByDayChart from "./RevenueByDayChart";
 import SellerBarList from "./SellerBarList";
 import EditSaleModal from "./EditSaleModal";
 import { SearchIcon } from "../icons";
+import { formatDateTime } from "../../utils/dates";
+import { formatMoney } from "../../utils/money";
 import {
   DATE_PRESETS,
   getPresetRange,
@@ -83,7 +85,7 @@ function PaymentDonut({ data }: { data: RevenueByPaymentMethod[] }) {
             strokeDasharray={`${s.dash} ${circumference - s.dash}`}
             strokeDashoffset={-s.offset}
           >
-            <title>{`${s.method}: ₱${s.revenue.toFixed(2)}`}</title>
+            <title>{`${s.method}: ${formatMoney(s.revenue)}`}</title>
           </circle>
         ))}
       </svg>
@@ -222,10 +224,10 @@ export default function ReportsDashboard({ sales, onReprintSale, onSaveSaleEdit 
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
-        <StatCard label="Total Revenue" value={`₱${summary.totalRevenue.toFixed(2)}`} accent="text-[#F17D0C]" />
+        <StatCard label="Total Revenue" value={formatMoney(summary.totalRevenue)} accent="text-[#F17D0C]" />
         <StatCard label="Transactions" value={summary.totalTransactions} />
-        <StatCard label="Avg Ticket" value={`₱${summary.avgTicket.toFixed(2)}`} />
-        <StatCard label="Tax Collected" value={`₱${summary.totalTax.toFixed(2)}`} />
+        <StatCard label="Avg Ticket" value={formatMoney(summary.avgTicket)} />
+        <StatCard label="Tax Collected" value={formatMoney(summary.totalTax)} />
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
@@ -255,7 +257,7 @@ export default function ReportsDashboard({ sales, onReprintSale, onSaveSaleEdit 
               {byPaymentMethod.map((m) => (
                 <div key={m.method} className="text-center p-4 bg-gray-50 rounded-xl">
                   <p className="text-xs font-medium text-gray-500 mb-1">{m.method}</p>
-                  <p className="text-lg font-bold text-[#121212]">₱{m.revenue.toFixed(2)}</p>
+                  <p className="text-lg font-bold text-[#121212]">{formatMoney(m.revenue)}</p>
                 </div>
               ))}
             </div>
@@ -314,11 +316,11 @@ export default function ReportsDashboard({ sales, onReprintSale, onSaveSaleEdit 
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-3 text-gray-600">{new Date(sale.createdAt).toLocaleString()}</td>
+                    <td className="px-6 py-3 text-gray-600">{formatDateTime(sale.createdAt)}</td>
                     <td className="px-6 py-3 text-gray-600">{sale.type}</td>
                     <td className="px-6 py-3 text-gray-800">{sale.customerName}</td>
                     <td className="px-6 py-3 text-gray-600">{sale.paymentMethod}</td>
-                    <td className="px-6 py-3 text-right font-semibold text-gray-900">₱{sale.total.toFixed(2)}</td>
+                    <td className="px-6 py-3 text-right font-semibold text-gray-900">{formatMoney(sale.total)}</td>
                     <td className="px-6 py-3 text-right">
                       <button
                         onClick={() => setEditingSale(sale)}

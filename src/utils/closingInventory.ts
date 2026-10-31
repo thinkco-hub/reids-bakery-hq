@@ -7,105 +7,10 @@ import type {
   InventoryItemCategory,
   ISODate,
   MenuItemStock,
-  MonthKey,
   StockItem,
 } from "../types/domain";
 import { computeDiscrepancy } from "./counts";
 import { csvEscape } from "./sales";
-
-// ---- Date helpers (ISO "YYYY-MM-DD" keys, computed in local time) ----
-
-export function toISODate(d: Date): ISODate {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-export function parseISODate(iso: ISODate): Date {
-  const [y, m, d] = iso.split("-").map(Number);
-  return new Date(y, m - 1, d);
-}
-
-export function todayISO(): ISODate {
-  return toISODate(new Date());
-}
-
-export function monthKeyOf(iso: ISODate): MonthKey {
-  return iso.slice(0, 7);
-}
-
-// Weeks run Monday–Sunday (ISO).
-export function getWeekRange(anchorISO: ISODate): DateRange {
-  const d = parseISODate(anchorISO);
-  const day = d.getDay(); // 0 = Sun ... 6 = Sat
-  const offsetToMonday = day === 0 ? -6 : 1 - day;
-  const start = new Date(d);
-  start.setDate(d.getDate() + offsetToMonday);
-  const end = new Date(start);
-  end.setDate(start.getDate() + 6);
-  return { start: toISODate(start), end: toISODate(end) };
-}
-
-// A day period is the single date itself.
-export function getDayRange(anchorISO: ISODate): DateRange {
-  return { start: anchorISO, end: anchorISO };
-}
-
-export function getMonthRange(monthKey: MonthKey): DateRange {
-  const [y, m] = monthKey.split("-").map(Number);
-  return {
-    start: toISODate(new Date(y, m - 1, 1)),
-    end: toISODate(new Date(y, m, 0)),
-  };
-}
-
-export function shiftWeekRange(range: DateRange, delta: number): DateRange {
-  const start = parseISODate(range.start);
-  start.setDate(start.getDate() + delta * 7);
-  return getWeekRange(toISODate(start));
-}
-
-export function shiftDayRange(range: DateRange, delta: number): DateRange {
-  const d = parseISODate(range.start);
-  d.setDate(d.getDate() + delta);
-  return getDayRange(toISODate(d));
-}
-
-export function shiftMonthKey(key: MonthKey, delta: number): MonthKey {
-  const [y, m] = key.split("-").map(Number);
-  const d = new Date(y, m - 1 + delta, 1);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-}
-
-// ---- Labels ----
-
-export function formatWeekLabel(range: DateRange): string {
-  const start = parseISODate(range.start);
-  const end = parseISODate(range.end);
-  const opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
-  return `Week of ${start.toLocaleDateString("en-US", opts)} – ${end.toLocaleDateString(
-    "en-US",
-    { ...opts, year: "numeric" }
-  )}`;
-}
-
-export function formatMonthLabel(key: MonthKey): string {
-  const [y, m] = key.split("-").map(Number);
-  return new Date(y, m - 1, 1).toLocaleDateString("en-US", {
-    month: "long",
-    year: "numeric",
-  });
-}
-
-export function formatDayLabel(iso: ISODate): string {
-  return parseISODate(iso).toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
 
 // ---- Closing inventory computation ----
 

@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import DashboardView from "./DashboardView";
+import { addDaysISO, todayISO } from "../../utils/dates";
 import type { Sale } from "../../types/domain";
 
 const noop = () => {};
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-const todayKey = new Date().toISOString().slice(0, 10);
-const yesterdayKey = new Date(Date.now() - DAY_MS).toISOString().slice(0, 10);
-/** Noon UTC keeps each fixture solidly inside its day key. */
-const atNoon = (dateKey: string) => `${dateKey}T12:00:00.000Z`;
+const todayKey = todayISO();
+const yesterdayKey = addDaysISO(todayKey, -1);
+/** Noon local keeps each fixture solidly inside its own day key. */
+const atNoon = (dateKey: string) => new Date(`${dateKey}T12:00:00`).toISOString();
 
 function saleOn(dateKey: string, total: number): Sale {
   return {
