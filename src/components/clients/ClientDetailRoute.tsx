@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams } from "react-router";
 import ClientDetail from "./ClientDetail";
-import RecordNotFound from "../common/RecordNotFound";
+import RecordRoute from "../common/RecordRoute";
 import type { Client, Order } from "../../types/domain";
 
 interface ClientDetailRouteProps {
@@ -19,18 +19,17 @@ export default function ClientDetailRoute({
   onViewOrder,
 }: ClientDetailRouteProps) {
   const { clientId = "" } = useParams();
-  const client = clients.find((c) => c.id === clientId);
-
-  if (!client) {
-    return <RecordNotFound kind="Client" id={clientId} onBack={onBack} />;
-  }
 
   return (
-    <ClientDetail
-      client={client}
-      orders={orders}
-      onBack={onBack}
-      onViewOrder={onViewOrder}
-    />
+    <RecordRoute items={clients} id={clientId} kind="Client" onBack={onBack}>
+      {(client) => (
+        <ClientDetail
+          client={client}
+          orders={orders}
+          onBack={onBack}
+          onViewOrder={onViewOrder}
+        />
+      )}
+    </RecordRoute>
   );
 }

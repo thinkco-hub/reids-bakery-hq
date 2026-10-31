@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams } from "react-router";
 import RecipeEditor from "./RecipeEditor";
-import RecordNotFound from "../common/RecordNotFound";
+import RecordRoute from "../common/RecordRoute";
 import type { IngredientStock, PricingRules, Recipe, RecipeInput } from "../../types/domain";
 
 interface RecipeDetailRouteProps {
@@ -10,7 +10,6 @@ interface RecipeDetailRouteProps {
   canViewIngredientCosts: boolean;
   pricingRules: PricingRules;
   onSave: (recipe: RecipeInput) => void;
-  onCancel: () => void;
   onBack: () => void;
 }
 
@@ -21,24 +20,22 @@ export default function RecipeDetailRoute({
   canViewIngredientCosts,
   pricingRules,
   onSave,
-  onCancel,
   onBack,
 }: RecipeDetailRouteProps) {
   const { recipeId = "" } = useParams();
-  const recipe = recipes.find((r) => r.id === recipeId);
-
-  if (!recipe) {
-    return <RecordNotFound kind="Recipe" id={recipeId} onBack={onBack} />;
-  }
 
   return (
-    <RecipeEditor
-      recipe={recipe}
-      ingredients={ingredients}
-      canViewIngredientCosts={canViewIngredientCosts}
-      pricingRules={pricingRules}
-      onCancel={onCancel}
-      onSave={onSave}
-    />
+    <RecordRoute items={recipes} id={recipeId} kind="Recipe" onBack={onBack}>
+      {(recipe) => (
+        <RecipeEditor
+          recipe={recipe}
+          ingredients={ingredients}
+          canViewIngredientCosts={canViewIngredientCosts}
+          pricingRules={pricingRules}
+          onCancel={onBack}
+          onSave={onSave}
+        />
+      )}
+    </RecordRoute>
   );
 }

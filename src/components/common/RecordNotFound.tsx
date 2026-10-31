@@ -29,9 +29,6 @@ export default function RecordNotFound({ kind, id, onBack }: RecordNotFoundProps
         <h2 className="text-3xl font-bold text-[#121212]">
           {kind} {id} not found
         </h2>
-        <p className="text-gray-500 mt-2">
-          This {kind.toLowerCase()} is not in this device&apos;s list.
-        </p>
       </section>
     </div>
   );
