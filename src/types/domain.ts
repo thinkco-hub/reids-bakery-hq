@@ -180,17 +180,10 @@ export interface EditHistoryEntry {
 }
 
 // ---------- POS / sales ----------
-export interface PosProduct {
-  id: MenuItemId;
-  name: string;
-  price: Price;
-  category: PosCategory;
-  color: string;
-}
+/** POS card projection of a catalogue item (utils/catalogue.toPosProducts). */
+export type PosProduct = Pick<CatalogueItem, "id" | "name" | "price" | "category" | "color">;
 
-export interface CartItem extends PosProduct {
-  qty: Quantity;
-}
+export type CartItem = PosProduct & { qty: Quantity };
 
 /** Customer attached to the open POS ticket. Its details prefill the confirm modal. */
 export interface TicketCustomer {
@@ -268,6 +261,14 @@ export interface Recipe extends MenuItemStock {
   yieldQty?: number;
   yieldUnit?: string;
   ingredients: RecipeIngredientLine[];
+}
+
+/** One catalogue record per menu item: the recipe detail plus its POS presentation. */
+export interface CatalogueItem extends Recipe {
+  /** Tailwind background class for the POS card swatch. */
+  color: string;
+  /** Untracked items (drinks and other POS-only goods) skip every stock movement. */
+  trackedStock: boolean;
 }
 
 /** Payload of the recipe editor; id is null when creating a new recipe. */

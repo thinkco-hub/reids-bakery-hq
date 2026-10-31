@@ -23,6 +23,7 @@ import type {
   EditSaleInput,
   Order,
   PaymentMethod,
+  PosProduct,
   RevenueByPaymentMethod,
   Sale,
   SaleId,
@@ -112,6 +113,8 @@ function PaymentDonut({ data }: { data: RevenueByPaymentMethod[] }) {
 interface ReportsDashboardProps {
   sales: Sale[];
   orders: Order[];
+  /** POS projection of the catalogue, for the edit-sale item picker. */
+  products: PosProduct[];
   onReprintSale?: (sale: Sale) => void;
   onSaveSaleEdit: (id: SaleId, input: EditSaleInput) => void;
 }
@@ -119,6 +122,7 @@ interface ReportsDashboardProps {
 export default function ReportsDashboard({
   sales,
   orders,
+  products,
   onReprintSale,
   onSaveSaleEdit,
 }: ReportsDashboardProps) {
@@ -169,6 +173,7 @@ export default function ReportsDashboard({
       {editingSale && (
         <EditSaleModal
           sale={editingSale}
+          products={products}
           onClose={() => setEditingSale(null)}
           onSave={(input) => {
             onSaveSaleEdit(editingSale.id, input);

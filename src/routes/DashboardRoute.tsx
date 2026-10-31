@@ -2,8 +2,8 @@ import React from "react";
 import { RequireTab } from "../components/RequireAccess";
 import DashboardView from "../components/views/DashboardView";
 import {
+  useCatalogueSlice,
   useClientsSlice,
-  useInventorySlice,
   useOrdersSlice,
   usePosSlice,
   useVisibleIngredients,
@@ -16,12 +16,12 @@ export default function DashboardRoute() {
   const { orders } = useOrdersSlice();
   const { clients } = useClientsSlice();
   const { sales } = usePosSlice();
-  const { menuInventory } = useInventorySlice();
+  const { stockItems } = useCatalogueSlice();
   const ingredients = useVisibleIngredients();
 
   const pendingOrdersCount = orders.filter((o) => o.status === "Pending").length;
   const readyOrdersCount = orders.filter((o) => o.status === "Ready").length;
-  const lowStockAlerts = [...menuInventory, ...ingredients].filter(
+  const lowStockAlerts = [...stockItems, ...ingredients].filter(
     (item) => item.qty < item.target
   );
 

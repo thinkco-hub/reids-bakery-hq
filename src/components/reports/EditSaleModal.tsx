@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import EditHistoryList from "../common/EditHistoryList";
 import SelectField from "../common/SelectField";
-import { initialPosProducts } from "../../data/initialProducts";
 import { computeSaleTotals } from "../../utils/checkout";
 import { formatMoney } from "../../utils/money";
 import type { FormEvent } from "react";
 import { isValidCustomerContact, toContactDigits } from "../../utils/orders";
-import type { CartItem, EditSaleInput, Sale } from "../../types/domain";
+import type { CartItem, EditSaleInput, PosProduct, Sale } from "../../types/domain";
 
 interface Line {
   item: CartItem;
@@ -15,18 +14,19 @@ interface Line {
 
 const toLine = (item: CartItem): Line => ({ item, qty: String(item.qty) });
 
-const emptyLine = (): Line => ({
-  item: { ...initialPosProducts[0], qty: 1 },
+const emptyLine = (products: PosProduct[]): Line => ({
+  item: { ...products[0], qty: 1 },
   qty: "",
 });
 
 interface EditSaleModalProps {
   sale: Sale;
+  products: PosProduct[];
   onClose: () => void;
   onSave: (input: EditSaleInput) => void;
 }
 
-export default function EditSaleModal({ sale, onClose, onSave }: EditSaleModalProps) {
+export default function EditSaleModal({ sale, products, onClose, onSave }: EditSaleModalProps) {
   const [customerName, setCustomerName] = useState(sale.customerName);
   const [customerContact, setCustomerContact] = useState(sale.customerContact);
   const [lines, setLines] = useState<Line[]>(sale.items.map(toLine));
@@ -34,11 +34,11 @@ export default function EditSaleModal({ sale, onClose, onSave }: EditSaleModalPr
   const updateQty = (idx: number, qty: string) =>
     setLines((prev) => prev.map((line, i) => (i === idx ? { ...line, qty } : line)));
   const changeItem = (idx: number, productId: string) => {
-    const product = initialPosProducts.find((p) => p.id === productId);
+    const product = products.find((p) => p.id === productId);
     if (!product) return;
     setLines((prev) => prev.map((line, i) => (i === idx ? { ...line, item: { ...product, qty: line.item.qty } } : line)));
   };
-  const addLine = () => setLines((prev) => [...prev, emptyLine()]);
+  const addLine = () => setLines((prev) => [...prev, emptyLine(products)]);
   const removeLine = (idx: number) => setLines((prev) => prev.filter((_, i) => i !== idx));
 
   const cleanLines = lines.filter((l) => (parseFloat(l.qty) || 0) >= 1);
@@ -118,10 +118,10 @@ export default function EditSaleModal({ sale, onClose, onSave }: EditSaleModalPr
                     wrapperClassName="flex-1"
                     className="w-full pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800 text-sm"
                   >
-                    {!initialPosProducts.some((p) => p.id === line.item.id) && (
+                    {!products.some((p) => p.id === line.item.id) && (
                       <option value={line.item.id}>{line.item.name}</option>
                     )}
-                    {initialPosProducts.map((p) => (
+                    {products.map((p) => (
                       <option key={p.id} value={p.id}>
                         {p.name} ({formatMoney(p.price)})
                       </option>

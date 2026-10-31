@@ -3,7 +3,7 @@ import { useParams } from "react-router";
 import OrderDetail from "../components/orders/OrderDetail";
 import RecordRoute from "../components/common/RecordRoute";
 import { RequireTab } from "../components/RequireAccess";
-import { useClientsSlice, useInventorySlice, useOrdersSlice } from "../store/slices";
+import { useCatalogueSlice, useClientsSlice, useOrdersSlice } from "../store/slices";
 import { PATH_BY_TAB } from "../routes";
 import { useShell } from "./shell";
 
@@ -19,7 +19,7 @@ export default function OrderDetailRoute() {
     markOrderDelivered,
   } = useOrdersSlice();
   const { clients } = useClientsSlice();
-  const { menuInventory } = useInventorySlice();
+  const { stockItems } = useCatalogueSlice();
   const { orderId = "" } = useParams();
   const onBack = () => backToList(PATH_BY_TAB.orders);
 
@@ -30,7 +30,7 @@ export default function OrderDetailRoute() {
           <OrderDetail
             order={order}
             client={clients.find((c) => c.id === order.clientId)}
-            menuInventory={menuInventory}
+            menuInventory={stockItems}
             onBack={onBack}
             onAdvanceStatus={advanceOrderStatus}
             onScheduleDelivery={scheduleOrderDelivery}

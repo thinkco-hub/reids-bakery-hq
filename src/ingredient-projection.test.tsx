@@ -101,7 +101,7 @@ describe("ingredient projection", () => {
     );
     expect(screen.queryByText("COGS / Unit")).not.toBeInTheDocument();
     expect(screen.queryByText("Suggested Price")).not.toBeInTheDocument();
-    // The recipe is still listed under both its own name and its menu item.
+    // The catalogue record still lists the recipe under its own name.
     expect(screen.getAllByText("Butter Croissants").length).toBeGreaterThan(0);
   });
 

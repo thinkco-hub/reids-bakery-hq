@@ -88,7 +88,7 @@ describe("app shell state identity", () => {
     await screen.findByText("Point of Sale");
 
     await openTab(user, "Point of Sale");
-    await addProduct(user, "Butter Croissant", 2);
+    await addProduct(user, "Butter Croissants", 2);
     await addProduct(user, "Pain au Chocolat", 1);
 
     expect(screen.getByText("₱240.00")).toBeInTheDocument();

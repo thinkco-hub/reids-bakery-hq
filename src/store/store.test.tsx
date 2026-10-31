@@ -6,36 +6,31 @@ import RecipesRoute from "../routes/RecipesRoute";
 import { addDaysISO, todayISO } from "../utils/dates";
 import { initialUsers } from "../data/initialUsers";
 import {
+  useCatalogueSlice,
   useClosingSlice,
-  useInventorySlice,
   useOrdersSlice,
   usePosSlice,
 } from "./slices";
 import { renderWithBakery } from "../test/render-bakery";
 import type {
+  CatalogueItem,
   InventoryCount,
-  MenuItemStock,
   Order,
-  PosProduct,
   User,
 } from "../types/domain";
 
-const PRODUCT: PosProduct = {
+const ITEM: CatalogueItem = {
   id: "B-101",
   name: "Butter Croissants",
-  price: 120,
+  type: "Menu Item",
   category: "Pastries",
-  color: "bg-orange-400",
-};
-
-const MENU: MenuItemStock = {
-  id: "B-101",
-  name: "Butter Croissants",
+  price: 120,
   qty: 10,
   target: 20,
   shelfLife: "24 Hours",
-  type: "Menu Item",
-  price: 120,
+  color: "bg-amber-400",
+  trackedStock: true,
+  ingredients: [],
 };
 
 const ORDER: Order = {
@@ -58,7 +53,7 @@ const ORDER: Order = {
 /** Drives every slice through its public actions and prints what the assertions pin. */
 function StoreProbe() {
   const { orders, markOrderDelivered } = useOrdersSlice();
-  const { menuInventory } = useInventorySlice();
+  const { stockItems } = useCatalogueSlice();
   const pos = usePosSlice();
   const { inventoryCounts, applyAllPendingCounts } = useClosingSlice();
 
@@ -76,7 +71,7 @@ function StoreProbe() {
         {orders.map((order) => `${order.id}:${order.status}`).join("|")}
       </div>
       <div data-testid="stock">
-        {menuInventory.map((item) => `${item.id}:${item.qty}`).join("|")}
+        {stockItems.map((item) => `${item.id}:${item.qty}`).join("|")}
       </div>
       <div data-testid="sales">
         {pos.sales.map((sale) => `${sale.id}:${sale.orderId ?? "walk-in"}`).join("|")}
@@ -108,17 +103,17 @@ function userFor(email: string): User {
 describe("the seeded store", () => {
   it("starts every slice from the fixture seed", () => {
     renderWithBakery(<StoreProbe />, {
-      seed: { menuInventory: [MENU], orders: [ORDER], posProducts: [PRODUCT] },
+      seed: { catalogue: [ITEM], orders: [ORDER] },
     });
 
     expect(screen.getByTestId("stock")).toHaveTextContent("B-101:10");
     expect(screen.getByTestId("orders")).toHaveTextContent("#1:Pending");
   });
 
-  it("deducts a delivered order's lines from the same inventory slice", async () => {
+  it("deducts a delivered order's lines from the same catalogue record", async () => {
     const user = userEvent.setup();
     renderWithBakery(<StoreProbe />, {
-      seed: { menuInventory: [MENU], orders: [ORDER], posProducts: [PRODUCT] },
+      seed: { catalogue: [ITEM], orders: [ORDER] },
     });
 
     await user.click(screen.getByRole("button", { name: "Deliver #1" }));
@@ -130,7 +125,7 @@ describe("the seeded store", () => {
   it("creates one sale linked to the order a checkout opens", async () => {
     const user = userEvent.setup();
     renderWithBakery(<StoreProbe />, {
-      seed: { menuInventory: [MENU], orders: [], posProducts: [PRODUCT] },
+      seed: { catalogue: [ITEM], orders: [] },
     });
 
     await user.click(screen.getByRole("button", { name: "Add product" }));
@@ -159,7 +154,7 @@ describe("the seeded store", () => {
       status: "pending",
     };
     renderWithBakery(<StoreProbe />, {
-      seed: { menuInventory: [MENU], inventoryCounts: [count] },
+      seed: { catalogue: [ITEM], inventoryCounts: [count] },
     });
 
     await user.click(screen.getByRole("button", { name: "Apply counts" }));

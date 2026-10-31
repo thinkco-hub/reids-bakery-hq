@@ -4,7 +4,6 @@ import { computeRecipeCost, suggestedPrice } from "../../utils/pricing";
 import { SearchIcon } from "../icons";
 import type {
   IngredientStock,
-  MenuItemStock,
   PricingRuleInput,
   PricingRules,
   Recipe,
@@ -15,7 +14,6 @@ interface RecipesListProps {
   ingredients: IngredientStock[];
   /** COGS and the price suggested from it are unit costs seen sideways, so they travel with that grant. */
   canViewIngredientCosts: boolean;
-  menuInventory: MenuItemStock[];
   pricingRules: PricingRules;
   onEditRule: (data: PricingRuleInput) => void;
   onEdit: (recipe: Recipe) => void;
@@ -26,23 +24,18 @@ export default function RecipesList({
   recipes,
   ingredients,
   canViewIngredientCosts,
-  menuInventory,
   pricingRules,
   onEditRule,
   onEdit,
   onCreate,
 }: RecipesListProps) {
   const [search, setSearch] = useState("");
-  const columnCount = canViewIngredientCosts ? 7 : 5;
+  const columnCount = canViewIngredientCosts ? 6 : 4;
 
   const query = search.toLowerCase();
-  const filtered = recipes.filter((recipe) => {
-    const menuItemName = menuInventory.find((m) => m.id === recipe.id)?.name ?? "";
-    return (
-      recipe.name.toLowerCase().includes(query) ||
-      menuItemName.toLowerCase().includes(query)
-    );
-  });
+  const filtered = recipes.filter((recipe) =>
+    recipe.name.toLowerCase().includes(query)
+  );
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
@@ -90,7 +83,7 @@ export default function RecipesList({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
-            placeholder="Search recipe or menu item..."
+            placeholder="Search recipes..."
           />
         </div>
       </div>
@@ -101,7 +94,6 @@ export default function RecipesList({
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
                 <th className="px-6 py-4">Recipe</th>
-                <th className="px-6 py-4">Linked Menu Item</th>
                 <th className="px-6 py-4">Yield</th>
                 {canViewIngredientCosts && (
                   <>
@@ -128,7 +120,6 @@ export default function RecipesList({
                 </tr>
               ) : (
                 filtered.map((recipe) => {
-                  const menuItem = menuInventory.find((m) => m.id === recipe.id);
                   const actualPrice = recipe.price;
                   const costPerUnit = canViewIngredientCosts
                     ? computeRecipeCost(recipe, ingredients).costPerUnit
@@ -140,7 +131,6 @@ export default function RecipesList({
                   return (
                     <tr key={recipe.id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-6 py-4 font-medium text-gray-900">{recipe.name}</td>
-                      <td className="px-6 py-4 text-gray-600">{menuItem ? menuItem.name : "—"}</td>
                       <td className="px-6 py-4 text-gray-600">
                         {recipe.yieldQty} {recipe.yieldUnit}
                       </td>

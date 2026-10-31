@@ -4,7 +4,7 @@ import RestockModal from "../components/inventory/RestockModal";
 import { RequireTab } from "../components/RequireAccess";
 import {
   useCanViewIngredients,
-  useInventorySlice,
+  useCatalogueSlice,
   useVisibleIngredients,
 } from "../store/slices";
 import { useShell } from "./shell";
@@ -12,7 +12,7 @@ import { useShell } from "./shell";
 export default function InventoryRoute() {
   const { currentUser, goToTab } = useShell();
   const {
-    menuInventory,
+    stockItems,
     restockReminders,
     restockModal,
     setRestockModal,
@@ -26,14 +26,14 @@ export default function InventoryRoute() {
     submitRestock,
     restockItems,
     isRestockConfirmDisabled,
-  } = useInventorySlice();
+  } = useCatalogueSlice();
   const canViewIngredients = useCanViewIngredients();
   const visibleIngredients = useVisibleIngredients();
 
   return (
     <RequireTab role={currentUser.role} tab="inventory">
       <InventoryView
-        menuInventory={menuInventory}
+        menuInventory={stockItems}
         ingredients={visibleIngredients}
         restockReminders={restockReminders}
         canViewIngredients={canViewIngredients}

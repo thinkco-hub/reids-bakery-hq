@@ -31,8 +31,8 @@ const nextOrderId = (): OrderId => `#${nextOrderSeq++}`;
 
 interface UseOrdersOptions {
   /**
-   * Inventory-owned deduction applied when an order is delivered. Injected by
-   * the app shell so stock updates stay owned by useInventory.
+   * Catalogue-owned deduction applied when an order is delivered. Injected by
+   * the app shell so stock updates stay with their one owner.
    */
   deductOrderLines: (lines: OrderItem[]) => void;
   currentUser: User | null;

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import SelectField from "../common/SelectField";
 import TicketLineItem from "./TicketLineItem";
 import { SearchIcon } from "../icons";
-import { POS_CATEGORIES } from "../../data/initialProducts";
+import { POS_CATEGORIES } from "../../data/initialCatalogue";
 import { formatMoney } from "../../utils/money";
 import type {
   CartItem,
