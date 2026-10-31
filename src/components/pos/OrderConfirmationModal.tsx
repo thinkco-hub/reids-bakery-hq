@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { TicketCustomerFields } from "./TicketCustomerInput";
 import { addDaysISO } from "../../utils/dates";
 import { formatMoney } from "../../utils/money";
@@ -36,7 +37,9 @@ export default function OrderConfirmationModal({
   // An Order must be delivered after today, so the earliest pickable date is tomorrow.
   const tomorrowISO = addDaysISO(todayISO, 1);
 
-  return (
+  // Portalled to <body>: this overlay renders inside <main>, whose `relative z-10`
+  // would cap it below the shell's sidebar rail.
+  return createPortal(
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
       onClick={(e) => {
@@ -202,6 +205,7 @@ export default function OrderConfirmationModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

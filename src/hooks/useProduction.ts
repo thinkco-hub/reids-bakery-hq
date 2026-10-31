@@ -24,6 +24,8 @@ interface UseProductionOptions {
   /** Inventory-owned stock increase for the produced menu item. */
   addMenuStock: (menuItemId: MenuItemId, amount: number) => void;
   currentUser: User | null;
+  /** Seeded runs; a test fixture replaces the value from src/data. */
+  productionRuns?: ProductionRun[];
 }
 
 /**
@@ -34,8 +36,11 @@ export function useProduction({
   deductRecipeLines,
   addMenuStock,
   currentUser,
+  productionRuns: seededProductionRuns,
 }: UseProductionOptions) {
-  const [productionRuns, setProductionRuns] = useState<ProductionRun[]>(initialProductionRuns);
+  const [productionRuns, setProductionRuns] = useState<ProductionRun[]>(
+    seededProductionRuns ?? initialProductionRuns
+  );
 
   const logProductionEvent = (
     action: "production.run_scheduled" | "production.run_completed" | "production.run_deleted",

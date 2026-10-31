@@ -44,6 +44,10 @@ const nextReminderId = (): RestockReminderId =>
 
 interface UseInventoryOptions {
   currentUser: User | null;
+  /** Seeded collections; a test fixture replaces the values from src/data. */
+  menuInventory?: MenuItemStock[];
+  ingredients?: IngredientStock[];
+  restockReminders?: RestockReminder[];
 }
 
 /**
@@ -52,10 +56,21 @@ interface UseInventoryOptions {
  * production completion, reconciliation, restocking) flow through the
  * stock-movement actions below so the stock collections have a single owner.
  */
-export function useInventory({ currentUser }: UseInventoryOptions) {
-  const [menuInventory, setMenuInventory] = useState<MenuItemStock[]>(initialRecipes);
-  const [ingredients, setIngredients] = useState<IngredientStock[]>(initialIngredients);
-  const [restockReminders, setRestockReminders] = useState<RestockReminder[]>(initialRestockReminders);
+export function useInventory({
+  currentUser,
+  menuInventory: seededMenuInventory,
+  ingredients: seededIngredients,
+  restockReminders: seededRestockReminders,
+}: UseInventoryOptions) {
+  const [menuInventory, setMenuInventory] = useState<MenuItemStock[]>(
+    seededMenuInventory ?? initialRecipes
+  );
+  const [ingredients, setIngredients] = useState<IngredientStock[]>(
+    seededIngredients ?? initialIngredients
+  );
+  const [restockReminders, setRestockReminders] = useState<RestockReminder[]>(
+    seededRestockReminders ?? initialRestockReminders
+  );
   const [restockModal, setRestockModal] = useState<RestockModalState>(EMPTY_RESTOCK_MODAL);
 
   // deductOrderLines/deductRecipeLines/addMenuStock/applyCountedQty/applyPendingCounts

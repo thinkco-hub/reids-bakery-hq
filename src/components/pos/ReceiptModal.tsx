@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { formatDateTime } from "../../utils/dates";
 import { formatMoney } from "../../utils/money";
 import type { Sale } from "../../types/domain";
@@ -9,7 +10,9 @@ interface ReceiptModalProps {
 }
 
 export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
-  return (
+  // Portalled to <body>: this overlay renders inside <main>, whose `relative z-10`
+  // would cap it below the shell's sidebar rail.
+  return createPortal(
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 print:bg-white print:static"
       onClick={(e) => {
@@ -125,6 +128,7 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

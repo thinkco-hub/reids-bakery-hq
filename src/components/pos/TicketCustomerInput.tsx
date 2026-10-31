@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { createPortal } from "react-dom";
 import { toContactDigits } from "../../utils/orders";
 import type { FormEvent } from "react";
 import type { TicketCustomer } from "../../types/domain";
@@ -52,7 +53,10 @@ export function TicketCustomerFields({
 }
 
 interface TicketCustomerInputProps {
-  attached: TicketCustomer | null;
+  name: string;
+  contact: string;
+  onNameChange: (value: string) => void;
+  onContactChange: (value: string) => void;
   onClose: () => void;
   onAttach: (customer: TicketCustomer) => void;
 }
@@ -60,17 +64,19 @@ interface TicketCustomerInputProps {
 /**
  * The customer step for a role with no Clients tab. PosCustomerPicker reads the
  * client roster and can create one; this does neither — it is the same two
- * fields, held locally until saved, so a cashier can put a name on a ticket
- * without reaching the collection. useClients.addClient refuses that role at the
- * mutation, so the absence of a roster is not the only thing standing there.
+ * fields, so a cashier can put a name on a ticket without reaching the
+ * collection. useClients.addClient refuses that role at the mutation, so the
+ * absence of a roster is not the only thing standing there. The fields are
+ * controlled by the pos slice so the draft outlives this route.
  */
 export default function TicketCustomerInput({
-  attached,
+  name,
+  contact,
+  onNameChange,
+  onContactChange,
   onClose,
   onAttach,
 }: TicketCustomerInputProps) {
-  const [name, setName] = useState(attached?.name ?? "");
-  const [contact, setContact] = useState(attached?.contact ?? "");
   const isSaveDisabled = !name.trim() && !contact;
 
   const handleSubmit = (e: FormEvent) => {
@@ -79,7 +85,9 @@ export default function TicketCustomerInput({
     onAttach({ name: name.trim(), contact });
   };
 
-  return (
+  // Portalled to <body>: this overlay renders inside <main>, whose `relative z-10`
+  // would cap it below the shell's sidebar rail.
+  return createPortal(
     <div className="fixed inset-0 z-[100] bg-[#FDF9F3] flex flex-col animate-fadeIn">
       <header className="flex-shrink-0 bg-[#562D07] text-[#FDF9F3] p-4 flex items-center gap-3 shadow-md">
         <button
@@ -106,8 +114,8 @@ export default function TicketCustomerInput({
           <TicketCustomerFields
             name={name}
             contact={contact}
-            onNameChange={setName}
-            onContactChange={setContact}
+            onNameChange={onNameChange}
+            onContactChange={onContactChange}
           />
           <p className="text-xs text-gray-400 mt-3">
             Saved to this ticket only. No client record is created.
@@ -134,6 +142,7 @@ export default function TicketCustomerInput({
           </div>
         </div>
       </form>
-    </div>
+    </div>,
+    document.body
   );
 }

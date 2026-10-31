@@ -49,6 +49,8 @@ interface UsePosOptions {
    */
   deductOrderLines: (lines: OrderItem[]) => void;
   currentUser: User | null;
+  /** Seeded sales; a test fixture replaces the empty ledger. */
+  sales?: Sale[];
 }
 
 /**
@@ -61,11 +63,18 @@ export function usePos({
   createOrderFromSale,
   deductOrderLines,
   currentUser,
+  sales: seededSales,
 }: UsePosOptions) {
   const [posCategory, setPosCategory] = useState<PosCategory>("All");
   const [posSearch, setPosSearch] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [ticketCustomer, setTicketCustomer] = useState<TicketCustomer | null>(null);
+  /**
+   * Unsaved fields of the typed customer form. The picker unmounts with the
+   * POS route, so the draft lives here or a cashier loses what they typed by
+   * checking another screen and coming back.
+   */
+  const [customerDraft, setCustomerDraft] = useState<TicketCustomer>({ name: "", contact: "" });
   const [isCustomerPickerOpen, setIsCustomerPickerOpen] = useState(false);
   /**
    * Whether the phone POS shows its ticket screen instead of the catalogue.
@@ -75,7 +84,7 @@ export function usePos({
    */
   const [isTicketViewOpen, setIsTicketViewOpen] = useState(false);
   const [confirmModal, setConfirmModal] = useState<ConfirmModalState>(EMPTY_CONFIRM_MODAL);
-  const [sales, setSales] = useState<Sale[]>([]);
+  const [sales, setSales] = useState<Sale[]>(seededSales ?? []);
   const [receipt, setReceipt] = useState<Sale | null>(null);
 
   // --- PRODUCT FILTER & CART TOTALS ---
@@ -131,8 +140,19 @@ export function usePos({
   };
 
   const clearTicketCustomer = () => setTicketCustomer(null);
-  const openCustomerPicker = () => setIsCustomerPickerOpen(true);
+  /** Opening starts from the attached customer, the way the form's mount used to. */
+  const openCustomerPicker = () => {
+    if (!isCustomerPickerOpen) {
+      setCustomerDraft({
+        name: ticketCustomer?.name ?? "",
+        contact: ticketCustomer?.contact ?? "",
+      });
+    }
+    setIsCustomerPickerOpen(true);
+  };
   const closeCustomerPicker = () => setIsCustomerPickerOpen(false);
+  const updateCustomerDraft = (field: keyof TicketCustomer, value: string) =>
+    setCustomerDraft((prev) => ({ ...prev, [field]: value }));
 
   /** Opens the confirm modal with the attached customer, if any, pre-filled. */
   const openConfirmModal = () => {
@@ -243,6 +263,8 @@ export function usePos({
     ticketCustomer,
     attachTicketCustomer,
     clearTicketCustomer,
+    customerDraft,
+    updateCustomerDraft,
     isCustomerPickerOpen,
     openCustomerPicker,
     closeCustomerPicker,

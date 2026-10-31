@@ -11,6 +11,8 @@ import type {
 
 interface UseRecipesOptions {
   currentUser: User | null;
+  /** Seeded recipes; a test fixture replaces the value from src/data. */
+  recipes?: Recipe[];
 }
 
 /**
@@ -18,8 +20,8 @@ interface UseRecipesOptions {
  * the editor is open, and on which recipe, is the router's `/recipes/new` and
  * `/recipes/:recipeId` routes, not state held here.
  */
-export function useRecipes({ currentUser }: UseRecipesOptions) {
-  const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
+export function useRecipes({ currentUser, recipes: seededRecipes }: UseRecipesOptions) {
+  const [recipes, setRecipes] = useState<Recipe[]>(seededRecipes ?? initialRecipes);
   const [pricingRules, setPricingRules] = useState<PricingRules>({
     targetMarginPercent: 40,
   });
