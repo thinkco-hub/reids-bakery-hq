@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import SelectField from "../common/SelectField";
+import { formatMoney } from "../../utils/money";
 import { computeRecipeCost, suggestedPrice } from "../../utils/pricing";
 import type { FormEvent } from "react";
 import type {
@@ -176,7 +177,7 @@ export default function RecipeEditor({
                   </SelectField>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Price (₱)</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Price</label>
                   <input
                     type="number"
                     min="0"
@@ -329,11 +330,11 @@ export default function RecipeEditor({
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between text-gray-600 font-medium">
                     <span>Total Batch Cost</span>
-                    <span className="text-gray-900">₱{totalCost.toFixed(2)}</span>
+                    <span className="text-gray-900">{formatMoney(totalCost)}</span>
                   </div>
                   <div className="flex justify-between text-gray-600 font-medium border-b border-gray-200 pb-3">
                     <span>Cost per Unit</span>
-                    <span className="text-gray-900">₱{costPerUnit.toFixed(2)}</span>
+                    <span className="text-gray-900">{formatMoney(costPerUnit)}</span>
                   </div>
                 </div>
 
@@ -365,7 +366,7 @@ export default function RecipeEditor({
                               <span className="text-xs text-gray-500 font-medium">% margin</span>
                             </div>
                           </div>
-                          <span className="text-lg font-bold text-[#F17D0C]">₱{tierPrice.toFixed(2)}</span>
+                          <span className="text-lg font-bold text-[#F17D0C]">{formatMoney(tierPrice)}</span>
                         </div>
                       );
                     })}

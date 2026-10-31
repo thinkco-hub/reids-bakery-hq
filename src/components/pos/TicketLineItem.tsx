@@ -1,4 +1,5 @@
 import React from "react";
+import { formatMoney } from "../../utils/money";
 import type { CartItem } from "../../types/domain";
 
 interface TicketLineItemProps {
@@ -22,7 +23,7 @@ export default function TicketLineItem({
       <div className="flex justify-between items-start mb-[0.8em]">
         <span className="font-bold text-gray-800">{item.name}</span>
         <span className="font-bold text-gray-900">
-          ₱{(item.price * item.qty).toFixed(2)}
+          {formatMoney(item.price * item.qty)}
         </span>
       </div>
       <div className="flex justify-between items-center text-gray-500">
@@ -65,7 +66,7 @@ export default function TicketLineItem({
             </svg>
           </button>
         </div>
-        <span>x ₱{item.price.toFixed(2)}</span>
+        <span>x {formatMoney(item.price)}</span>
       </div>
     </li>
   );

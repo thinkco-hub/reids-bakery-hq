@@ -3,7 +3,11 @@ import ScheduleRunModal from "./ScheduleRunModal";
 import RunDetailModal from "./RunDetailModal";
 import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
 import { SearchIcon } from "../icons";
-import { getRunStatus, RUN_STATUS_LABELS } from "../../utils/production";
+import { getRunStatus } from "../../utils/production";
+import {
+  RUN_STATUS_BADGE_CLASSES,
+  RUN_STATUS_LABELS,
+} from "../../utils/status";
 import type {
   IngredientStock,
   MenuItemStock,
@@ -14,17 +18,11 @@ import type {
   ScheduleRunData,
 } from "../../types/domain";
 
-const STATUS_STYLES: Record<ProductionRunDisposition, string> = {
-  scheduled: "border-blue-300 bg-blue-50 text-blue-700",
-  insufficient: "border-red-300 bg-red-50 text-red-700",
-  completed: "border-green-300 bg-green-50 text-green-700",
-};
-
 const STAT_CARDS: Array<{ key: "all" | ProductionRunDisposition; label: string; iconBg: string }> = [
   { key: "all", label: "Total Runs", iconBg: "bg-gray-100 text-gray-500" },
-  { key: "scheduled", label: "Scheduled", iconBg: "bg-blue-50 text-blue-500" },
-  { key: "insufficient", label: "Insufficient Stock", iconBg: "bg-red-50 text-red-500" },
-  { key: "completed", label: "Completed", iconBg: "bg-green-50 text-green-500" },
+  { key: "scheduled", label: RUN_STATUS_LABELS.scheduled, iconBg: "bg-blue-50 text-blue-500" },
+  { key: "insufficient", label: RUN_STATUS_LABELS.insufficient, iconBg: "bg-red-50 text-red-500" },
+  { key: "completed", label: RUN_STATUS_LABELS.completed, iconBg: "bg-green-50 text-green-500" },
 ];
 
 interface ProductionRunsListProps {
@@ -230,7 +228,7 @@ export default function ProductionRunsList({
                           </td>
                           <td className="px-5 py-4">
                             <span
-                              className={`px-3 py-1 rounded-full border text-xs font-bold whitespace-nowrap ${STATUS_STYLES[status]}`}
+                              className={`px-3 py-1 rounded-full border text-xs font-bold whitespace-nowrap ${RUN_STATUS_BADGE_CLASSES[status]}`}
                             >
                               {RUN_STATUS_LABELS[status]}
                             </span>

@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import InventoryStatsBar from "./InventoryStatsBar";
 import StockStatusBadge from "./StockStatusBadge";
 import { SearchIcon } from "../icons";
-import { groupByStatus, getStockStatus, STOCK_STATUS_LABELS } from "../../utils/stock";
+import { STOCK_STATUS_LABELS } from "../../utils/status";
+import { groupByStatus, getStockStatus } from "../../utils/stock";
 import type { MenuItemStock, StockStatus } from "../../types/domain";
 
 interface FinishedGoodsTableProps {

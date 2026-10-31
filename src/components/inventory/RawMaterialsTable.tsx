@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import InventoryStatsBar from "./InventoryStatsBar";
 import StockStatusBadge from "./StockStatusBadge";
 import { SearchIcon } from "../icons";
-import { groupByStatus, getStockStatus, STOCK_STATUS_LABELS } from "../../utils/stock";
+import { formatMoney } from "../../utils/money";
+import { STOCK_STATUS_LABELS } from "../../utils/status";
+import { groupByStatus, getStockStatus } from "../../utils/stock";
 import type { FormEvent } from "react";
 import type { IngredientFormData, IngredientStock, StockStatus } from "../../types/domain";
 
@@ -122,7 +124,7 @@ function IngredientFormModal({
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">
-                Unit Cost (₱)
+                Unit Cost
               </label>
               <input
                 type="number"
@@ -290,7 +292,7 @@ export default function RawMaterialsTable({ ingredients, onRestock, onAdd, onUpd
                         </td>
                         <td className="px-4 md:px-6 py-4 text-sm text-gray-600">{item.supplier || "—"}</td>
                         <td className="px-4 md:px-6 py-4 text-sm text-gray-800 font-medium">
-                          ₱{Number(item.unitCost || 0).toFixed(2)}
+                          {formatMoney(Number(item.unitCost || 0))}
                         </td>
                         <td className="px-4 md:px-6 py-4">
                           <StockStatusBadge item={item} />

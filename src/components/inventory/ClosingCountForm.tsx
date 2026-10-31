@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { todayISO } from "../../utils/dates";
 import type { FormEvent } from "react";
 import type {
   ClosingCountEntry,
@@ -7,8 +8,6 @@ import type {
   InventoryItemCategory,
   MenuItemStock,
 } from "../../types/domain";
-
-const today = () => new Date().toISOString().slice(0, 10);
 
 type CountMap = Record<string, string>;
 
@@ -72,7 +71,7 @@ interface ClosingCountFormProps {
 }
 
 export default function ClosingCountForm({ menuInventory, ingredients, onSubmit, onBack }: ClosingCountFormProps) {
-  const [date, setDate] = useState(today());
+  const [date, setDate] = useState(todayISO());
   const [menuCounts, setMenuCounts] = useState<CountMap>({});
   const [ingredientCounts, setIngredientCounts] = useState<CountMap>({});
   const [submittedMsg, setSubmittedMsg] = useState("");

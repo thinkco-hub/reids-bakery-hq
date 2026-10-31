@@ -1,4 +1,5 @@
 import React from "react";
+import { formatMoney } from "../../utils/money";
 import type { ItemSalesLine } from "../../types/domain";
 
 export default function SellerBarList({
@@ -23,7 +24,7 @@ export default function SellerBarList({
             <div className="flex justify-between items-baseline mb-1">
               <span className="text-sm font-semibold text-gray-800 truncate pr-2">{item.name}</span>
               <span className="text-xs font-bold text-gray-900 whitespace-nowrap">
-                {item.qty} sold · ₱{item.revenue.toFixed(0)}
+                {item.qty} sold · {formatMoney(item.revenue)}
               </span>
             </div>
             <div className="h-[10px] bg-gray-100 rounded-full overflow-hidden">

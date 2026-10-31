@@ -5,6 +5,7 @@ import SelectField from "../common/SelectField";
 import TicketLineItem from "../pos/TicketLineItem";
 import { SearchIcon } from "../icons";
 import { POS_CATEGORIES } from "../../data/initialProducts";
+import { formatMoney } from "../../utils/money";
 import type {
   CartItem,
   PosCategory,
@@ -128,7 +129,7 @@ export default function PosView({
                   className={`relative w-full aspect-square rounded-xl shadow-sm hover:shadow-md transition-all transform active:scale-95 flex flex-col justify-between p-3 ${product.color} text-white overflow-hidden group`}
                 >
                   <span className="self-end text-sm font-bold opacity-90 drop-shadow-sm">
-                    ₱{product.price}
+                    {formatMoney(product.price)}
                   </span>
                   <span className="self-start text-left text-base font-bold leading-tight drop-shadow-sm group-hover:underline">
                     {product.name}
@@ -289,15 +290,15 @@ export default function PosView({
             <div className="space-y-[0.4em] mb-[var(--tk-pad)]">
               <div className="flex justify-between text-gray-500 text-[length:var(--tk-body)] font-medium">
                 <span>Subtotal</span>
-                <span>₱{cartSubtotal.toFixed(2)}</span>
+                <span>{formatMoney(cartSubtotal)}</span>
               </div>
               <div className="flex justify-between text-gray-500 text-[length:var(--tk-body)] font-medium border-b border-gray-200 pb-[0.5em]">
                 <span>Tax (5%)</span>
-                <span>₱{cartTax.toFixed(2)}</span>
+                <span>{formatMoney(cartTax)}</span>
               </div>
               <div className="flex justify-between text-[#121212] text-[length:var(--tk-title)] font-bold pt-[0.25em]">
                 <span>Total</span>
-                <span>₱{cartTotal.toFixed(2)}</span>
+                <span>{formatMoney(cartTotal)}</span>
               </div>
             </div>
 

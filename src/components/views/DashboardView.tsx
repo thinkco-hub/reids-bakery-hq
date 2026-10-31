@@ -1,6 +1,8 @@
 import React from "react";
 import OrderStatusBadge from "../orders/OrderStatusBadge";
 import { CalendarIcon } from "../icons";
+import { addDaysISO, formatDate, toISODate } from "../../utils/dates";
+import { formatMoney } from "../../utils/money";
 import { computeOrderTotal } from "../../utils/orders";
 import { getRevenueByDay } from "../../utils/sales";
 import type { Client, NavTabId, Order, Quantity, Sale } from "../../types/domain";
@@ -35,17 +37,10 @@ export default function DashboardView({
   onNavClick,
   onViewOrder,
 }: DashboardViewProps) {
-  const todayLabel = new Date().toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-
   const today = new Date();
-  const todayKey = today.toISOString().slice(0, 10);
-  const yesterday = new Date(today);
-  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-  const yesterdayKey = yesterday.toISOString().slice(0, 10);
+  const todayLabel = formatDate(today);
+  const todayKey = toISODate(today);
+  const yesterdayKey = addDaysISO(todayKey, -1);
   const revenueByDay = getRevenueByDay(sales);
   const revenueOn = (date: string) =>
     revenueByDay.find((entry) => entry.date === date)?.revenue ?? 0;
@@ -106,7 +101,7 @@ export default function DashboardView({
             Today's Revenue
           </h3>
           <p className="text-2xl font-bold text-[#121212]">
-            ₱{todayRevenue.toFixed(2)}
+            {formatMoney(todayRevenue)}
           </p>
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100">
@@ -231,7 +226,7 @@ export default function DashboardView({
                       <OrderStatusBadge status={order.status} />
                     </td>
                     <td className="px-5 py-4 font-medium text-gray-900 text-right">
-                      ₱{computeOrderTotal(order).toFixed(2)}
+                      {formatMoney(computeOrderTotal(order))}
                     </td>
                   </tr>
                 ))}

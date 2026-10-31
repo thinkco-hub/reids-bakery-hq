@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { formatMoney } from "../../utils/money";
 import { computeRecipeCost, suggestedPrice } from "../../utils/pricing";
 import { SearchIcon } from "../icons";
 import type {
@@ -146,16 +147,16 @@ export default function RecipesList({
                       {canViewIngredientCosts && (
                         <>
                           <td className="px-6 py-4 text-right font-medium text-gray-900">
-                            ₱{costPerUnit.toFixed(2)}
+                            {formatMoney(costPerUnit)}
                           </td>
                           <td className="px-6 py-4 text-right font-bold text-[#F17D0C]">
-                            ₱{price.toFixed(2)}
+                            {formatMoney(price)}
                           </td>
                         </>
                       )}
                       <td className="px-6 py-4 text-right">
                         <div>
-                          <span className="font-bold text-gray-900">₱{actualPrice.toFixed(2)}</span>
+                          <span className="font-bold text-gray-900">{formatMoney(actualPrice)}</span>
                           {canViewIngredientCosts && (
                             <span
                               className={`ml-2 text-xs font-bold px-1.5 py-0.5 rounded ${
@@ -165,7 +166,7 @@ export default function RecipesList({
                               }`}
                             >
                               {delta >= 0 ? "+" : ""}
-                              ₱{delta.toFixed(2)}
+                              {formatMoney(delta)}
                             </span>
                           )}
                         </div>

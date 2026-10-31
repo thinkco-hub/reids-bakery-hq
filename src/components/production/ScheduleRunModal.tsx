@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
+import { todayISO } from "../../utils/dates";
 import { computeBatches } from "../../utils/production";
 import type { FormEvent } from "react";
 import type { Recipe, ScheduleRunData } from "../../types/domain";
 import SelectField from "../common/SelectField";
-
-const today = () => new Date().toISOString().slice(0, 10);
 
 const SELECT_BASE =
   "rounded-lg border border-gray-300 py-2.5 text-gray-800 outline-none focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C]";
@@ -21,7 +20,7 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
     recipeId: recipes[0]?.id || "",
     qty: "",
     qtyUnit: "pcs",
-    plannedDate: today(),
+    plannedDate: todayISO(),
     notes: "",
   });
 

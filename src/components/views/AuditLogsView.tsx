@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { SearchIcon } from "../icons";
 import { getAuditLog } from "../../utils/auditLog";
+import { toISODate, todayISO } from "../../utils/dates";
 import { roleLabel } from "../../utils/permissions";
 import type { AuditActionType, AuditLogEntry } from "../../types/domain";
 
@@ -43,23 +44,15 @@ const WARNING_ACTIONS: ReadonlySet<AuditActionType> = new Set([
   "auth.login.lockout",
 ]);
 
-/** YYYY-MM-DD in the viewer's local timezone (matches what <input type="date"> uses). */
-function toLocalDate(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
-
 export default function AuditLogsView() {
   // Read once on mount: the view is only mounted while its tab is open, so each visit is a fresh read.
   const [entries] = useState<AuditLogEntry[]>(() => getAuditLog());
   const [search, setSearch] = useState("");
-  const [dateFilter, setDateFilter] = useState(() => toLocalDate(new Date()));
+  const [dateFilter, setDateFilter] = useState(() => todayISO());
 
   const query = search.trim().toLowerCase();
   const filtered = entries.filter((entry) => {
-    const matchDate = !dateFilter || toLocalDate(new Date(entry.timestamp)) === dateFilter;
+    const matchDate = !dateFilter || toISODate(new Date(entry.timestamp)) === dateFilter;
     const matchSearch =
       !query ||
       entry.userName.toLowerCase().includes(query) ||
@@ -69,7 +62,7 @@ export default function AuditLogsView() {
     return matchDate && matchSearch;
   });
 
-  const today = toLocalDate(new Date());
+  const today = todayISO();
 
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">

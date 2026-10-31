@@ -1,4 +1,5 @@
 import React from "react";
+import { formatDateTime } from "../../utils/dates";
 import type { EditHistoryEntry } from "../../types/domain";
 
 /** Chronological list of edit entries with from -> to per changed field. */
@@ -8,7 +9,7 @@ export default function EditHistoryList({ entries }: { entries: EditHistoryEntry
       {entries.map((entry) => (
         <li key={entry.id} className="bg-gray-50 rounded-lg p-4">
           <p className="text-xs font-semibold text-gray-500 mb-2">
-            {new Date(entry.at).toLocaleString()} · {entry.userName}
+            {formatDateTime(entry.at)} · {entry.userName}
           </p>
           <ul className="space-y-1.5 text-sm">
             {entry.changes.map((change) => (

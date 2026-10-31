@@ -1,5 +1,7 @@
 import React from "react";
 import { TicketCustomerFields } from "./TicketCustomerInput";
+import { addDaysISO } from "../../utils/dates";
+import { formatMoney } from "../../utils/money";
 import { PAYMENT_METHODS } from "../../utils/orders";
 import type { CartItem, ConfirmModalState, ISODate, SaleType } from "../../types/domain";
 
@@ -32,9 +34,7 @@ export default function OrderConfirmationModal({
   disabled,
 }: OrderConfirmationModalProps) {
   // An Order must be delivered after today, so the earliest pickable date is tomorrow.
-  const tomorrowISO = new Date(Date.parse(todayISO) + 24 * 60 * 60 * 1000)
-    .toISOString()
-    .slice(0, 10);
+  const tomorrowISO = addDaysISO(todayISO, 1);
 
   return (
     <div
@@ -82,7 +82,7 @@ export default function OrderConfirmationModal({
                   {item.name}
                 </span>
                 <span className="font-bold text-gray-900">
-                  ₱{(item.price * item.qty).toFixed(2)}
+                  {formatMoney(item.price * item.qty)}
                 </span>
               </li>
             ))}
@@ -91,7 +91,7 @@ export default function OrderConfirmationModal({
 
         <div className="flex justify-between items-center mb-6 text-xl font-bold text-[#121212] px-2">
           <span>Total to Charge:</span>
-          <span className="text-[#F17D0C]">₱{cartTotal.toFixed(2)}</span>
+          <span className="text-[#F17D0C]">{formatMoney(cartTotal)}</span>
         </div>
 
         <div className="mb-6">

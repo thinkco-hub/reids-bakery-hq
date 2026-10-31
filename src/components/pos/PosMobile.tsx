@@ -3,6 +3,7 @@ import SelectField from "../common/SelectField";
 import TicketLineItem from "./TicketLineItem";
 import { SearchIcon } from "../icons";
 import { POS_CATEGORIES } from "../../data/initialProducts";
+import { formatMoney } from "../../utils/money";
 import type {
   CartItem,
   PosCategory,
@@ -129,15 +130,15 @@ export default function PosMobile({
             <div className="space-y-1 mb-4">
               <div className="flex justify-between text-gray-500 text-[0.95rem] font-medium">
                 <span>Subtotal</span>
-                <span>₱{cartSubtotal.toFixed(2)}</span>
+                <span>{formatMoney(cartSubtotal)}</span>
               </div>
               <div className="flex justify-between text-gray-500 text-[0.95rem] font-medium border-b border-gray-200 pb-1.5">
                 <span>Tax (5%)</span>
-                <span>₱{cartTax.toFixed(2)}</span>
+                <span>{formatMoney(cartTax)}</span>
               </div>
               <div className="flex justify-between text-[#121212] text-[1.05rem] font-bold pt-1">
                 <span>Total</span>
-                <span>₱{cartTotal.toFixed(2)}</span>
+                <span>{formatMoney(cartTotal)}</span>
               </div>
             </div>
             <TicketButton
@@ -246,7 +247,7 @@ export default function PosMobile({
                           {product.name}
                         </span>
                         <span className="flex-shrink-0 font-bold text-[#121212]">
-                          ₱{product.price.toFixed(2)}
+                          {formatMoney(product.price)}
                         </span>
                       </button>
                     </li>
@@ -286,7 +287,7 @@ function TicketButton({
       }`}
     >
       <span className="text-[1.05rem]">{label}</span>
-      <span className="text-[0.95rem]">₱{total.toFixed(2)}</span>
+      <span className="text-[0.95rem]">{formatMoney(total)}</span>
     </button>
   );
 }

@@ -1,4 +1,6 @@
 import React from "react";
+import { formatDateTime } from "../../utils/dates";
+import { formatMoney } from "../../utils/money";
 import type { Sale } from "../../types/domain";
 
 interface ReceiptModalProps {
@@ -56,7 +58,7 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
           <div className="flex justify-between">
             <span>Date</span>
             <span className="font-semibold text-gray-800">
-              {new Date(receipt.createdAt).toLocaleString()}
+              {formatDateTime(receipt.createdAt)}
             </span>
           </div>
         </div>
@@ -69,7 +71,7 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
                 {item.name}
               </span>
               <span className="font-semibold text-gray-900">
-                ₱{(item.price * item.qty).toFixed(2)}
+                {formatMoney(item.price * item.qty)}
               </span>
             </li>
           ))}
@@ -78,11 +80,11 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
         <div className="space-y-1 mb-6 border-t border-dashed border-gray-300 pt-3">
           <div className="flex justify-between text-gray-500 text-sm">
             <span>Subtotal</span>
-            <span>₱{receipt.subtotal.toFixed(2)}</span>
+            <span>{formatMoney(receipt.subtotal)}</span>
           </div>
           <div className="flex justify-between text-gray-500 text-sm">
             <span>Tax (5%)</span>
-            <span>₱{receipt.tax.toFixed(2)}</span>
+            <span>{formatMoney(receipt.tax)}</span>
           </div>
           <div
             className={`flex justify-between text-lg font-bold text-[#121212] pt-1 ${
@@ -90,7 +92,7 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
             }`}
           >
             <span>Total</span>
-            <span className="text-[#F17D0C]">₱{receipt.total.toFixed(2)}</span>
+            <span className="text-[#F17D0C]">{formatMoney(receipt.total)}</span>
           </div>
           {receipt.notes && (
             <div className="flex justify-between text-sm pt-1">

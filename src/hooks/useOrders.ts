@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { initialOrders } from "../data/initialOrders";
 import { recordAuditEvent } from "../utils/auditLog";
+import { todayISO } from "../utils/dates";
 import { buildEditHistoryEntry, diffField, diffLines } from "../utils/editHistory";
 import {
   computeAmountDue,
@@ -48,7 +49,7 @@ const buildOrder = (
   notes: data.notes,
   deliveryDate: null,
   assignedTo: null,
-  createdAt: new Date().toISOString().slice(0, 10),
+  createdAt: todayISO(),
   deliveredAt: null,
   paymentMethod: null,
   amountPaid: 0,
@@ -89,7 +90,7 @@ export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
   };
 
   const createOrderFromSale = (sale: Sale) => {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayISO();
     const order: Order = buildOrder(nextOrderId(), {
       clientId: null,
       customerName: sale.customerName,
@@ -205,7 +206,7 @@ export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
     const order = orders.find((o) => o.id === id);
     // Guard against re-delivering: deduction must run only once per order.
     if (!order || order.status === "Delivered") return;
-    const deliveredAt = new Date().toISOString().slice(0, 10);
+    const deliveredAt = todayISO();
 
     deductOrderLines(order.items);
 

@@ -1,4 +1,5 @@
 import React from "react";
+import { STOCK_STATUS_LABELS } from "../../utils/status";
 import { getStockStatus } from "../../utils/stock";
 import type { StockItem, StockStatus } from "../../types/domain";
 
@@ -16,12 +17,10 @@ const CARD_STYLES = {
     iconBg: "bg-gray-100 text-gray-500",
   },
   ok: {
-    label: "In Stock",
     icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />,
     iconBg: "bg-green-50 text-green-500",
   },
   low: {
-    label: "Low Stock",
     icon: (
       <path
         strokeLinecap="round"
@@ -33,7 +32,6 @@ const CARD_STYLES = {
     iconBg: "bg-[#F17D0C]/10 text-[#F17D0C]",
   },
   out: {
-    label: "Out of Stock",
     icon: (
       <path
         strokeLinecap="round"
@@ -62,6 +60,7 @@ export default function InventoryStatsBar({ items, activeFilter, onFilterChange 
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
       {(["all", "ok", "low", "out"] as const).map((key) => {
         const style = CARD_STYLES[key];
+        const label = key === "all" ? CARD_STYLES.all.label : STOCK_STATUS_LABELS[key];
         const isActive = activeFilter === key;
         return (
           <button
@@ -81,7 +80,7 @@ export default function InventoryStatsBar({ items, activeFilter, onFilterChange 
                 </svg>
               </div>
             </div>
-            <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">{style.label}</p>
+            <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">{label}</p>
             <p className="text-xl md:text-2xl font-bold text-[#121212]">{counts[key]}</p>
           </button>
         );

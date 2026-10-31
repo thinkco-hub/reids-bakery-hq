@@ -1,11 +1,6 @@
 import { describe, expect, it } from "vitest";
-import {
-  closingInventoryToCSV,
-  computeClosingInventory,
-  formatDayLabel,
-  getDayRange,
-  shiftDayRange,
-} from "./closingInventory";
+import { closingInventoryToCSV, computeClosingInventory } from "./closingInventory";
+import { formatDayLabel, getDayRange, shiftDayRange } from "./dates";
 import { csvEscape, salesToCSV } from "./sales";
 import type { IngredientStock, InventoryCount, MenuItemStock, Sale } from "../types/domain";
 

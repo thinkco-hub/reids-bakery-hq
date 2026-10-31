@@ -2,6 +2,7 @@ import { useState } from "react";
 import { initialProductionRuns } from "../data/initialProductionRuns";
 import { computeBatches } from "../utils/production";
 import { recordAuditEvent } from "../utils/auditLog";
+import { todayISO } from "../utils/dates";
 import type {
   MenuItemId,
   ProductionRun,
@@ -91,7 +92,7 @@ export function useProduction({
           ? {
               ...r,
               status: "completed",
-              completedDate: new Date().toISOString().slice(0, 10),
+              completedDate: todayISO(),
               actualYield,
               batches,
             }

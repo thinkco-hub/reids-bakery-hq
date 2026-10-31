@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import EditHistoryList from "../common/EditHistoryList";
 import SelectField from "../common/SelectField";
 import { initialPosProducts } from "../../data/initialProducts";
+import { formatMoney } from "../../utils/money";
 import type { FormEvent } from "react";
 import { isValidCustomerContact, toContactDigits } from "../../utils/orders";
 import type { CartItem, EditSaleInput, Sale } from "../../types/domain";
@@ -117,7 +118,7 @@ export default function EditSaleModal({ sale, onClose, onSave }: EditSaleModalPr
                     )}
                     {initialPosProducts.map((p) => (
                       <option key={p.id} value={p.id}>
-                        {p.name} (₱{p.price})
+                        {p.name} ({formatMoney(p.price)})
                       </option>
                     ))}
                   </SelectField>
@@ -145,7 +146,7 @@ export default function EditSaleModal({ sale, onClose, onSave }: EditSaleModalPr
 
           <div className="flex justify-between items-center bg-gray-50 rounded-lg px-4 py-3">
             <span className="text-sm font-semibold text-gray-700">New Total (incl. tax)</span>
-            <span className="text-lg font-bold text-[#F17D0C]">₱{(newSubtotal * 1.05).toFixed(2)}</span>
+            <span className="text-lg font-bold text-[#F17D0C]">{formatMoney(newSubtotal * 1.05)}</span>
           </div>
 
           {sale.editHistory && sale.editHistory.length > 0 && (
