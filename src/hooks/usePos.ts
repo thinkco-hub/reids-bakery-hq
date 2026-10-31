@@ -49,6 +49,8 @@ interface UsePosOptions {
    */
   deductOrderLines: (lines: OrderItem[]) => void;
   currentUser: User | null;
+  /** Seeded sales; a test fixture replaces the empty ledger. */
+  sales?: Sale[];
 }
 
 /**
@@ -61,6 +63,7 @@ export function usePos({
   createOrderFromSale,
   deductOrderLines,
   currentUser,
+  sales: seededSales,
 }: UsePosOptions) {
   const [posCategory, setPosCategory] = useState<PosCategory>("All");
   const [posSearch, setPosSearch] = useState("");
@@ -75,7 +78,7 @@ export function usePos({
    */
   const [isTicketViewOpen, setIsTicketViewOpen] = useState(false);
   const [confirmModal, setConfirmModal] = useState<ConfirmModalState>(EMPTY_CONFIRM_MODAL);
-  const [sales, setSales] = useState<Sale[]>([]);
+  const [sales, setSales] = useState<Sale[]>(seededSales ?? []);
   const [receipt, setReceipt] = useState<Sale | null>(null);
 
   // --- PRODUCT FILTER & CART TOTALS ---

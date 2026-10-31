@@ -36,6 +36,8 @@ interface UseOrdersOptions {
    */
   deductOrderLines: (lines: OrderItem[]) => void;
   currentUser: User | null;
+  /** Seeded orders; a test fixture replaces the value from src/data. */
+  orders?: Order[];
 }
 
 /**
@@ -43,8 +45,12 @@ interface UseOrdersOptions {
  * changes, scheduling and delivery. Which order is on screen is the router's
  * `/orders/:orderId` route, not state held here.
  */
-export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
-  const [orders, setOrders] = useState<Order[]>(initialOrders);
+export function useOrders({
+  deductOrderLines,
+  currentUser,
+  orders: seededOrders,
+}: UseOrdersOptions) {
+  const [orders, setOrders] = useState<Order[]>(seededOrders ?? initialOrders);
 
   const logOrderEvent = (
     action: AuditActionType,

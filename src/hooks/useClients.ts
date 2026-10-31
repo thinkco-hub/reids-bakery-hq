@@ -6,14 +6,16 @@ import type { Client, ClientFormData, ClientId, User } from "../types/domain";
 
 interface UseClientsOptions {
   currentUser: User | null;
+  /** Seeded clients; a test fixture replaces the value from src/data. */
+  clients?: Client[];
 }
 
 /**
  * Owns the clients feature: the client list. Which client is on screen is the
  * router's `/clients/:clientId` route, not state held here.
  */
-export function useClients({ currentUser }: UseClientsOptions) {
-  const [clients, setClients] = useState<Client[]>(initialClients);
+export function useClients({ currentUser, clients: seededClients }: UseClientsOptions) {
+  const [clients, setClients] = useState<Client[]>(seededClients ?? initialClients);
 
   const logClientEvent = (
     action: "client.created" | "client.updated",

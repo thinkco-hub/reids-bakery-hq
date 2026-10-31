@@ -25,14 +25,23 @@ interface UseClosingOptions {
   applyCountedQty: (itemType: InventoryItemCategory, itemId: string, countedQty: number) => void;
   applyPendingCounts: (pending: InventoryCount[]) => void;
   currentUser: User | null;
+  /** Seeded counts; a test fixture replaces the value from src/data. */
+  inventoryCounts?: InventoryCount[];
 }
 
 /**
  * Owns the closing feature: inventory reconciliation counts, expenses and
  * end-of-day closings.
  */
-export function useClosing({ applyCountedQty, applyPendingCounts, currentUser }: UseClosingOptions) {
-  const [inventoryCounts, setInventoryCounts] = useState<InventoryCount[]>(initialInventoryCounts);
+export function useClosing({
+  applyCountedQty,
+  applyPendingCounts,
+  currentUser,
+  inventoryCounts: seededInventoryCounts,
+}: UseClosingOptions) {
+  const [inventoryCounts, setInventoryCounts] = useState<InventoryCount[]>(
+    seededInventoryCounts ?? initialInventoryCounts
+  );
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [dayClosings, setDayClosings] = useState<DayClosing[]>([]);
 
