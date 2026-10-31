@@ -69,6 +69,12 @@ export function usePos({
   const [posSearch, setPosSearch] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [ticketCustomer, setTicketCustomer] = useState<TicketCustomer | null>(null);
+  /**
+   * Unsaved fields of the typed customer form. The picker now unmounts with the
+   * POS route, so the draft lives here or a cashier loses what they typed by
+   * checking another screen and coming back.
+   */
+  const [customerDraft, setCustomerDraft] = useState<TicketCustomer>({ name: "", contact: "" });
   const [isCustomerPickerOpen, setIsCustomerPickerOpen] = useState(false);
   /**
    * Whether the phone POS shows its ticket screen instead of the catalogue.
@@ -134,8 +140,19 @@ export function usePos({
   };
 
   const clearTicketCustomer = () => setTicketCustomer(null);
-  const openCustomerPicker = () => setIsCustomerPickerOpen(true);
+  /** Opening starts from the attached customer, the way the form's mount used to. */
+  const openCustomerPicker = () => {
+    if (!isCustomerPickerOpen) {
+      setCustomerDraft({
+        name: ticketCustomer?.name ?? "",
+        contact: ticketCustomer?.contact ?? "",
+      });
+    }
+    setIsCustomerPickerOpen(true);
+  };
   const closeCustomerPicker = () => setIsCustomerPickerOpen(false);
+  const updateCustomerDraft = (field: keyof TicketCustomer, value: string) =>
+    setCustomerDraft((prev) => ({ ...prev, [field]: value }));
 
   /** Opens the confirm modal with the attached customer, if any, pre-filled. */
   const openConfirmModal = () => {
@@ -246,6 +263,8 @@ export function usePos({
     ticketCustomer,
     attachTicketCustomer,
     clearTicketCustomer,
+    customerDraft,
+    updateCustomerDraft,
     isCustomerPickerOpen,
     openCustomerPicker,
     closeCustomerPicker,

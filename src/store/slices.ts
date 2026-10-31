@@ -1,7 +1,7 @@
 import { useBakeryStore } from "./BakeryProvider";
 import { canAccessIngredients, canViewRecipeCosts } from "../utils/permissions";
 import type { BakeryStore } from "./BakeryProvider";
-import type { IngredientStock, User } from "../types/domain";
+import type { IngredientStock } from "../types/domain";
 
 export type InventorySlice = BakeryStore["inventory"];
 export type ClientsSlice = BakeryStore["clients"];
@@ -11,7 +11,6 @@ export type OrdersSlice = BakeryStore["orders"];
 export type ClosingSlice = BakeryStore["closing"];
 export type PosSlice = BakeryStore["pos"];
 
-export const useCurrentUser = (): User => useBakeryStore().currentUser;
 export const useInventorySlice = (): InventorySlice => useBakeryStore().inventory;
 export const useClientsSlice = (): ClientsSlice => useBakeryStore().clients;
 export const useRecipesSlice = (): RecipesSlice => useBakeryStore().recipes;
@@ -21,10 +20,10 @@ export const useClosingSlice = (): ClosingSlice => useBakeryStore().closing;
 export const usePosSlice = (): PosSlice => useBakeryStore().pos;
 
 export const useCanViewIngredients = (): boolean =>
-  canAccessIngredients(useCurrentUser().role);
+  canAccessIngredients(useBakeryStore().currentUser.role);
 
 export const useCanViewIngredientCosts = (): boolean =>
-  canViewRecipeCosts(useCurrentUser().role);
+  canViewRecipeCosts(useBakeryStore().currentUser.role);
 
 /**
  * Raw-material stock reduced to the one projection the screens may read. Its
