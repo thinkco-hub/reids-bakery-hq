@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { toContactDigits } from "../../utils/orders";
 import type { FormEvent } from "react";
 import type { TicketCustomer } from "../../types/domain";
@@ -84,7 +85,9 @@ export default function TicketCustomerInput({
     onAttach({ name: name.trim(), contact });
   };
 
-  return (
+  // Portalled to <body>: this overlay renders inside <main>, whose `relative z-10`
+  // would cap it below the shell's sidebar rail.
+  return createPortal(
     <div className="fixed inset-0 z-[100] bg-[#FDF9F3] flex flex-col animate-fadeIn">
       <header className="flex-shrink-0 bg-[#562D07] text-[#FDF9F3] p-4 flex items-center gap-3 shadow-md">
         <button
@@ -139,6 +142,7 @@ export default function TicketCustomerInput({
           </div>
         </div>
       </form>
-    </div>
+    </div>,
+    document.body
   );
 }

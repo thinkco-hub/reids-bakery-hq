@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import SelectField from "../common/SelectField";
 import type { RestockModalState, StockItem } from "../../types/domain";
 
@@ -23,7 +24,9 @@ export default function RestockModal({
   onConfirm,
   disabled,
 }: RestockModalProps) {
-  return (
+  // Portalled to <body>: this overlay renders inside <main>, whose `relative z-10`
+  // would cap it below the shell's sidebar rail.
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto animate-fadeIn">
         <h2 className="text-2xl font-bold text-[#121212] mb-1">
@@ -103,6 +106,7 @@ export default function RestockModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

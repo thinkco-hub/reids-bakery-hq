@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import ClientFormModal from "../clients/ClientFormModal";
 import { SearchIcon } from "../icons";
 import type {
@@ -44,7 +45,9 @@ export default function PosCustomerPicker({
     onAttach({ name: data.name, contact: data.contact });
   };
 
-  return (
+  // Portalled to <body>: this overlay renders inside <main>, whose `relative z-10`
+  // would cap it below the shell's sidebar rail.
+  return createPortal(
     <div className="fixed inset-0 z-[100] bg-[#FDF9F3] flex flex-col animate-fadeIn">
       {isFormOpen && (
         <ClientFormModal
@@ -122,7 +125,8 @@ export default function PosCustomerPicker({
           </ul>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
