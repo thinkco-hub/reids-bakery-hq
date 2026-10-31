@@ -70,7 +70,7 @@ export function usePos({
   const [cart, setCart] = useState<CartItem[]>([]);
   const [ticketCustomer, setTicketCustomer] = useState<TicketCustomer | null>(null);
   /**
-   * Unsaved fields of the typed customer form. The picker now unmounts with the
+   * Unsaved fields of the typed customer form. The picker unmounts with the
    * POS route, so the draft lives here or a cashier loses what they typed by
    * checking another screen and coming back.
    */
