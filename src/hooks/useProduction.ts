@@ -17,11 +17,11 @@ interface UseProductionOptions {
   /** Current recipes (used to resolve BOM lines when completing a run). */
   recipes: Recipe[];
   /**
-   * Inventory-owned ingredient deduction for completed batches. Injected by
-   * the app shell so stock updates stay owned by useInventory.
+   * Catalogue-owned ingredient deduction for completed batches. Injected by
+   * the app shell so stock updates stay with their one owner.
    */
   deductRecipeLines: (lines: RecipeIngredientLine[], batches: number) => void;
-  /** Inventory-owned stock increase for the produced menu item. */
+  /** Catalogue-owned stock increase for the produced menu item. */
   addMenuStock: (menuItemId: MenuItemId, amount: number) => void;
   currentUser: User | null;
   /** Seeded runs; a test fixture replaces the value from src/data. */

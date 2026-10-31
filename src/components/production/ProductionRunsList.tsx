@@ -9,12 +9,11 @@ import {
   RUN_STATUS_LABELS,
 } from "../../utils/status";
 import type {
+  CatalogueItem,
   IngredientStock,
-  MenuItemStock,
   ProductionRun,
   ProductionRunDisposition,
   ProductionRunId,
-  Recipe,
   ScheduleRunData,
 } from "../../types/domain";
 
@@ -27,8 +26,7 @@ const STAT_CARDS: Array<{ key: "all" | ProductionRunDisposition; label: string; 
 
 interface ProductionRunsListProps {
   productionRuns: ProductionRun[];
-  recipes: Recipe[];
-  menuInventory: MenuItemStock[];
+  catalogue: CatalogueItem[];
   ingredients: IngredientStock[];
   onSchedule: (data: ScheduleRunData) => void;
   onComplete: (id: ProductionRunId) => void;
@@ -37,8 +35,7 @@ interface ProductionRunsListProps {
 
 export default function ProductionRunsList({
   productionRuns,
-  recipes,
-  menuInventory,
+  catalogue,
   ingredients,
   onSchedule,
   onComplete,
@@ -51,7 +48,7 @@ export default function ProductionRunsList({
   const [pendingDelete, setPendingDelete] = useState<ProductionRun | null>(null);
 
   const withStatus = productionRuns.map((run) => {
-    const recipe = recipes.find((r) => r.id === run.recipeId) || null;
+    const recipe = catalogue.find((r) => r.id === run.recipeId) || null;
     return {
       run,
       recipe,
@@ -74,13 +71,7 @@ export default function ProductionRunsList({
     const { recipe, status } = entry;
     if (statusFilter !== "all" && status !== statusFilter) return false;
     if (!search) return true;
-    const menuItemName = recipe
-      ? menuInventory.find((m) => m.id === recipe.id)?.name ?? ""
-      : "";
-    return (
-      (recipe?.name ?? "").toLowerCase().includes(query) ||
-      menuItemName.toLowerCase().includes(query)
-    );
+    return (recipe?.name ?? "").toLowerCase().includes(query);
   });
 
   const sorted = [...filtered].sort((a, b) => a.run.plannedDate.localeCompare(b.run.plannedDate));
@@ -110,7 +101,7 @@ export default function ProductionRunsList({
   };
 
   const pendingRecipe = pendingDelete
-    ? recipes.find((recipe) => recipe.id === pendingDelete.recipeId)
+    ? catalogue.find((recipe) => recipe.id === pendingDelete.recipeId)
     : undefined;
 
   const confirmPendingDelete = () => {
@@ -123,7 +114,7 @@ export default function ProductionRunsList({
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       {isScheduling && (
-        <ScheduleRunModal recipes={recipes} onClose={() => setIsScheduling(false)} onSchedule={handleSchedule} />
+        <ScheduleRunModal recipes={catalogue} onClose={() => setIsScheduling(false)} onSchedule={handleSchedule} />
       )}
       {selectedModalEntry && (
         <RunDetailModal
@@ -156,14 +147,14 @@ export default function ProductionRunsList({
         </div>
         <button
           onClick={() => setIsScheduling(true)}
-          disabled={recipes.length === 0}
+          disabled={catalogue.length === 0}
           className="px-4 py-2.5 rounded-lg bg-[#562D07] hover:bg-[#3a1d04] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold text-sm shadow-sm transition-colors whitespace-nowrap"
         >
           + Schedule Production Run
         </button>
       </header>
 
-      {recipes.length === 0 && (
+      {catalogue.length === 0 && (
         <p className="text-sm text-gray-500 bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
           No recipes yet — create one under Recipes before scheduling a production run.
         </p>
@@ -198,7 +189,7 @@ export default function ProductionRunsList({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
-            placeholder="Search recipe or menu item..."
+            placeholder="Search recipes..."
           />
         </div>
       </div>
@@ -217,41 +208,37 @@ export default function ProductionRunsList({
               <div className="overflow-x-auto w-full">
                 <table className="w-full text-left border-collapse min-w-[720px]">
                   <tbody className="divide-y divide-gray-100 text-sm">
-                    {group.entries.map(({ run, recipe, status }) => {
-                      const menuItem = recipe ? menuInventory.find((m) => m.id === recipe.id) : null;
-                      return (
-                        <tr key={run.id} className="hover:bg-gray-50/50 transition-colors">
-                          <td className="px-5 py-4 font-medium text-gray-900">{recipe ? recipe.name : "—"}</td>
-                          <td className="px-5 py-4 text-gray-600">{menuItem ? menuItem.name : "—"}</td>
-                          <td className="px-5 py-4 text-gray-600">
-                            {run.plannedQty} {recipe ? recipe.yieldUnit : ""}
-                          </td>
-                          <td className="px-5 py-4">
-                            <span
-                              className={`px-3 py-1 rounded-full border text-xs font-bold whitespace-nowrap ${RUN_STATUS_BADGE_CLASSES[status]}`}
-                            >
-                              {RUN_STATUS_LABELS[status]}
-                            </span>
-                          </td>
-                          <td className="px-5 py-4 text-right whitespace-nowrap">
+                    {group.entries.map(({ run, recipe, status }) => (
+                      <tr key={run.id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="px-5 py-4 font-medium text-gray-900">{recipe ? recipe.name : "—"}</td>
+                        <td className="px-5 py-4 text-gray-600">
+                          {run.plannedQty} {recipe ? recipe.yieldUnit : ""}
+                        </td>
+                        <td className="px-5 py-4">
+                          <span
+                            className={`px-3 py-1 rounded-full border text-xs font-bold whitespace-nowrap ${RUN_STATUS_BADGE_CLASSES[status]}`}
+                          >
+                            {RUN_STATUS_LABELS[status]}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4 text-right whitespace-nowrap">
+                          <button
+                            onClick={() => setSelectedRunId(run.id)}
+                            className="text-gray-500 hover:text-[#F17D0C] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
+                          >
+                            {status === "completed" ? "View" : "View / Complete"}
+                          </button>
+                          {status !== "completed" && (
                             <button
-                              onClick={() => setSelectedRunId(run.id)}
-                              className="text-gray-500 hover:text-[#F17D0C] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
+                              onClick={() => setPendingDelete(run)}
+                              className="text-gray-400 hover:text-red-500 hover:bg-red-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                             >
-                              {status === "completed" ? "View" : "View / Complete"}
+                              Delete
                             </button>
-                            {status !== "completed" && (
-                              <button
-                                onClick={() => setPendingDelete(run)}
-                                className="text-gray-400 hover:text-red-500 hover:bg-red-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
-                              >
-                                Delete
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
+                          )}
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>

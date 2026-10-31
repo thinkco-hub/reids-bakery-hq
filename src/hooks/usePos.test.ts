@@ -1,14 +1,16 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { initialPosProducts } from "../data/initialProducts";
+import { initialCatalogue } from "../data/initialCatalogue";
 import { initialUsers } from "../data/initialUsers";
 import { getAuditLog } from "../utils/auditLog";
+import { toPosProducts } from "../utils/catalogue";
 import { addDaysISO, todayISO } from "../utils/dates";
 import { usePos } from "./usePos";
 import type { ConfirmModalState, OrderItem } from "../types/domain";
 
 const cashier = initialUsers.find((u) => u.email === "cashier@rbc.test") ?? initialUsers[0];
-const product = initialPosProducts[0];
+const posProducts = toPosProducts(initialCatalogue);
+const product = posProducts[0];
 const TOMORROW = addDaysISO(todayISO(), 1);
 
 type PosHook = ReturnType<typeof usePos>;
@@ -17,7 +19,7 @@ function mountPos() {
   const createOrderFromSale = vi.fn<() => string>(() => "#9001");
   const deductOrderLines = vi.fn<(lines: OrderItem[]) => void>();
   const view = renderHook(() =>
-    usePos({ posProducts: initialPosProducts, createOrderFromSale, deductOrderLines, currentUser: cashier })
+    usePos({ posProducts, createOrderFromSale, deductOrderLines, currentUser: cashier })
   );
   return { view, createOrderFromSale, deductOrderLines };
 }

@@ -36,6 +36,7 @@ const EMPTY_CONFIRM_MODAL: ConfirmModalState = {
 };
 
 interface UsePosOptions {
+  /** POS projection of the catalogue (posProducts in the store). */
   posProducts: PosProduct[];
   /**
    * Orders-owned pre-order creation. Returns the new order id, which the sale
@@ -44,8 +45,8 @@ interface UsePosOptions {
    */
   createOrderFromSale: (sale: Sale) => OrderId;
   /**
-   * Inventory-owned deduction for finished goods leaving stock at checkout.
-   * Injected by the app shell so stock updates stay owned by useInventory.
+   * Catalogue-owned deduction for finished goods leaving stock at checkout.
+   * Injected by the app shell so stock updates stay with their one owner.
    */
   deductOrderLines: (lines: OrderItem[]) => void;
   currentUser: User | null;

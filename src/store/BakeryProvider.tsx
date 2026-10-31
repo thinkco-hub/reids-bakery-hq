@@ -1,21 +1,17 @@
 import React, { createContext, useContext } from "react";
-import { initialPosProducts } from "../data/initialProducts";
+import { useCatalogue } from "../hooks/useCatalogue";
 import { useClients } from "../hooks/useClients";
 import { useClosing } from "../hooks/useClosing";
-import { useInventory } from "../hooks/useInventory";
 import { useOrders } from "../hooks/useOrders";
 import { usePos } from "../hooks/usePos";
 import { useProduction } from "../hooks/useProduction";
-import { useRecipes } from "../hooks/useRecipes";
 import type {
+  CatalogueItem,
   Client,
   IngredientStock,
   InventoryCount,
-  MenuItemStock,
   Order,
-  PosProduct,
   ProductionRun,
-  Recipe,
   RestockReminder,
   Sale,
   User,
@@ -26,23 +22,20 @@ import type {
  * hook starts from src/data exactly as it did when the shell called it.
  */
 export interface BakerySeed {
-  menuInventory?: MenuItemStock[];
+  catalogue?: CatalogueItem[];
   ingredients?: IngredientStock[];
   restockReminders?: RestockReminder[];
   clients?: Client[];
-  recipes?: Recipe[];
   productionRuns?: ProductionRun[];
   orders?: Order[];
   inventoryCounts?: InventoryCount[];
   sales?: Sale[];
-  posProducts?: PosProduct[];
 }
 
 export interface BakeryStore {
   currentUser: User;
-  inventory: ReturnType<typeof useInventory>;
+  catalogue: ReturnType<typeof useCatalogue>;
   clients: ReturnType<typeof useClients>;
-  recipes: ReturnType<typeof useRecipes>;
   production: ReturnType<typeof useProduction>;
   orders: ReturnType<typeof useOrders>;
   closing: ReturnType<typeof useClosing>;
@@ -60,48 +53,47 @@ interface BakeryProviderProps {
 /**
  * Calls every feature hook once and exposes the slices. It lives above the
  * router outlet, so swapping routes changes what reads the state, never the
- * state itself. The hooks are ordered by dependency: stock movements feed
- * orders, production and closing, and the POS needs orders to mint a linked
- * order.
+ * state itself. The hooks are ordered by dependency: the catalogue feeds stock
+ * movements to orders, production and closing, and the POS reads its products
+ * from the same records.
  */
 export function BakeryProvider({ currentUser, seed, children }: BakeryProviderProps) {
-  const inventory = useInventory({
+  const catalogue = useCatalogue({
     currentUser,
-    menuInventory: seed?.menuInventory,
+    catalogue: seed?.catalogue,
     ingredients: seed?.ingredients,
     restockReminders: seed?.restockReminders,
   });
   const clients = useClients({ currentUser, clients: seed?.clients });
-  const recipes = useRecipes({ currentUser, recipes: seed?.recipes });
   const production = useProduction({
-    recipes: recipes.recipes,
-    deductRecipeLines: inventory.deductRecipeLines,
-    addMenuStock: inventory.addMenuStock,
+    recipes: catalogue.stockItems,
+    deductRecipeLines: catalogue.deductRecipeLines,
+    addMenuStock: catalogue.addMenuStock,
     currentUser,
     productionRuns: seed?.productionRuns,
   });
   const orders = useOrders({
-    deductOrderLines: inventory.deductOrderLines,
+    deductOrderLines: catalogue.deductOrderLines,
     currentUser,
     orders: seed?.orders,
   });
   const closing = useClosing({
-    applyCountedQty: inventory.applyCountedQty,
-    applyPendingCounts: inventory.applyPendingCounts,
+    applyCountedQty: catalogue.applyCountedQty,
+    applyPendingCounts: catalogue.applyPendingCounts,
     currentUser,
     inventoryCounts: seed?.inventoryCounts,
   });
   const pos = usePos({
-    posProducts: seed?.posProducts ?? initialPosProducts,
+    posProducts: catalogue.posProducts,
     createOrderFromSale: orders.createOrderFromSale,
-    deductOrderLines: inventory.deductOrderLines,
+    deductOrderLines: catalogue.deductOrderLines,
     currentUser,
     sales: seed?.sales,
   });
 
   return (
     <BakeryContext.Provider
-      value={{ currentUser, inventory, clients, recipes, production, orders, closing, pos }}
+      value={{ currentUser, catalogue, clients, production, orders, closing, pos }}
     >
       {children}
     </BakeryContext.Provider>

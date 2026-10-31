@@ -1,27 +1,31 @@
 import { useState } from "react";
+import { initialCatalogue } from "../data/initialCatalogue";
 import {
   initialIngredients,
   initialRestockReminders,
 } from "../data/initialInventory";
-import { initialRecipes } from "../data/initialRecipes";
 import { recordAuditEvent } from "../utils/auditLog";
+import { DEFAULT_POS_COLOR, toPosProducts, trackedItems } from "../utils/catalogue";
 import type {
+  CatalogueItem,
   IngredientFormData,
   IngredientId,
   IngredientStock,
   InventoryCount,
   InventoryItemCategory,
   MenuItemId,
-  MenuItemStock,
   OrderItem,
+  PricingRuleInput,
+  PricingRules,
   Quantity,
+  Recipe,
   RecipeIngredientLine,
+  RecipeInput,
   RestockCategory,
   RestockModalState,
   RestockReminder,
   RestockReminderData,
   RestockReminderId,
-  StockItem,
   User,
 } from "../types/domain";
 
@@ -42,29 +46,32 @@ let nextReminderSeq = initialRestockReminders.length + 1;
 const nextReminderId = (): RestockReminderId =>
   `RR-${String(nextReminderSeq++).padStart(3, "0")}`;
 
-interface UseInventoryOptions {
+interface UseCatalogueOptions {
   currentUser: User | null;
   /** Seeded collections; a test fixture replaces the values from src/data. */
-  menuInventory?: MenuItemStock[];
+  catalogue?: CatalogueItem[];
   ingredients?: IngredientStock[];
   restockReminders?: RestockReminder[];
 }
 
 /**
- * Owns the inventory feature: menu item stock, raw ingredient stock, restock
- * reminders and the restock modal. All stock movements (order delivery,
- * production completion, reconciliation, restocking) flow through the
- * stock-movement actions below so the stock collections have a single owner.
+ * Owns the menu catalogue and the raw-material stock beside it: one record per
+ * menu item carries its recipe detail, POS presentation and finished-goods
+ * stock, so a recipe edit and a POS price are the same write. Stock movements
+ * target catalogue ids and skip untracked items, whose goods never enter stock.
  */
-export function useInventory({
+export function useCatalogue({
   currentUser,
-  menuInventory: seededMenuInventory,
+  catalogue: seededCatalogue,
   ingredients: seededIngredients,
   restockReminders: seededRestockReminders,
-}: UseInventoryOptions) {
-  const [menuInventory, setMenuInventory] = useState<MenuItemStock[]>(
-    seededMenuInventory ?? initialRecipes
+}: UseCatalogueOptions) {
+  const [catalogue, setCatalogue] = useState<CatalogueItem[]>(
+    seededCatalogue ?? initialCatalogue
   );
+  const [pricingRules, setPricingRules] = useState<PricingRules>({
+    targetMarginPercent: 40,
+  });
   const [ingredients, setIngredients] = useState<IngredientStock[]>(
     seededIngredients ?? initialIngredients
   );
@@ -73,32 +80,80 @@ export function useInventory({
   );
   const [restockModal, setRestockModal] = useState<RestockModalState>(EMPTY_RESTOCK_MODAL);
 
-  // deductOrderLines/deductRecipeLines/addMenuStock/applyCountedQty/applyPendingCounts
-  // are internal side effects invoked by useOrders/useProduction/useClosing, which
-  // already log the user-facing action they originate from — not logged again here.
-  const logInventoryEvent = (
-    action: "inventory.ingredient_added" | "inventory.ingredient_updated" | "inventory.restocked",
-    entityId: string,
-    details: string
-  ) => {
-    if (!currentUser) return;
-    recordAuditEvent({
-      userId: currentUser.id,
-      userName: currentUser.name,
-      userRole: currentUser.role,
-      action,
-      entityType: "Inventory",
-      entityId,
-      details,
+  const stockItems = trackedItems(catalogue);
+  const posProducts = toPosProducts(catalogue);
+
+  // --- RECIPES (FR-1.1, FR-2.x) ---
+  const saveRecipe = (recipe: RecipeInput) => {
+    const existing = catalogue.find((item) => item.id === recipe.id);
+    const savedId = existing
+      ? (recipe.id as string)
+      : `REC-${String(catalogue.length + 1).padStart(2, "0")}`;
+
+    setCatalogue((prev) => {
+      if (existing) {
+        // A recipe edit rewrites the catalogue record in place; the POS swatch
+        // and stock participation belong to the record, not the editor form.
+        return prev.map((item) =>
+          item.id === recipe.id
+            ? {
+                ...(recipe as Recipe),
+                id: item.id,
+                color: item.color,
+                trackedStock: item.trackedStock,
+              }
+            : item
+        );
+      }
+      return [
+        ...prev,
+        { ...(recipe as Recipe), id: savedId, color: DEFAULT_POS_COLOR, trackedStock: true },
+      ];
     });
+
+    if (currentUser) {
+      recordAuditEvent({
+        userId: currentUser.id,
+        userName: currentUser.name,
+        userRole: currentUser.role,
+        action: "recipe.saved",
+        entityType: "Recipe",
+        entityId: savedId,
+        details: `${existing ? "Updated" : "Created"} recipe ${savedId} (${recipe.name})`,
+      });
+    }
+  };
+
+  const updatePricingRule = (data: PricingRuleInput) => {
+    setPricingRules((prev) => ({
+      ...prev,
+      targetMarginPercent:
+        data.targetMarginPercent === "" ? "" : parseFloat(data.targetMarginPercent) || 0,
+    }));
   };
 
   // --- STOCK MOVEMENTS (consumed by orders, production and closing) ---
 
-  // Deducts the menu items of a delivered order (FR-8).
+  const setMenuQty = (id: string, qty: (prev: Quantity) => Quantity) => {
+    setCatalogue((prev) =>
+      prev.map((item) =>
+        item.id === id && item.trackedStock ? { ...item, qty: qty(item.qty) } : item
+      )
+    );
+  };
+
+  const setIngredientQty = (id: string, qty: (prev: Quantity) => Quantity) => {
+    setIngredients((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, qty: qty(item.qty) } : item))
+    );
+  };
+
+  // Deducts the menu items of a delivered order (FR-8). Untracked items have no
+  // stock row to move.
   const deductOrderLines = (lines: OrderItem[]) => {
-    setMenuInventory((prev) =>
+    setCatalogue((prev) =>
       prev.map((item) => {
+        if (!item.trackedStock) return item;
         const line = lines.find((l) => l.menuItemId === item.id);
         if (!line) return item;
         return { ...item, qty: Math.max(0, item.qty - line.qty) };
@@ -119,26 +174,7 @@ export function useInventory({
 
   // Adds completed production yield to a menu item's stock (FR-8).
   const addMenuStock = (menuItemId: MenuItemId, amount: number) => {
-    setMenuInventory((prev) =>
-      prev.map((item) =>
-        item.id === menuItemId ? { ...item, qty: item.qty + amount } : item
-      )
-    );
-  };
-
-  // Sets one stock item's qty in the collection matching the category.
-  const setQtyById = (
-    category: InventoryItemCategory,
-    id: string,
-    qty: (prev: Quantity) => Quantity
-  ) => {
-    const apply = <T extends StockItem>(item: T): T =>
-      item.id === id ? { ...item, qty: qty(item.qty) } : item;
-    if (category === "menu") {
-      setMenuInventory((prev) => prev.map(apply));
-    } else {
-      setIngredients((prev) => prev.map(apply));
-    }
+    setMenuQty(menuItemId, (qty) => qty + amount);
   };
 
   // Applies a resolved count to system stock (FR-4.5).
@@ -147,20 +183,58 @@ export function useInventory({
     itemId: string,
     countedQty: number
   ) => {
-    setQtyById(itemType, itemId, () => countedQty);
+    if (itemType === "menu") {
+      setMenuQty(itemId, () => countedQty);
+    } else {
+      setIngredientQty(itemId, () => countedQty);
+    }
   };
 
   // Bulk-applies pending reconciliation counts (FR-4.5).
   const applyPendingCounts = (pending: InventoryCount[]) => {
-    pending.forEach((count) => {
-      setQtyById(count.itemType, count.itemId, () => count.countedQty);
+    const menuCounts = pending.filter((count) => count.itemType === "menu");
+    if (menuCounts.length > 0) {
+      setCatalogue((prev) =>
+        prev.map((item) => {
+          if (!item.trackedStock) return item;
+          const count = menuCounts.find((c) => c.itemId === item.id);
+          return count ? { ...item, qty: count.countedQty } : item;
+        })
+      );
+    }
+
+    const ingredientCounts = pending.filter((count) => count.itemType === "ingredient");
+    if (ingredientCounts.length > 0) {
+      setIngredients((prev) =>
+        prev.map((item) => {
+          const count = ingredientCounts.find((c) => c.itemId === item.id);
+          return count ? { ...item, qty: count.countedQty } : item;
+        })
+      );
+    }
+  };
+
+  const logInventoryEvent = (
+    action: "inventory.ingredient_added" | "inventory.ingredient_updated" | "inventory.restocked",
+    entityId: string,
+    details: string
+  ) => {
+    if (!currentUser) return;
+    recordAuditEvent({
+      userId: currentUser.id,
+      userName: currentUser.name,
+      userRole: currentUser.role,
+      action,
+      entityType: "Inventory",
+      entityId,
+      details,
     });
   };
 
   // --- RESTOCKING (FR-1.2) ---
   const openRestock = (category: RestockCategory, itemId = "") => {
-    const defaultId =
-      itemId || (category === "menu" ? menuInventory[0].id : ingredients[0].id);
+    const items = category === "menu" ? stockItems : ingredients;
+    const defaultId = itemId || items[0].id;
     setRestockModal({
       isOpen: true,
       category: category,
@@ -173,7 +247,8 @@ export function useInventory({
     const amount = parseInt(restockModal.amountToAdd);
     if (isNaN(amount) || amount <= 0) return;
 
-    setQtyById(restockModal.category, restockModal.selectedItemId, (qty) => qty + amount);
+    const setQty = restockModal.category === "menu" ? setMenuQty : setIngredientQty;
+    setQty(restockModal.selectedItemId, (qty) => qty + amount);
     logInventoryEvent(
       "inventory.restocked",
       restockModal.selectedItemId,
@@ -221,14 +296,18 @@ export function useInventory({
     );
   };
 
-  // --- RESTOCK MODAL DERIVED VALUES ---
-  const restockItems =
-    restockModal.category === "menu" ? menuInventory : ingredients;
+  // --- DERIVED VALUES ---
+  const restockItems = restockModal.category === "menu" ? stockItems : ingredients;
   const isRestockConfirmDisabled =
     !restockModal.amountToAdd || parseInt(restockModal.amountToAdd) <= 0;
 
   return {
-    menuInventory,
+    catalogue,
+    stockItems,
+    posProducts,
+    pricingRules,
+    saveRecipe,
+    updatePricingRule,
     ingredients,
     restockReminders,
     restockModal,

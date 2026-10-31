@@ -3,17 +3,15 @@ import { canAccessIngredients, canViewRecipeCosts } from "../utils/permissions";
 import type { BakeryStore } from "./BakeryProvider";
 import type { IngredientStock } from "../types/domain";
 
-export type InventorySlice = BakeryStore["inventory"];
+export type CatalogueSlice = BakeryStore["catalogue"];
 export type ClientsSlice = BakeryStore["clients"];
-export type RecipesSlice = BakeryStore["recipes"];
 export type ProductionSlice = BakeryStore["production"];
 export type OrdersSlice = BakeryStore["orders"];
 export type ClosingSlice = BakeryStore["closing"];
 export type PosSlice = BakeryStore["pos"];
 
-export const useInventorySlice = (): InventorySlice => useBakeryStore().inventory;
+export const useCatalogueSlice = (): CatalogueSlice => useBakeryStore().catalogue;
 export const useClientsSlice = (): ClientsSlice => useBakeryStore().clients;
-export const useRecipesSlice = (): RecipesSlice => useBakeryStore().recipes;
 export const useProductionSlice = (): ProductionSlice => useBakeryStore().production;
 export const useOrdersSlice = (): OrdersSlice => useBakeryStore().orders;
 export const useClosingSlice = (): ClosingSlice => useBakeryStore().closing;
@@ -34,6 +32,6 @@ export const useCanViewIngredientCosts = (): boolean =>
  * unit cost is suppressed by useCanViewIngredientCosts instead.
  */
 export function useVisibleIngredients(): IngredientStock[] {
-  const ingredients = useInventorySlice().ingredients;
+  const ingredients = useCatalogueSlice().ingredients;
   return useCanViewIngredients() ? ingredients : [];
 }

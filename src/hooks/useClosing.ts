@@ -19,8 +19,8 @@ import type {
 
 interface UseClosingOptions {
   /**
-   * Inventory-owned stock corrections for reconciled counts. Injected by the
-   * app shell so stock updates stay owned by useInventory.
+   * Catalogue-owned stock corrections for reconciled counts. Injected by the
+   * app shell so stock updates stay with their one owner.
    */
   applyCountedQty: (itemType: InventoryItemCategory, itemId: string, countedQty: number) => void;
   applyPendingCounts: (pending: InventoryCount[]) => void;

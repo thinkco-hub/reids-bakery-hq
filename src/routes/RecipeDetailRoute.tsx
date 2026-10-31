@@ -5,8 +5,7 @@ import RecordRoute from "../components/common/RecordRoute";
 import { RequireTab } from "../components/RequireAccess";
 import {
   useCanViewIngredientCosts,
-  useInventorySlice,
-  useRecipesSlice,
+  useCatalogueSlice,
 } from "../store/slices";
 import { PATH_BY_TAB } from "../routes";
 import type { RecipeInput } from "../types/domain";
@@ -15,8 +14,7 @@ import { useShell } from "./shell";
 /** `/recipes/:recipeId` — the editor opened on the recipe the URL names. */
 export default function RecipeDetailRoute() {
   const { currentUser, backToList, openPath } = useShell();
-  const { recipes, pricingRules, saveRecipe } = useRecipesSlice();
-  const { ingredients } = useInventorySlice();
+  const { stockItems, ingredients, pricingRules, saveRecipe } = useCatalogueSlice();
   const canViewIngredientCosts = useCanViewIngredientCosts();
   const { recipeId = "" } = useParams();
   const onBack = () => backToList(PATH_BY_TAB.recipes);
@@ -28,7 +26,7 @@ export default function RecipeDetailRoute() {
 
   return (
     <RequireTab role={currentUser.role} tab="recipes">
-      <RecordRoute items={recipes} id={recipeId} kind="Recipe" onBack={onBack}>
+      <RecordRoute items={stockItems} id={recipeId} kind="Recipe" onBack={onBack}>
         {(recipe) => (
           <RecipeEditor
             recipe={recipe}
