@@ -138,13 +138,8 @@ export interface Order {
   editHistory?: EditHistoryEntry[];
 }
 
-/** Order payload consumed by useOrders.buildOrder; POS is the only creator. */
-export interface CreateOrderData {
-  clientId: ClientId;
-  requestedDate: ISODate;
-  notes: string;
-  items: Array<Pick<OrderItem, "menuItemId" | "qty" | "unitPrice">>;
-}
+/** Order fields before useOrders mints the id (utils/checkout.buildOrderFromSale). */
+export type OrderDraft = Omit<Order, "id">;
 
 /** Payload of the record-payment modal (OrderDetail). */
 export interface OrderPaymentInput {
@@ -205,6 +200,8 @@ export interface TicketCustomer {
 
 export interface Sale {
   id: SaleId;
+  /** Set on Order-type sales: the order that owns customer/item edits. */
+  orderId?: OrderId;
   type: SaleType;
   customerName: string;
   customerContact: string;
@@ -225,6 +222,26 @@ export interface EditSaleInput {
   customerName: string;
   customerContact: string;
   items: CartItem[];
+}
+
+/** A reason a checkout cannot be confirmed (utils/checkout). */
+export type CheckoutError =
+  | "customer-name"
+  | "customer-contact"
+  | "payment-method"
+  | "delivery-date";
+
+/** Result of the single checkout rule (utils/checkout). */
+export interface CheckoutValidation {
+  isValid: boolean;
+  errors: CheckoutError[];
+}
+
+/** Money owed for one sale's lines (utils/checkout). */
+export interface SaleTotals {
+  subtotal: number;
+  tax: number;
+  total: number;
 }
 
 /** State of the order confirmation modal (OrderConfirmationModal). */

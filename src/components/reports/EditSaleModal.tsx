@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import EditHistoryList from "../common/EditHistoryList";
 import SelectField from "../common/SelectField";
 import { initialPosProducts } from "../../data/initialProducts";
+import { computeSaleTotals } from "../../utils/checkout";
 import { formatMoney } from "../../utils/money";
 import type { FormEvent } from "react";
 import { isValidCustomerContact, toContactDigits } from "../../utils/orders";
@@ -41,8 +42,12 @@ export default function EditSaleModal({ sale, onClose, onSave }: EditSaleModalPr
   const removeLine = (idx: number) => setLines((prev) => prev.filter((_, i) => i !== idx));
 
   const cleanLines = lines.filter((l) => (parseFloat(l.qty) || 0) >= 1);
-  const newSubtotal = cleanLines.reduce((sum, l) => sum + l.item.price * (parseFloat(l.qty) || 0), 0);
-  const canSave = !!customerName.trim() && isValidCustomerContact(customerContact) && cleanLines.length > 0;
+  const cleanItems: CartItem[] = cleanLines.map((l) => ({
+    ...l.item,
+    qty: parseFloat(l.qty) || 0,
+  }));
+  const canSave =
+    !!customerName.trim() && isValidCustomerContact(customerContact) && cleanItems.length > 0;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -50,7 +55,7 @@ export default function EditSaleModal({ sale, onClose, onSave }: EditSaleModalPr
     onSave({
       customerName: customerName.trim(),
       customerContact: customerContact.trim(),
-      items: cleanLines.map((l) => ({ ...l.item, qty: parseFloat(l.qty) || 0 })),
+      items: cleanItems,
     });
   };
 
@@ -146,7 +151,9 @@ export default function EditSaleModal({ sale, onClose, onSave }: EditSaleModalPr
 
           <div className="flex justify-between items-center bg-gray-50 rounded-lg px-4 py-3">
             <span className="text-sm font-semibold text-gray-700">New Total (incl. tax)</span>
-            <span className="text-lg font-bold text-[#F17D0C]">{formatMoney(newSubtotal * 1.05)}</span>
+            <span className="text-lg font-bold text-[#F17D0C]">
+              {formatMoney(computeSaleTotals(cleanItems).total)}
+            </span>
           </div>
 
           {sale.editHistory && sale.editHistory.length > 0 && (

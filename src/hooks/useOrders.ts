@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { initialOrders } from "../data/initialOrders";
 import { recordAuditEvent } from "../utils/auditLog";
+import { buildOrderFromSale } from "../utils/checkout";
 import { todayISO } from "../utils/dates";
 import { buildEditHistoryEntry, diffField, diffLines } from "../utils/editHistory";
 import {
@@ -11,8 +12,6 @@ import {
 } from "../utils/orders";
 import type {
   AuditActionType,
-  ClientId,
-  CreateOrderData,
   EditOrderInput,
   FieldEdit,
   Order,
@@ -29,31 +28,6 @@ import type {
 // IDs never collide with the initial data (or with each other after deletes).
 let nextOrderSeq = 1048 + initialOrders.length;
 const nextOrderId = (): OrderId => `#${nextOrderSeq++}`;
-
-/** Shared order construction for createOrderFromSale. */
-const buildOrder = (
-  id: OrderId,
-  data: Omit<CreateOrderData, "clientId"> & {
-    clientId: ClientId | null;
-    customerName?: string;
-    customerContact?: string;
-  }
-): Order => ({
-  id,
-  clientId: data.clientId,
-  customerName: data.customerName,
-  customerContact: data.customerContact,
-  items: data.items,
-  requestedDate: data.requestedDate,
-  status: "Pending",
-  notes: data.notes,
-  deliveryDate: null,
-  assignedTo: null,
-  createdAt: todayISO(),
-  deliveredAt: null,
-  paymentMethod: null,
-  amountPaid: 0,
-});
 
 interface UseOrdersOptions {
   /**
@@ -89,35 +63,17 @@ export function useOrders({ deductOrderLines, currentUser }: UseOrdersOptions) {
     });
   };
 
-  const createOrderFromSale = (sale: Sale) => {
-    const today = todayISO();
-    const order: Order = buildOrder(nextOrderId(), {
-      clientId: null,
-      customerName: sale.customerName,
-      customerContact: sale.customerContact,
-      items: sale.items.map((item) => ({
-        menuItemId: item.id,
-        name: item.name,
-        qty: item.qty,
-        unitPrice: item.price,
-      })),
-      requestedDate: today,
-      notes: sale.notes
-        ? `Placed via POS Order — ${sale.notes}`
-        : "Placed via POS Order",
-    });
-    const finalOrder: Order = {
-      ...order,
-      deliveryDate: sale.deliveryDate,
-      paymentMethod: sale.paymentMethod,
-      amountPaid: sale.total,
-    };
-    setOrders((prev) => [finalOrder, ...prev]);
+  /** Creates the order side of a POS Order-type sale and returns its new id,
+   *  which the sale stores as `Sale.orderId`. */
+  const createOrderFromSale = (sale: Sale): OrderId => {
+    const order: Order = { ...buildOrderFromSale(sale), id: nextOrderId() };
+    setOrders((prev) => [order, ...prev]);
     logOrderEvent(
       "order.created",
-      finalOrder.id,
-      `Created order ${finalOrder.id} via POS${finalOrder.customerName ? ` for ${finalOrder.customerName}` : ""}`
+      order.id,
+      `Created order ${order.id} via POS${order.customerName ? ` for ${order.customerName}` : ""}`
     );
+    return order.id;
   };
 
   /**

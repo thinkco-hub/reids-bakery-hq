@@ -1,16 +1,21 @@
 import { useState } from "react";
 import { recordAuditEvent } from "../utils/auditLog";
+import {
+  buildSale,
+  buildSaleEdit,
+  computeSaleTotals,
+  toOrderLines,
+  validateCheckout,
+} from "../utils/checkout";
 import { todayISO } from "../utils/dates";
-import { buildEditHistoryEntry, diffField, diffLines } from "../utils/editHistory";
 import { formatMoney } from "../utils/money";
-import { isValidCustomerContact, toContactDigits } from "../utils/orders";
+import { toContactDigits } from "../utils/orders";
 import type {
   CartItem,
   ConfirmModalState,
   EditSaleInput,
-  FieldEdit,
+  OrderId,
   OrderItem,
-  PaymentMethod,
   PosCategory,
   PosProduct,
   Sale,
@@ -30,19 +35,14 @@ const EMPTY_CONFIRM_MODAL: ConfirmModalState = {
   notes: "",
 };
 
-/** VAT applied to every sale subtotal. */
-const SALES_TAX_RATE = 0.05;
-
-/** How one sale line reads in an edit-history entry. */
-const describeSaleLine = (line: CartItem) => `${line.qty} × ${line.name}`;
-
 interface UsePosOptions {
   posProducts: PosProduct[];
   /**
-   * Orders-owned pre-order creation for deliveries scheduled after today.
-   * Injected by the app shell so order state stays owned by useOrders.
+   * Orders-owned pre-order creation. Returns the new order id, which the sale
+   * stores as its `orderId`. Injected by the app shell so order state stays
+   * owned by useOrders.
    */
-  createOrderFromSale: (sale: Sale) => void;
+  createOrderFromSale: (sale: Sale) => OrderId;
   /**
    * Inventory-owned deduction for finished goods leaving stock at checkout.
    * Injected by the app shell so stock updates stay owned by useInventory.
@@ -86,12 +86,7 @@ export function usePos({
       (!searchQuery || p.name.toLowerCase().includes(searchQuery))
   );
 
-  const cartSubtotal = cart.reduce(
-    (sum, item) => sum + item.price * item.qty,
-    0
-  );
-  const cartTax = cartSubtotal * SALES_TAX_RATE;
-  const cartTotal = cartSubtotal + cartTax;
+  const { subtotal: cartSubtotal, tax: cartTax, total: cartTotal } = computeSaleTotals(cart);
   /** Units ringing up, so repeats of one product count as the cashier rang them. */
   const cartQty = cart.reduce((sum, item) => sum + item.qty, 0);
   const today = todayISO();
@@ -151,31 +146,17 @@ export function usePos({
 
   // --- CHECKOUT (FR-5, FR-8) ---
   const completeSale = () => {
-    // Orders (chosen explicitly in the modal) are tracked in the Orders view;
-    // walk-ins only appear in Sales.
-    const isOrder = confirmModal.saleType === "Order";
-    // Guardrail: never confirm without a complete contact number
-    // (also enforced by isConfirmOrderDisabled).
-    if (!isValidCustomerContact(confirmModal.customerContact)) return;
-    // An Order must be delivered after today (also enforced by isConfirmOrderDisabled).
-    if (isOrder && !(confirmModal.deliveryDate > today)) return;
-    const sale: Sale = {
-      id: `SALE-${String(sales.length + 1).padStart(4, "0")}`,
-      type: confirmModal.saleType,
-      customerName: confirmModal.customerName.trim(),
-      customerContact: confirmModal.customerContact.trim(),
-      // Confirm is disabled until a payment method is chosen (isConfirmOrderDisabled).
-      paymentMethod: confirmModal.paymentMethod as PaymentMethod,
-      items: cart,
-      subtotal: cartSubtotal,
-      tax: cartTax,
-      total: cartTotal,
-      // Only Orders carry a delivery date; walk-ins are handed over today.
-      deliveryDate: isOrder && confirmModal.deliveryDate ? confirmModal.deliveryDate : today,
-      notes: confirmModal.notes.trim(),
-      createdAt: new Date().toISOString(),
-    };
-    setSales((prev) => [sale, ...prev]);
+    const sale = buildSale(confirmModal, cart);
+    // The same checkout rule disables the confirm button; re-checking here
+    // closes the window between the render and the click.
+    if (!sale) return;
+
+    // An Order-type sale is one sale plus one order: the order owns later
+    // customer/item edits, the sale is the record of what was paid.
+    const finalSale: Sale =
+      sale.type === "Order" ? { ...sale, orderId: createOrderFromSale(sale) } : sale;
+
+    setSales((prev) => [finalSale, ...prev]);
     if (currentUser) {
       recordAuditEvent({
         userId: currentUser.id,
@@ -183,71 +164,34 @@ export function usePos({
         userRole: currentUser.role,
         action: "sale.completed",
         entityType: "Sale",
-        entityId: sale.id,
-        details: `${sale.type} sale ${sale.id} completed (${sale.items.length} line${sale.items.length === 1 ? "" : "s"}, ${formatMoney(sale.total)}, ${sale.paymentMethod})`,
+        entityId: finalSale.id,
+        details: `${finalSale.type} sale ${finalSale.id} completed (${finalSale.items.length} line${finalSale.items.length === 1 ? "" : "s"}, ${formatMoney(finalSale.total)}, ${finalSale.paymentMethod})`,
       });
     }
-    if (isOrder) {
-      // Stock for an order is deducted when the order is delivered
-      // (markOrderDelivered -> deductOrderLines), not at placement.
-      createOrderFromSale(sale);
-    } else {
-      // Walk-in goods leave stock immediately at checkout (FR-8).
-      deductOrderLines(
-        sale.items.map((item) => ({
-          menuItemId: item.id,
-          name: item.name,
-          qty: item.qty,
-          unitPrice: item.price,
-        }))
-      );
-    }
+    // A linked order's stock waits for delivery (markOrderDelivered); a
+    // walk-in's goods leave stock now (FR-8).
+    if (!finalSale.orderId) deductOrderLines(toOrderLines(finalSale.items));
+
     setCart([]);
     setTicketCustomer(null);
     setIsTicketViewOpen(false);
     setConfirmModal(EMPTY_CONFIRM_MODAL);
-    setReceipt(sale);
+    setReceipt(finalSale);
   };
 
   /**
-   * Edits a completed sale's customer details or items from the sales log,
-   * appending a history entry per changed field. Money totals are recomputed
-   * from the saved lines; reports, CSV export and reprinted receipts follow.
+   * Edits a walk-in sale's customer details or items from the sales log,
+   * appending a history entry per changed field. Linked sales are refused:
+   * their order is the only editor. Totals are recomputed from the saved
+   * lines; reports, CSV export and reprinted receipts follow.
    */
   const editSale = (id: SaleId, input: EditSaleInput) => {
     const sale = sales.find((s) => s.id === id);
     if (!sale) return;
-    // Guardrails mirrored by the disabled Save in EditSaleModal.
-    if (!input.customerName.trim()) return;
-    if (!isValidCustomerContact(input.customerContact)) return;
+    const result = buildSaleEdit(sale, input, currentUser?.name || "Unknown");
+    if (!result) return;
 
-    const changes: FieldEdit[] = [];
-    const name = diffField("customerName", "Customer name", sale.customerName, input.customerName);
-    if (name) changes.push(name);
-    const contact = diffField("customerContact", "Contact number", sale.customerContact, input.customerContact);
-    if (contact) changes.push(contact);
-    const items = diffLines("items", "Ordered items", sale.items, input.items, describeSaleLine);
-    if (items) changes.push(items);
-    if (changes.length === 0) return;
-
-    const entry = buildEditHistoryEntry(currentUser?.name || "Unknown", changes);
-    setSales((prev) =>
-      prev.map((s) => {
-        if (s.id !== id) return s;
-        const subtotal = input.items.reduce((sum, item) => sum + item.price * item.qty, 0);
-        const tax = subtotal * SALES_TAX_RATE;
-        return {
-          ...s,
-          customerName: input.customerName.trim(),
-          customerContact: input.customerContact.trim(),
-          items: input.items,
-          subtotal,
-          tax,
-          total: subtotal + tax,
-          editHistory: [...(s.editHistory || []), entry],
-        };
-      })
-    );
+    setSales((prev) => prev.map((s) => (s.id === id ? result.sale : s)));
     if (currentUser) {
       recordAuditEvent({
         userId: currentUser.id,
@@ -256,7 +200,7 @@ export function usePos({
         action: "sale.edited",
         entityType: "Sale",
         entityId: id,
-        details: `Edited sale ${id}: ${changes.map((c) => `${c.label} "${c.from}" -> "${c.to}"`).join("; ")}`,
+        details: `Edited sale ${id}: ${result.changes.map((c) => `${c.label} "${c.from}" -> "${c.to}"`).join("; ")}`,
       });
     }
   };
@@ -281,13 +225,7 @@ export function usePos({
     setConfirmModal(EMPTY_CONFIRM_MODAL);
   };
 
-  // Every sale type needs a reachable customer, so the contact must be a full
-  // number; an Order additionally needs a delivery date after today.
-  const isConfirmOrderDisabled =
-    !confirmModal.paymentMethod ||
-    !confirmModal.customerName.trim() ||
-    !isValidCustomerContact(confirmModal.customerContact) ||
-    (confirmModal.saleType === "Order" && !(confirmModal.deliveryDate > today));
+  const isConfirmOrderDisabled = !validateCheckout(confirmModal).isValid;
 
   return {
     posCategory,

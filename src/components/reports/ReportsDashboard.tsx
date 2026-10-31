@@ -3,6 +3,7 @@ import RevenueByDayChart from "./RevenueByDayChart";
 import SellerBarList from "./SellerBarList";
 import EditSaleModal from "./EditSaleModal";
 import { SearchIcon } from "../icons";
+import { linkedSaleView } from "../../utils/checkout";
 import { formatDateTime } from "../../utils/dates";
 import { formatMoney } from "../../utils/money";
 import {
@@ -20,6 +21,7 @@ import {
 import type {
   DatePresetId,
   EditSaleInput,
+  Order,
   PaymentMethod,
   RevenueByPaymentMethod,
   Sale,
@@ -109,11 +111,17 @@ function PaymentDonut({ data }: { data: RevenueByPaymentMethod[] }) {
 
 interface ReportsDashboardProps {
   sales: Sale[];
+  orders: Order[];
   onReprintSale?: (sale: Sale) => void;
   onSaveSaleEdit: (id: SaleId, input: EditSaleInput) => void;
 }
 
-export default function ReportsDashboard({ sales, onReprintSale, onSaveSaleEdit }: ReportsDashboardProps) {
+export default function ReportsDashboard({
+  sales,
+  orders,
+  onReprintSale,
+  onSaveSaleEdit,
+}: ReportsDashboardProps) {
   const [preset, setPreset] = useState<DatePresetId | "custom">("month");
   const [customStart, setCustomStart] = useState("");
   const [customEnd, setCustomEnd] = useState("");
@@ -125,9 +133,16 @@ export default function ReportsDashboard({ sales, onReprintSale, onSaveSaleEdit 
     return getPresetRange(preset);
   }, [preset, customStart, customEnd]);
 
+  // An Order-type sale reports as its linked order currently stands; a walk-in
+  // reports as recorded.
+  const reportSales = useMemo(
+    () => sales.map((sale) => linkedSaleView(sale, orders)),
+    [sales, orders]
+  );
+
   const filteredSales = useMemo(() => {
-    return filterSalesByRange(sales, range.start, range.end).slice().sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
-  }, [sales, range.start, range.end]);
+    return filterSalesByRange(reportSales, range.start, range.end).slice().sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+  }, [reportSales, range.start, range.end]);
 
   const summary = useMemo(() => computeSalesSummary(filteredSales), [filteredSales]);
   const bestSellers = useMemo(() => getBestSellers(filteredSales, 5), [filteredSales]);
@@ -322,20 +337,23 @@ export default function ReportsDashboard({ sales, onReprintSale, onSaveSaleEdit 
                     <td className="px-6 py-3 text-gray-600">{sale.paymentMethod}</td>
                     <td className="px-6 py-3 text-right font-semibold text-gray-900">{formatMoney(sale.total)}</td>
                     <td className="px-6 py-3 text-right">
-                      <button
-                        onClick={() => setEditingSale(sale)}
-                        title="Edit sale details"
-                        className="p-2 rounded-lg text-gray-400 hover:text-[#562D07] hover:bg-orange-50 transition-colors"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                          />
-                        </svg>
-                      </button>
+                      {/* A linked sale's order is its only editor. */}
+                      {!sale.orderId && (
+                        <button
+                          onClick={() => setEditingSale(sale)}
+                          title="Edit sale details"
+                          className="p-2 rounded-lg text-gray-400 hover:text-[#562D07] hover:bg-orange-50 transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                            />
+                          </svg>
+                        </button>
+                      )}
                     </td>
                     <td className="px-6 py-3 text-right">
                       <button

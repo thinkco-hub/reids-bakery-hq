@@ -611,6 +611,7 @@ export default function BakeryCommandCenter() {
                 <RequireTab role={role} tab="reports-dashboard">
                   <ReportsDashboard
                     sales={sales}
+                    orders={orders}
                     onReprintSale={setReceipt}
                     onSaveSaleEdit={editSale}
                   />
