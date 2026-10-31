@@ -573,7 +573,6 @@ export default function BakeryCommandCenter() {
                     canViewIngredientCosts={canViewIngredientCosts}
                     pricingRules={pricingRules}
                     onSave={saveRecipeAndReturn}
-                    onCancel={() => backToList(PATH_BY_TAB.recipes)}
                     onBack={() => backToList(PATH_BY_TAB.recipes)}
                   />
                 </RequireTab>

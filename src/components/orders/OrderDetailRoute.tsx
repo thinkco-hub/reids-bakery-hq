@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams } from "react-router";
 import OrderDetail from "./OrderDetail";
-import RecordNotFound from "../common/RecordNotFound";
+import RecordRoute from "../common/RecordRoute";
 import type {
   Client,
   EditOrderInput,
@@ -26,11 +26,7 @@ interface OrderDetailRouteProps {
   onBack: () => void;
 }
 
-/**
- * `/orders/:orderId` — the detail panel addressed by the record instead of by
- * app-shell state. The lookup reads the same array the shell already owns, so
- * wiring a store later changes this line and nothing above it.
- */
+/** `/orders/:orderId` — the detail panel addressed by the record instead of by app-shell state. */
 export default function OrderDetailRoute({
   orders,
   clients,
@@ -44,24 +40,23 @@ export default function OrderDetailRoute({
   onBack,
 }: OrderDetailRouteProps) {
   const { orderId = "" } = useParams();
-  const order = orders.find((o) => o.id === orderId);
-
-  if (!order) {
-    return <RecordNotFound kind="Order" id={orderId} onBack={onBack} />;
-  }
 
   return (
-    <OrderDetail
-      order={order}
-      client={clients.find((c) => c.id === order.clientId)}
-      menuInventory={menuInventory}
-      onBack={onBack}
-      onAdvanceStatus={onAdvanceStatus}
-      onScheduleDelivery={onScheduleDelivery}
-      onMarkDelivered={onMarkDelivered}
-      onRecordPayment={onRecordPayment}
-      onEditOrder={onEditOrder}
-      onGoToProduction={onGoToProduction}
-    />
+    <RecordRoute items={orders} id={orderId} kind="Order" onBack={onBack}>
+      {(order) => (
+        <OrderDetail
+          order={order}
+          client={clients.find((c) => c.id === order.clientId)}
+          menuInventory={menuInventory}
+          onBack={onBack}
+          onAdvanceStatus={onAdvanceStatus}
+          onScheduleDelivery={onScheduleDelivery}
+          onMarkDelivered={onMarkDelivered}
+          onRecordPayment={onRecordPayment}
+          onEditOrder={onEditOrder}
+          onGoToProduction={onGoToProduction}
+        />
+      )}
+    </RecordRoute>
   );
 }
