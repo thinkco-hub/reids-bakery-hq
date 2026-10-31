@@ -21,7 +21,7 @@ describe("formatMoney", () => {
 
 describe("formatMoneyAscii", () => {
   it("uses the PDF-safe prefix", () => {
-    expect(formatMoneyAscii(240)).toBe("PhP240.00");
+    expect(formatMoneyAscii(240)).toBe("Php240.00");
   });
 
   it("matches the DOM amount, differing only in the currency mark", () => {

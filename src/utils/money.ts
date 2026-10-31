@@ -11,5 +11,5 @@ export function formatMoney(value: number): string {
  * the peso sign, so the PDF uses an ASCII prefix instead.
  */
 export function formatMoneyAscii(value: number): string {
-  return `PhP${value.toFixed(2)}`;
+  return `Php${value.toFixed(2)}`;
 }
