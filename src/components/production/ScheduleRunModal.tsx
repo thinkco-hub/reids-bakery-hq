@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { createPortal } from "react-dom";
+import React, { useId, useState } from "react";
+import Modal from "../common/Modal";
 import { todayISO } from "../../utils/dates";
 import { computeBatches } from "../../utils/production";
 import type { FormEvent } from "react";
@@ -25,6 +25,7 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
   });
 
   const recipe = recipes.find((r) => r.id === form.recipeId);
+  const headingId = useId();
   const qtyNum = parseFloat(form.qty) || 0;
   const isBatchMode = form.qtyUnit === "batch";
   const batches = recipe ? (isBatchMode ? qtyNum : computeBatches(qtyNum, recipe)) : 0;
@@ -41,19 +42,15 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
     });
   };
 
-  // Portalled to <body>: <main> is `relative z-10`, which caps this overlay's z-[100]
-  // below the mobile top bar's z-30. Same trap RunDetailModal had.
-  return createPortal(
-    <div
-      onClick={(event) => event.target === event.currentTarget && onClose()}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+  return (
+    <Modal
+      labelledBy={headingId}
+      onClose={onClose}
+      className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-fadeIn max-h-[85dvh] flex flex-col overflow-hidden"
     >
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-fadeIn max-h-[85dvh] flex flex-col overflow-hidden"
-      >
-        <div className="flex-1 min-h-0 overflow-y-auto p-6 md:p-8">
-          <h2 className="text-2xl font-bold text-[#121212] mb-1">Schedule Production Run</h2>
+      <form onSubmit={handleSubmit} className="flex-1 min-h-0 flex flex-col">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-6 md:p-8">
+          <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-1">Schedule Production Run</h2>
           <p className="text-gray-500 text-sm mb-6">Plan a batch run for a recipe.</p>
 
           <div className="space-y-4">
@@ -141,7 +138,6 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
           </button>
         </div>
       </form>
-    </div>,
-    document.body
+    </Modal>
   );
 }

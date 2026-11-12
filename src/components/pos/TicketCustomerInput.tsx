@@ -1,5 +1,5 @@
-import React from "react";
-import { createPortal } from "react-dom";
+import React, { useId } from "react";
+import Modal from "../common/Modal";
 import { toContactDigits } from "../../utils/orders";
 import type { FormEvent } from "react";
 import type { TicketCustomer } from "../../types/domain";
@@ -78,6 +78,7 @@ export default function TicketCustomerInput({
   onAttach,
 }: TicketCustomerInputProps) {
   const isSaveDisabled = !name.trim() && !contact;
+  const headingId = useId();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -85,10 +86,14 @@ export default function TicketCustomerInput({
     onAttach({ name: name.trim(), contact });
   };
 
-  // Portalled to <body>: this overlay renders inside <main>, whose `relative z-10`
-  // would cap it below the shell's sidebar rail.
-  return createPortal(
-    <div className="fixed inset-0 z-[100] bg-[#FDF9F3] flex flex-col animate-fadeIn">
+  return (
+    <Modal
+      labelledBy={headingId}
+      onClose={onClose}
+      dismissOnBackdrop={false}
+      overlayClassName="z-[100] bg-[#FDF9F3]"
+      className="w-full h-full flex flex-col animate-fadeIn"
+    >
       <header className="flex-shrink-0 bg-[#562D07] text-[#FDF9F3] p-4 flex items-center gap-3 shadow-md">
         <button
           onClick={onClose}
@@ -106,7 +111,7 @@ export default function TicketCustomerInput({
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        <h2 className="text-lg font-bold">Add customer to ticket</h2>
+        <h2 id={headingId} className="text-lg font-bold">Add customer to ticket</h2>
       </header>
 
       <form onSubmit={handleSubmit} className="flex-1 min-h-0 overflow-y-auto p-4">
@@ -142,7 +147,6 @@ export default function TicketCustomerInput({
           </div>
         </div>
       </form>
-    </div>,
-    document.body
+    </Modal>
   );
 }

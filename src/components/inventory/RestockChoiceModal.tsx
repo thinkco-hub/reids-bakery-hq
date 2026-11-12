@@ -1,3 +1,6 @@
+import { useId } from "react";
+import Modal from "../common/Modal";
+
 interface RestockChoiceModalProps {
   itemName: string;
   onDirectRestock: () => void;
@@ -14,10 +17,14 @@ export default function RestockChoiceModal({
   onScheduleRun,
   onClose,
 }: RestockChoiceModalProps) {
+  const headingId = useId();
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm animate-fadeIn">
-        <h2 className="text-2xl font-bold text-[#121212] mb-1">Restock {itemName}</h2>
+    <Modal
+      labelledBy={headingId}
+      onClose={onClose}
+      className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm animate-fadeIn"
+    >
+        <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-1">Restock {itemName}</h2>
         <p className="text-gray-500 text-sm mb-6">How is this stock arriving?</p>
 
         <div className="space-y-3">
@@ -41,7 +48,6 @@ export default function RestockChoiceModal({
         >
           Cancel
         </button>
-      </div>
-    </div>
+    </Modal>
   );
 }

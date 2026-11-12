@@ -1,5 +1,5 @@
-import React from "react";
-import { createPortal } from "react-dom";
+import React, { useId } from "react";
+import Modal from "../common/Modal";
 import { formatDateTime } from "../../utils/dates";
 import { formatMoney } from "../../utils/money";
 import type { Sale } from "../../types/domain";
@@ -10,25 +10,21 @@ interface ReceiptModalProps {
 }
 
 export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
-  // Portalled to <body>: this overlay renders inside <main>, whose `relative z-10`
-  // would cap it below the shell's sidebar rail.
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 print:bg-white print:static"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          onClose();
-        }
-      }}
+  const headingId = useId();
+  return (
+    <Modal
+      labelledBy={headingId}
+      onClose={onClose}
+      overlayClassName="z-[100] bg-black/50 backdrop-blur-sm p-4 print:bg-white print:static"
+      className="print-receipt bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto overscroll-contain animate-fadeIn print:shadow-none print:rounded-none"
     >
-      <div className="print-receipt bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto animate-fadeIn print:shadow-none print:rounded-none">
         <div className="text-center mb-6">
           <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
             <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-[#121212]">Sale Complete</h2>
+          <h2 id={headingId} className="text-xl font-bold text-[#121212]">Sale Complete</h2>
           <p className="text-gray-500 text-sm mt-1">{receipt.id}</p>
           {receipt.type === "Order" && (
             <p className="text-xs font-semibold text-[#F17D0C] mt-2 bg-orange-50 rounded-full px-3 py-1 inline-block">
@@ -127,8 +123,6 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
             Download Receipt
           </button>
         </div>
-      </div>
-    </div>,
-    document.body
+    </Modal>
   );
 }

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
+import Modal from "../common/Modal";
 import EditHistoryList from "../common/EditHistoryList";
 import SelectField from "../common/SelectField";
 import type { FormEvent } from "react";
@@ -26,6 +27,7 @@ interface EditOrderModalProps {
 
 export default function EditOrderModal({ order, client, menuInventory, onClose, onSave }: EditOrderModalProps) {
   const isClientOrder = order.clientId !== null;
+  const headingId = useId();
   const [customerName, setCustomerName] = useState(order.customerName || "");
   const [customerContact, setCustomerContact] = useState(order.customerContact || "");
   const [lines, setLines] = useState<Line[]>(
@@ -73,12 +75,14 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-lg animate-fadeIn max-h-[90vh] overflow-y-auto"
-      >
-        <h2 className="text-2xl font-bold text-[#121212] mb-6">Edit Order {order.id}</h2>
+    <Modal
+      labelledBy={headingId}
+      onClose={onClose}
+      overlayClassName="z-[100] bg-black/50 backdrop-blur-sm px-4"
+      className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-lg animate-fadeIn max-h-[90vh] overflow-y-auto overscroll-contain"
+    >
+      <form onSubmit={handleSubmit}>
+        <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-6">Edit Order {order.id}</h2>
 
         <div className="space-y-4">
           {isClientOrder && (
@@ -191,6 +195,6 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
           </button>
         </div>
       </form>
-    </div>
+    </Modal>
   );
 }
