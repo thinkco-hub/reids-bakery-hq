@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
+import Modal from "../common/Modal";
 import EditHistoryList from "../common/EditHistoryList";
 import SelectField from "../common/SelectField";
 import { computeSaleTotals } from "../../utils/checkout";
@@ -27,6 +28,7 @@ interface EditSaleModalProps {
 }
 
 export default function EditSaleModal({ sale, products, onClose, onSave }: EditSaleModalProps) {
+  const headingId = useId();
   const [customerName, setCustomerName] = useState(sale.customerName);
   const [customerContact, setCustomerContact] = useState(sale.customerContact);
   const [lines, setLines] = useState<Line[]>(sale.items.map(toLine));
@@ -60,12 +62,14 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-lg animate-fadeIn max-h-[90vh] overflow-y-auto"
-      >
-        <h2 className="text-2xl font-bold text-[#121212] mb-1">Edit Sale {sale.id}</h2>
+    <Modal
+      labelledBy={headingId}
+      onClose={onClose}
+      overlayClassName="z-[100] bg-black/50 backdrop-blur-sm px-4"
+      className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-lg animate-fadeIn max-h-[90vh] overflow-y-auto overscroll-contain"
+    >
+      <form onSubmit={handleSubmit}>
+        <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-1">Edit Sale {sale.id}</h2>
         <p className="text-xs text-gray-400 mb-6">
           Totals (incl. 5% tax), reports and reprinted receipts follow the edited items.
         </p>
@@ -181,6 +185,6 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
           </button>
         </div>
       </form>
-    </div>
+    </Modal>
   );
 }

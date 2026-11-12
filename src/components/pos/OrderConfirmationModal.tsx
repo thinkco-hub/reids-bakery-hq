@@ -1,5 +1,5 @@
-import React from "react";
-import { createPortal } from "react-dom";
+import React, { useId } from "react";
+import Modal from "../common/Modal";
 import { TicketCustomerFields } from "./TicketCustomerInput";
 import { addDaysISO } from "../../utils/dates";
 import { formatMoney } from "../../utils/money";
@@ -36,20 +36,15 @@ export default function OrderConfirmationModal({
 }: OrderConfirmationModalProps) {
   // An Order must be delivered after today, so the earliest pickable date is tomorrow.
   const tomorrowISO = addDaysISO(todayISO, 1);
+  const headingId = useId();
 
-  // Portalled to <body>: this overlay renders inside <main>, whose `relative z-10`
-  // would cap it below the shell's sidebar rail.
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          onClose();
-        }
-      }}
+  return (
+    <Modal
+      labelledBy={headingId}
+      onClose={onClose}
+      className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto overscroll-contain animate-fadeIn"
     >
-      <div className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto animate-fadeIn">
-        <div className="flex items-center gap-3 mb-2">
+      <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-full flex items-center justify-center text-white bg-[#F17D0C]">
             <svg
               className="w-5 h-5"
@@ -65,7 +60,7 @@ export default function OrderConfirmationModal({
               />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-[#121212]">
+          <h2 id={headingId} className="text-2xl font-bold text-[#121212]">
             Confirm Order
           </h2>
         </div>
@@ -204,8 +199,6 @@ export default function OrderConfirmationModal({
             Confirm Order
           </button>
         </div>
-      </div>
-    </div>,
-    document.body
+    </Modal>
   );
 }

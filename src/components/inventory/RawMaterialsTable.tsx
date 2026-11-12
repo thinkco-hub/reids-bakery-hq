@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
+import Modal from "../common/Modal";
 import InventoryStatsBar from "./InventoryStatsBar";
 import StockStatusBadge from "./StockStatusBadge";
 import { SearchIcon } from "../icons";
@@ -46,6 +47,7 @@ function IngredientFormModal({
 
   const update = (field: keyof IngredientFormState, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
+  const headingId = useId();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -60,12 +62,14 @@ function IngredientFormModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md animate-fadeIn"
-      >
-        <h2 className="text-2xl font-bold text-[#121212] mb-6">
+    <Modal
+      labelledBy={headingId}
+      onClose={onClose}
+      overlayClassName="z-[100] bg-black/50 backdrop-blur-sm px-4"
+      className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md animate-fadeIn"
+    >
+      <form onSubmit={handleSubmit}>
+        <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-6">
           {initial ? "Edit Ingredient" : "Add Ingredient"}
         </h2>
 
@@ -163,7 +167,7 @@ function IngredientFormModal({
           </button>
         </div>
       </form>
-    </div>
+    </Modal>
   );
 }
 

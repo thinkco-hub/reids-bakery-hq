@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
+import Modal from "../common/Modal";
 import OrderStatusBadge from "./OrderStatusBadge";
 import PaymentStatusBadge from "./PaymentStatusBadge";
 import EditOrderModal from "./EditOrderModal";
@@ -45,6 +46,7 @@ function ScheduleDeliveryModal({
 }) {
   const [deliveryDate, setDeliveryDate] = useState(order.deliveryDate || "");
   const [assignedTo, setAssignedTo] = useState(order.assignedTo || "");
+  const headingId = useId();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -54,12 +56,14 @@ function ScheduleDeliveryModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm animate-fadeIn"
-      >
-        <h2 className="text-2xl font-bold text-[#121212] mb-6">Schedule Delivery</h2>
+    <Modal
+      labelledBy={headingId}
+      onClose={onClose}
+      overlayClassName="z-[100] bg-black/50 backdrop-blur-sm px-4"
+      className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm animate-fadeIn"
+    >
+      <form onSubmit={handleSubmit}>
+        <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-6">Schedule Delivery</h2>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Delivery Date</label>
@@ -99,7 +103,7 @@ function ScheduleDeliveryModal({
           </button>
         </div>
       </form>
-    </div>
+    </Modal>
   );
 }
 
@@ -115,6 +119,7 @@ function RecordPaymentModal({
   const amountDue = computeAmountDue(order);
   const [method, setMethod] = useState<PaymentMethod>(order.paymentMethod || PAYMENT_METHODS[0]);
   const [amount, setAmount] = useState(amountDue > 0 ? amountDue.toFixed(2) : "");
+  const headingId = useId();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -127,12 +132,14 @@ function RecordPaymentModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm animate-fadeIn"
-      >
-        <h2 className="text-2xl font-bold text-[#121212] mb-6">Record Payment</h2>
+    <Modal
+      labelledBy={headingId}
+      onClose={onClose}
+      overlayClassName="z-[100] bg-black/50 backdrop-blur-sm px-4"
+      className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm animate-fadeIn"
+    >
+      <form onSubmit={handleSubmit}>
+        <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-6">Record Payment</h2>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Payment Method</label>
@@ -179,7 +186,7 @@ function RecordPaymentModal({
           </button>
         </div>
       </form>
-    </div>
+    </Modal>
   );
 }
 

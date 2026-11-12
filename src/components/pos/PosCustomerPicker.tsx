@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { createPortal } from "react-dom";
+import React, { useId, useRef, useState } from "react";
+import Modal from "../common/Modal";
 import ClientFormModal from "../clients/ClientFormModal";
 import { SearchIcon } from "../icons";
 import type {
@@ -32,6 +32,8 @@ export default function PosCustomerPicker({
 }: PosCustomerPickerProps) {
   const [search, setSearch] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const headingId = useId();
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const query = search.trim().toLowerCase();
   // Newest first: addClient appends, so the end of the list is the most recent.
@@ -45,10 +47,15 @@ export default function PosCustomerPicker({
     onAttach({ name: data.name, contact: data.contact });
   };
 
-  // Portalled to <body>: this overlay renders inside <main>, whose `relative z-10`
-  // would cap it below the shell's sidebar rail.
-  return createPortal(
-    <div className="fixed inset-0 z-[100] bg-[#FDF9F3] flex flex-col animate-fadeIn">
+  return (
+    <Modal
+      labelledBy={headingId}
+      onClose={onClose}
+      initialFocusRef={searchRef}
+      dismissOnBackdrop={false}
+      overlayClassName="z-[100] bg-[#FDF9F3]"
+      className="w-full h-full flex flex-col animate-fadeIn"
+    >
       {isFormOpen && (
         <ClientFormModal
           initial={null}
@@ -74,7 +81,7 @@ export default function PosCustomerPicker({
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        <h2 className="text-lg font-bold">Add customer to ticket</h2>
+        <h2 id={headingId} className="text-lg font-bold">Add customer to ticket</h2>
       </header>
 
       <div className="flex-shrink-0 bg-white border-b border-gray-200 p-3">
@@ -83,6 +90,7 @@ export default function PosCustomerPicker({
             <SearchIcon className="h-5 w-5 text-gray-400" />
           </div>
           <input
+            ref={searchRef}
             autoFocus
             type="text"
             value={search}
@@ -125,8 +133,7 @@ export default function PosCustomerPicker({
           </ul>
         )}
       </div>
-    </div>,
-    document.body
+    </Modal>
   );
 }
 

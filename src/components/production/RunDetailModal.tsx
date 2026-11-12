@@ -1,5 +1,5 @@
-import React from "react";
-import { createPortal } from "react-dom";
+import React, { useId } from "react";
+import Modal from "../common/Modal";
 import {
   computeBatches,
   computeRequiredIngredients,
@@ -25,17 +25,17 @@ export default function RunDetailModal({ run, recipe, ingredients, onClose, onCo
   const actualYield = batches * (Number(recipe.yieldQty) || 0);
   const isCompleted = run.status === "completed";
   const status = getRunStatus(run, recipe, ingredients);
+  const headingId = useId();
 
-  // Portalled to <body>: <main> is `relative z-10`, which caps this overlay's z-[100] below the mobile top bar's z-30.
-  return createPortal(
-    <div
-      onClick={(event) => event.target === event.currentTarget && onClose()}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+  return (
+    <Modal
+      labelledBy={headingId}
+      onClose={onClose}
+      className="bg-white rounded-2xl shadow-2xl w-full max-w-lg animate-fadeIn max-h-[85dvh] flex flex-col overflow-hidden"
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg animate-fadeIn max-h-[85dvh] flex flex-col overflow-hidden">
-        <div className="flex-1 min-h-0 overflow-y-auto p-6 md:p-8">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-6 md:p-8">
           <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mb-1">
-            <h2 className="min-w-0 text-lg md:text-2xl font-bold text-[#121212]">{recipe.name}</h2>
+            <h2 id={headingId} className="min-w-0 text-lg md:text-2xl font-bold text-[#121212]">{recipe.name}</h2>
             <span
               className={`shrink-0 whitespace-nowrap px-3 py-1 rounded-full border text-xs font-bold ${RUN_STATUS_BADGE_CLASSES[status]}`}
             >
@@ -133,8 +133,6 @@ export default function RunDetailModal({ run, recipe, ingredients, onClose, onCo
             </>
           )}
         </div>
-      </div>
-    </div>,
-    document.body
+    </Modal>
   );
 }
