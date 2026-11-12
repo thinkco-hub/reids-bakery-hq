@@ -48,6 +48,7 @@ function CountSection({
                     type="number"
                     min="0"
                     step="any"
+                    aria-label={`${title} count for ${item.name}`}
                     value={counts[item.id] ?? ""}
                     onChange={(e) => onUpdate(item.id, e.target.value)}
                     placeholder="Enter count"
@@ -140,8 +141,9 @@ export default function ClosingCountForm({ menuInventory, ingredients, onSubmit,
       <form onSubmit={handleSubmit}>
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <label className="text-sm font-semibold text-gray-700">Count Date</label>
+            <label htmlFor="closing-count-date" className="text-sm font-semibold text-gray-700">Count Date</label>
             <input
+              id="closing-count-date"
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}

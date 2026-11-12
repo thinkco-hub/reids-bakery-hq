@@ -54,8 +54,9 @@ export default function LedgerView({ branches, products, beginnings, movements, 
             onClick={() => onMonthChange(shiftMonthKey(month, -1))}
             className="p-1.5 rounded-md hover:bg-gray-100 text-gray-600"
             title="Previous month"
+            aria-label="Previous month"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -64,8 +65,9 @@ export default function LedgerView({ branches, products, beginnings, movements, 
             onClick={() => onMonthChange(shiftMonthKey(month, 1))}
             className="p-1.5 rounded-md hover:bg-gray-100 text-gray-600"
             title="Next month"
+            aria-label="Next month"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
@@ -119,6 +121,7 @@ export default function LedgerView({ branches, products, beginnings, movements, 
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            aria-label="Search ledger by branch or siopao type"
             className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
             placeholder="Search branch or siopao type..."
           />

@@ -65,6 +65,7 @@ export default function RecipesList({
             type="number"
             min="0"
             max="95"
+            aria-label="Target margin percent"
             value={pricingRules.targetMarginPercent}
             onChange={(e) => onEditRule({ targetMarginPercent: e.target.value })}
             className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800 text-right font-bold"
@@ -82,6 +83,7 @@ export default function RecipesList({
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            aria-label="Search recipes by name"
             className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
             placeholder="Search recipes..."
           />
@@ -164,6 +166,7 @@ export default function RecipesList({
                       <td className="px-4 py-4 text-center">
                         <button
                           onClick={() => onEdit(recipe)}
+                          aria-label={`Edit ${recipe.name}`}
                           className="text-gray-500 hover:text-[#F17D0C] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                         >
                           Edit

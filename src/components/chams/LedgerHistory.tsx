@@ -59,6 +59,7 @@ export default function LedgerHistory({ branches, products, beginnings, movement
           <SelectField
             value={branchId}
             onChange={(e) => setBranchId(e.target.value)}
+            aria-label="Branch"
             className="pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800 bg-white shadow-sm"
           >
             {branches.map((b) => (
@@ -70,6 +71,7 @@ export default function LedgerHistory({ branches, products, beginnings, movement
           <SelectField
             value={productId}
             onChange={(e) => setProductId(e.target.value)}
+            aria-label="Siopao type"
             className="pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800 bg-white shadow-sm"
           >
             {products.map((p) => (

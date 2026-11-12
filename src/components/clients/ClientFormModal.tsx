@@ -15,6 +15,11 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
     initial || { name: "", contact: "", email: "", address: "", standingOrder: "" }
   );
   const headingId = useId();
+  const nameFieldId = useId();
+  const contactFieldId = useId();
+  const emailFieldId = useId();
+  const addressFieldId = useId();
+  const standingOrderFieldId = useId();
 
   const update = (field: keyof ClientFormData, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -40,8 +45,9 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Client / Business Name</label>
+            <label htmlFor={nameFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Client / Business Name</label>
             <input
+              id={nameFieldId}
               type="text"
               value={form.name}
               onChange={(e) => update("name", e.target.value)}
@@ -51,8 +57,9 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Contact Number</label>
+              <label htmlFor={contactFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Contact Number</label>
               <input
+                id={contactFieldId}
                 type="tel"
                 inputMode="numeric"
                 placeholder="09XXXXXXXXX"
@@ -62,8 +69,9 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+              <label htmlFor={emailFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
               <input
+                id={emailFieldId}
                 type="email"
                 value={form.email}
                 onChange={(e) => update("email", e.target.value)}
@@ -72,8 +80,9 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
             </div>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Address</label>
+            <label htmlFor={addressFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Address</label>
             <input
+              id={addressFieldId}
               type="text"
               value={form.address}
               onChange={(e) => update("address", e.target.value)}
@@ -81,10 +90,11 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label htmlFor={standingOrderFieldId} className="block text-sm font-semibold text-gray-700 mb-1">
               Standing Order Preferences
             </label>
             <textarea
+              id={standingOrderFieldId}
               value={form.standingOrder}
               onChange={(e) => update("standingOrder", e.target.value)}
               rows={3}

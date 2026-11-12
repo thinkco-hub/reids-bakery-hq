@@ -101,6 +101,7 @@ export default function UserManagementView({
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            aria-label="Search users by name, email or role"
             className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
             placeholder="Search name, email or role..."
           />
@@ -191,6 +192,7 @@ export default function UserManagementView({
                               : handleSetActive(user, true)
                           }
                           disabled={!mayManage || user.id === currentUser.id}
+                          aria-label={`${user.active ? "Deactivate" : "Reactivate"} ${user.name}`}
                           title={
                             !mayManage
                               ? "You don't have permission to change account status"

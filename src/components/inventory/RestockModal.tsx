@@ -25,6 +25,8 @@ export default function RestockModal({
   disabled,
 }: RestockModalProps) {
   const headingId = useId();
+  const itemFieldId = useId();
+  const amountFieldId = useId();
   return (
     <Modal
       labelledBy={headingId}
@@ -41,10 +43,11 @@ export default function RestockModal({
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label htmlFor={itemFieldId} className="block text-sm font-semibold text-gray-700 mb-1">
               Item to Restock
             </label>
             <SelectField
+              id={itemFieldId}
               className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
               value={modal.selectedItemId}
               onChange={(e) => onItemChange(e.target.value)}
@@ -58,10 +61,11 @@ export default function RestockModal({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label htmlFor={amountFieldId} className="block text-sm font-semibold text-gray-700 mb-1">
               Quantity to Add
             </label>
             <input
+              id={amountFieldId}
               type="number"
               min="1"
               placeholder="Enter amount..."

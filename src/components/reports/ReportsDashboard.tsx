@@ -228,6 +228,7 @@ export default function ReportsDashboard({
               setCustomStart(e.target.value);
               setPreset("custom");
             }}
+            aria-label="Report start date"
             className="px-3 py-1.5 border border-gray-200 rounded-md text-sm text-gray-600 focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none"
           />
           <span className="text-gray-400 text-sm">to</span>
@@ -238,6 +239,7 @@ export default function ReportsDashboard({
               setCustomEnd(e.target.value);
               setPreset("custom");
             }}
+            aria-label="Report end date"
             className="px-3 py-1.5 border border-gray-200 rounded-md text-sm text-gray-600 focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none"
           />
         </div>
@@ -296,6 +298,7 @@ export default function ReportsDashboard({
               type="text"
               value={logSearch}
               onChange={(e) => setLogSearch(e.target.value)}
+              aria-label="Search sales by sale number or customer"
               className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 outline-none focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C]"
               placeholder="Search sale # or customer..."
             />
@@ -347,9 +350,10 @@ export default function ReportsDashboard({
                         <button
                           onClick={() => setEditingSale(sale)}
                           title="Edit sale details"
+                          aria-label={`Edit sale ${sale.id}`}
                           className="p-2 rounded-lg text-gray-400 hover:text-[#562D07] hover:bg-orange-50 transition-colors"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -364,9 +368,10 @@ export default function ReportsDashboard({
                       <button
                         onClick={() => onReprintSale?.(sale)}
                         title="View / Print Receipt"
+                        aria-label={`View receipt for sale ${sale.id}`}
                         className="p-2 rounded-lg text-gray-400 hover:text-[#F17D0C] hover:bg-orange-50 transition-colors"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"

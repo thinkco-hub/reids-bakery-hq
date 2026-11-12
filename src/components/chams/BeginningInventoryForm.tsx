@@ -64,8 +64,9 @@ export default function BeginningInventoryForm({ branches, products, beginnings,
       <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Branch</label>
+            <label htmlFor="beginning-branch" className="block text-sm font-semibold text-gray-700 mb-1.5">Branch</label>
             <SelectField
+              id="beginning-branch"
               value={branchId}
               onChange={(e) => setBranchId(e.target.value)}
               className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
@@ -78,8 +79,9 @@ export default function BeginningInventoryForm({ branches, products, beginnings,
             </SelectField>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Siopao Type</label>
+            <label htmlFor="beginning-product" className="block text-sm font-semibold text-gray-700 mb-1.5">Siopao Type</label>
             <SelectField
+              id="beginning-product"
               value={productId}
               onChange={(e) => setProductId(e.target.value)}
               className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
@@ -92,8 +94,9 @@ export default function BeginningInventoryForm({ branches, products, beginnings,
             </SelectField>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Month</label>
+            <label htmlFor="beginning-month" className="block text-sm font-semibold text-gray-700 mb-1.5">Month</label>
             <SelectField
+              id="beginning-month"
               value={month}
               onChange={(e) => setMonth(e.target.value)}
               className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
@@ -108,8 +111,9 @@ export default function BeginningInventoryForm({ branches, products, beginnings,
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Opening Count</label>
+          <label htmlFor="beginning-opening" className="block text-sm font-semibold text-gray-700 mb-1.5">Opening Count</label>
           <input
+            id="beginning-opening"
             type="number"
             min="0"
             step="any"

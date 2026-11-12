@@ -55,8 +55,9 @@ export default function RemainingCountForm({ branches, products, counts, onSubmi
       <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Branch</label>
+            <label htmlFor="remaining-branch" className="block text-sm font-semibold text-gray-700 mb-1.5">Branch</label>
             <SelectField
+              id="remaining-branch"
               value={branchId}
               onChange={(e) => setBranchId(e.target.value)}
               className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
@@ -69,8 +70,9 @@ export default function RemainingCountForm({ branches, products, counts, onSubmi
             </SelectField>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Siopao Type</label>
+            <label htmlFor="remaining-product" className="block text-sm font-semibold text-gray-700 mb-1.5">Siopao Type</label>
             <SelectField
+              id="remaining-product"
               value={productId}
               onChange={(e) => setProductId(e.target.value)}
               className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
@@ -85,7 +87,7 @@ export default function RemainingCountForm({ branches, products, counts, onSubmi
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Period</label>
+          <span className="block text-sm font-semibold text-gray-700 mb-1.5">Period</span>
           <div className="px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-600 font-medium">
             {formatMonthLabel(month)}
           </div>
@@ -99,8 +101,9 @@ export default function RemainingCountForm({ branches, products, counts, onSubmi
         )}
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Physical Remaining Count</label>
+          <label htmlFor="remaining-count" className="block text-sm font-semibold text-gray-700 mb-1.5">Physical Remaining Count</label>
           <input
+            id="remaining-count"
             type="number"
             min="0"
             step="any"
