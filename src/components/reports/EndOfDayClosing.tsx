@@ -60,6 +60,7 @@ export default function EndOfDayClosing({
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
+          aria-label="Closing date"
           className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-700 focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none bg-white shadow-sm"
         />
       </header>
@@ -117,6 +118,7 @@ export default function EndOfDayClosing({
             <input
               type="text"
               placeholder="Description (e.g. flour delivery)"
+              aria-label="Expense description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none"
@@ -126,6 +128,7 @@ export default function EndOfDayClosing({
               min="0.01"
               step="0.01"
               placeholder="Amount"
+              aria-label="Expense amount"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               className="sm:w-40 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none"
@@ -153,8 +156,9 @@ export default function EndOfDayClosing({
                       onClick={() => onDeleteExpense(exp.id)}
                       className="text-gray-400 hover:text-red-500 transition-colors"
                       title="Remove expense"
+                      aria-label={`Remove expense ${exp.description}`}
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>

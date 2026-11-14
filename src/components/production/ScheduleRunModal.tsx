@@ -26,6 +26,11 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
 
   const recipe = recipes.find((r) => r.id === form.recipeId);
   const headingId = useId();
+  const recipeFieldId = useId();
+  const qtyFieldId = useId();
+  const qtyUnitFieldId = useId();
+  const dateFieldId = useId();
+  const notesFieldId = useId();
   const qtyNum = parseFloat(form.qty) || 0;
   const isBatchMode = form.qtyUnit === "batch";
   const batches = recipe ? (isBatchMode ? qtyNum : computeBatches(qtyNum, recipe)) : 0;
@@ -55,8 +60,9 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Recipe</label>
+              <label htmlFor={recipeFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Recipe</label>
               <SelectField
+                id={recipeFieldId}
                 value={form.recipeId}
                 onChange={(e) => setForm({ ...form, recipeId: e.target.value })}
                 className={`w-full pl-4 ${SELECT_BASE}`}
@@ -70,9 +76,10 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
               </SelectField>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Quantity to Produce</label>
+              <label htmlFor={qtyFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Quantity to Produce</label>
               <div className="flex gap-2">
                 <input
+                  id={qtyFieldId}
                   type="number"
                   min="1"
                   step={isBatchMode ? "1" : "any"}
@@ -82,8 +89,10 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
                   required
                 />
                 <SelectField
+                  id={qtyUnitFieldId}
                   value={form.qtyUnit}
                   onChange={(e) => setForm({ ...form, qtyUnit: e.target.value })}
+                  aria-label="Quantity unit"
                   wrapperClassName="shrink-0"
                   className={`pl-3 font-medium ${SELECT_BASE}`}
                 >
@@ -99,8 +108,9 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
               )}
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Planned Date</label>
+              <label htmlFor={dateFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Planned Date</label>
               <input
+                id={dateFieldId}
                 type="date"
                 value={form.plannedDate}
                 onChange={(e) => setForm({ ...form, plannedDate: e.target.value })}
@@ -109,8 +119,9 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Notes</label>
+              <label htmlFor={notesFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Notes</label>
               <textarea
+                id={notesFieldId}
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
                 rows={2}

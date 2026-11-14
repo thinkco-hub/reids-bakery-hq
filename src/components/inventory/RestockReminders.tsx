@@ -43,8 +43,9 @@ export default function RestockReminders({ ingredients, reminders, onAdd, onTogg
           <h3 className="text-lg font-bold text-[#121212] mb-4">New Reminder</h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Ingredient</label>
+              <label htmlFor="reminder-ingredient" className="block text-sm font-semibold text-gray-700 mb-1">Ingredient</label>
               <SelectField
+                id="reminder-ingredient"
                 value={form.ingredientId}
                 onChange={(e) => setForm({ ...form, ingredientId: e.target.value })}
                 className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
@@ -57,8 +58,9 @@ export default function RestockReminders({ ingredients, reminders, onAdd, onTogg
               </SelectField>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Due Date</label>
+              <label htmlFor="reminder-due-date" className="block text-sm font-semibold text-gray-700 mb-1">Due Date</label>
               <input
+                id="reminder-due-date"
                 type="date"
                 value={form.dueDate}
                 onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
@@ -67,8 +69,9 @@ export default function RestockReminders({ ingredients, reminders, onAdd, onTogg
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Note</label>
+              <label htmlFor="reminder-note" className="block text-sm font-semibold text-gray-700 mb-1">Note</label>
               <textarea
+                id="reminder-note"
                 value={form.note}
                 onChange={(e) => setForm({ ...form, note: e.target.value })}
                 rows={3}
@@ -105,6 +108,7 @@ export default function RestockReminders({ ingredients, reminders, onAdd, onTogg
                     </div>
                     <button
                       onClick={() => onToggleDone(r.id)}
+                      aria-label={`Mark ${ingredientName(r.ingredientId)} reminder as done`}
                       className="px-3 py-1.5 rounded-md text-xs font-bold bg-orange-50 text-[#F17D0C] hover:bg-orange-100 transition-colors whitespace-nowrap"
                     >
                       Mark Done
@@ -133,6 +137,7 @@ export default function RestockReminders({ ingredients, reminders, onAdd, onTogg
                     </div>
                     <button
                       onClick={() => onToggleDone(r.id)}
+                      aria-label={`Reopen ${ingredientName(r.ingredientId)} reminder`}
                       className="px-3 py-1.5 rounded-md text-xs font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors whitespace-nowrap"
                     >
                       Reopen

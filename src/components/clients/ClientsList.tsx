@@ -59,6 +59,7 @@ export default function ClientsList({ clients, orders, onAdd, onUpdate, onView }
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            aria-label="Search clients by name"
             className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
             placeholder="Search clients..."
           />
@@ -97,12 +98,14 @@ export default function ClientsList({ clients, orders, onAdd, onUpdate, onView }
                     <td className="px-4 py-4 text-center whitespace-nowrap">
                       <button
                         onClick={() => setModalState({ isOpen: true, editing: client })}
+                        aria-label={`Edit ${client.name}`}
                         className="text-gray-500 hover:bg-gray-100 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => onView(client)}
+                        aria-label={`View ${client.name}`}
                         className="text-[#F17D0C] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                       >
                         View

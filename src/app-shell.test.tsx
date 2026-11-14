@@ -248,7 +248,7 @@ describe("order detail routes", () => {
     await signInAsAdmin(user);
     await screen.findByRole("heading", { name: "Orders" });
 
-    const [firstRow] = screen.getAllByRole("button", { name: "View Order Details" });
+    const [firstRow] = screen.getAllByRole("button", { name: /^View order #/ });
     await user.click(firstRow);
 
     // The id has to survive as a path segment. /orders/ plus a "#1042" fragment
@@ -316,7 +316,7 @@ describe("record dismissal", () => {
     await signInAsAdmin(user);
     await screen.findByRole("heading", { name: "Orders" });
 
-    const [firstRow] = screen.getAllByRole("button", { name: "View Order Details" });
+    const [firstRow] = screen.getAllByRole("button", { name: /^View order #/ });
     await user.click(firstRow);
     expect(pathInAddressBar()).toBe("/orders/%231042");
 
@@ -354,7 +354,7 @@ describe("client record routes", () => {
     await signInAsAdmin(user);
     await screen.findByRole("heading", { name: "Clients" });
 
-    const [firstClient] = screen.getAllByRole("button", { name: "View" });
+    const [firstClient] = screen.getAllByRole("button", { name: /^View / });
     await user.click(firstClient);
 
     expect(pathInAddressBar()).toBe("/clients/CL-001");
@@ -414,7 +414,7 @@ describe("recipe record routes", () => {
     await signInAsAdmin(user);
     await screen.findByRole("heading", { name: "Recipes / BOM" });
 
-    const [firstRecipe] = screen.getAllByRole("button", { name: "Edit" });
+    const [firstRecipe] = screen.getAllByRole("button", { name: /^Edit / });
     await user.click(firstRecipe);
     expect(pathInAddressBar()).toBe("/recipes/B-101");
 

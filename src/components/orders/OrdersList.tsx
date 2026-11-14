@@ -48,14 +48,16 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            aria-label="Search orders by client or order number"
             className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
             placeholder="Search client or order #..."
           />
         </div>
         <div className="w-full h-px md:w-px md:h-8 bg-gray-200 my-2 md:my-0 block"></div>
         <div className="flex items-center gap-2 w-full md:w-auto px-2">
-          <label className="text-sm text-gray-500 font-medium whitespace-nowrap">Filter Date:</label>
+          <label htmlFor="orders-date-filter" className="text-sm text-gray-500 font-medium whitespace-nowrap">Filter Date:</label>
           <input
+            id="orders-date-filter"
             type="date"
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
@@ -64,10 +66,11 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
           {dateFilter && (
             <button
               onClick={() => setDateFilter("")}
+              aria-label="Clear date filter"
               className="text-gray-400 hover:text-red-500 p-1 transition-colors"
               title="Clear Date Filter"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -152,10 +155,11 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
                       <td className="px-4 py-4 text-center">
                         <button
                           onClick={() => onView(order)}
+                          aria-label={`View order ${order.id}`}
                           className="text-gray-400 hover:text-[#F17D0C] transition-colors p-2 rounded-md hover:bg-orange-50"
                           title="View Order Details"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"

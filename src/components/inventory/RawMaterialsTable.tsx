@@ -48,6 +48,12 @@ function IngredientFormModal({
   const update = (field: keyof IngredientFormState, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
   const headingId = useId();
+  const nameFieldId = useId();
+  const qtyFieldId = useId();
+  const unitFieldId = useId();
+  const targetFieldId = useId();
+  const unitCostFieldId = useId();
+  const supplierFieldId = useId();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -75,8 +81,9 @@ function IngredientFormModal({
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Name</label>
+            <label htmlFor={nameFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Name</label>
             <input
+              id={nameFieldId}
               type="text"
               value={form.name}
               onChange={(e) => update("name", e.target.value)}
@@ -86,10 +93,11 @@ function IngredientFormModal({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label htmlFor={qtyFieldId} className="block text-sm font-semibold text-gray-700 mb-1">
                 Qty in Stock
               </label>
               <input
+                id={qtyFieldId}
                 type="number"
                 min="0"
                 step="any"
@@ -100,8 +108,9 @@ function IngredientFormModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Unit</label>
+              <label htmlFor={unitFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Unit</label>
               <input
+                id={unitFieldId}
                 type="text"
                 placeholder="kg, Liters..."
                 value={form.unit}
@@ -113,10 +122,11 @@ function IngredientFormModal({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label htmlFor={targetFieldId} className="block text-sm font-semibold text-gray-700 mb-1">
                 Reorder Threshold
               </label>
               <input
+                id={targetFieldId}
                 type="number"
                 min="0"
                 step="any"
@@ -127,10 +137,11 @@ function IngredientFormModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label htmlFor={unitCostFieldId} className="block text-sm font-semibold text-gray-700 mb-1">
                 Unit Cost
               </label>
               <input
+                id={unitCostFieldId}
                 type="number"
                 min="0"
                 step="any"
@@ -141,8 +152,9 @@ function IngredientFormModal({
             </div>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Supplier</label>
+            <label htmlFor={supplierFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Supplier</label>
             <input
+              id={supplierFieldId}
               type="text"
               value={form.supplier}
               onChange={(e) => update("supplier", e.target.value)}
@@ -240,6 +252,7 @@ export default function RawMaterialsTable({ ingredients, onRestock, onAdd, onUpd
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            aria-label="Search ingredients by name or ID"
             className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
             placeholder="Search ingredients by name or ID..."
           />
@@ -304,12 +317,14 @@ export default function RawMaterialsTable({ ingredients, onRestock, onAdd, onUpd
                         <td className="px-4 md:px-6 py-4 text-center whitespace-nowrap">
                           <button
                             onClick={() => setModalState({ isOpen: true, editing: item })}
+                            aria-label={`Edit ${item.name}`}
                             className="text-gray-500 hover:bg-gray-100 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                           >
                             Edit
                           </button>
                           <button
                             onClick={() => onRestock(item.id)}
+                            aria-label={`Restock ${item.name}`}
                             className="text-[#F17D0C] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                           >
                             + Restock

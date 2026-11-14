@@ -37,6 +37,8 @@ export default function OrderConfirmationModal({
   // An Order must be delivered after today, so the earliest pickable date is tomorrow.
   const tomorrowISO = addDaysISO(todayISO, 1);
   const headingId = useId();
+  const deliveryFieldId = useId();
+  const notesFieldId = useId();
 
   return (
     <Modal
@@ -123,10 +125,11 @@ export default function OrderConfirmationModal({
 
         {modal.saleType === "Order" && (
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor={deliveryFieldId} className="block text-sm font-semibold text-gray-700 mb-2">
               Delivery Date
             </label>
             <input
+              id={deliveryFieldId}
               type="date"
               min={tomorrowISO}
               value={modal.deliveryDate}
@@ -168,10 +171,11 @@ export default function OrderConfirmationModal({
         </div>
 
         <div className="mb-8">
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label htmlFor={notesFieldId} className="block text-sm font-semibold text-gray-700 mb-2">
             Notes on Order
           </label>
           <textarea
+            id={notesFieldId}
             rows={2}
             placeholder="Special instructions, allergies, packaging..."
             value={modal.notes}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
 import SelectField from "../common/SelectField";
 import { formatMoney } from "../../utils/money";
 import { computeRecipeCost, suggestedPrice } from "../../utils/pricing";
@@ -47,6 +47,14 @@ export default function RecipeEditor({
   onSave,
 }: RecipeEditorProps) {
   const isNew = !recipe;
+  const nameFieldId = useId();
+  const categoryFieldId = useId();
+  const priceFieldId = useId();
+  const qtyFieldId = useId();
+  const targetFieldId = useId();
+  const shelfLifeFieldId = useId();
+  const yieldQtyFieldId = useId();
+  const yieldUnitFieldId = useId();
   const [form, setForm] = useState<RecipeEditorForm>(() =>
     recipe
       ? { ...recipe, yieldQty: recipe.yieldQty ?? "", yieldUnit: recipe.yieldUnit ?? "pcs" }
@@ -153,8 +161,9 @@ export default function RecipeEditor({
               <h3 className="text-lg font-bold text-[#121212] mb-4">Recipe Details</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Recipe Name</label>
+                  <label htmlFor={nameFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Recipe Name</label>
                   <input
+                    id={nameFieldId}
                     type="text"
                     value={form.name}
                     onChange={(e) => updateField("name", e.target.value)}
@@ -163,8 +172,9 @@ export default function RecipeEditor({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Category</label>
+                  <label htmlFor={categoryFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Category</label>
                   <SelectField
+                    id={categoryFieldId}
                     value={form.category}
                     onChange={(e) => updateCategory(e.target.value as PosItemCategory)}
                     className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
@@ -177,8 +187,9 @@ export default function RecipeEditor({
                   </SelectField>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Price</label>
+                  <label htmlFor={priceFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Price</label>
                   <input
+                    id={priceFieldId}
                     type="number"
                     min="0"
                     step="any"
@@ -189,8 +200,9 @@ export default function RecipeEditor({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Initial Qty on Hand</label>
+                  <label htmlFor={qtyFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Initial Qty on Hand</label>
                   <input
+                    id={qtyFieldId}
                     type="number"
                     min="0"
                     step="any"
@@ -201,8 +213,9 @@ export default function RecipeEditor({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Target Stock</label>
+                  <label htmlFor={targetFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Target Stock</label>
                   <input
+                    id={targetFieldId}
                     type="number"
                     min="0"
                     step="any"
@@ -213,8 +226,9 @@ export default function RecipeEditor({
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Shelf Life</label>
+                  <label htmlFor={shelfLifeFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Shelf Life</label>
                   <input
+                    id={shelfLifeFieldId}
                     type="text"
                     placeholder="e.g. 24 Hours"
                     value={form.shelfLife}
@@ -225,10 +239,11 @@ export default function RecipeEditor({
                 </div>
                 <div className="sm:col-span-2 grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    <label htmlFor={yieldQtyFieldId} className="block text-sm font-semibold text-gray-700 mb-1">
                       Yield Qty <span className="text-gray-400 font-normal">(if made in batches)</span>
                     </label>
                     <input
+                      id={yieldQtyFieldId}
                       type="number"
                       min="0"
                       step="any"
@@ -238,8 +253,9 @@ export default function RecipeEditor({
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Yield Unit</label>
+                    <label htmlFor={yieldUnitFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Yield Unit</label>
                     <input
+                      id={yieldUnitFieldId}
                       type="text"
                       value={form.yieldUnit}
                       onChange={(e) => updateField("yieldUnit", e.target.value)}
@@ -278,6 +294,7 @@ export default function RecipeEditor({
                           updateLine(idx, "ingredientId", e.target.value);
                           if (selected) updateLine(idx, "unit", selected.unit);
                         }}
+                        aria-label={`Ingredient ${idx + 1}`}
                         wrapperClassName="flex-1 w-full"
                         className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
                       >
@@ -293,6 +310,7 @@ export default function RecipeEditor({
                         min="0"
                         step="any"
                         placeholder="Qty"
+                        aria-label={`Quantity for ingredient ${idx + 1}`}
                         value={line.qty}
                         onChange={(e) => updateLine(idx, "qty", e.target.value)}
                         className="w-full sm:w-28 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
@@ -305,8 +323,9 @@ export default function RecipeEditor({
                         onClick={() => removeLine(idx)}
                         className="text-gray-400 hover:text-red-500 p-2 transition-colors"
                         title="Remove"
+                        aria-label={`Remove ingredient ${idx + 1}`}
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -359,6 +378,7 @@ export default function RecipeEditor({
                                 type="number"
                                 min="0"
                                 max="95"
+                                aria-label={`${TIER_LABELS[idx]} margin percent`}
                                 value={margin}
                                 onChange={(e) => updateMarginTier(idx, e.target.value)}
                                 className="w-14 px-1.5 py-1 border border-gray-300 rounded text-xs font-bold text-gray-800 text-right focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none"

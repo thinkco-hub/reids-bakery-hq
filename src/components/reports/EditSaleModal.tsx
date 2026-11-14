@@ -29,6 +29,8 @@ interface EditSaleModalProps {
 
 export default function EditSaleModal({ sale, products, onClose, onSave }: EditSaleModalProps) {
   const headingId = useId();
+  const nameFieldId = useId();
+  const contactFieldId = useId();
   const [customerName, setCustomerName] = useState(sale.customerName);
   const [customerContact, setCustomerContact] = useState(sale.customerContact);
   const [lines, setLines] = useState<Line[]>(sale.items.map(toLine));
@@ -77,8 +79,9 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Customer Name</label>
+              <label htmlFor={nameFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Customer Name</label>
               <input
+                id={nameFieldId}
                 type="text"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
@@ -87,8 +90,9 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Contact Number</label>
+              <label htmlFor={contactFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Contact Number</label>
               <input
+                id={contactFieldId}
                 type="tel"
                 value={customerContact}
                 onChange={(e) => setCustomerContact(toContactDigits(e.target.value))}
@@ -104,7 +108,7 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
 
           <div>
             <div className="flex justify-between items-center mb-2">
-              <label className="block text-sm font-semibold text-gray-700">Items</label>
+              <span className="block text-sm font-semibold text-gray-700">Items</span>
               <button
                 type="button"
                 onClick={addLine}
@@ -119,6 +123,7 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
                   <SelectField
                     value={line.item.id}
                     onChange={(e) => changeItem(idx, e.target.value)}
+                    aria-label={`Item ${idx + 1}`}
                     wrapperClassName="flex-1"
                     className="w-full pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800 text-sm"
                   >
@@ -135,6 +140,7 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
                     type="number"
                     min="1"
                     placeholder="Qty"
+                    aria-label={`Quantity for item ${idx + 1}`}
                     value={line.qty}
                     onChange={(e) => updateQty(idx, e.target.value)}
                     className="w-20 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800 text-sm"
@@ -142,9 +148,10 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
                   <button
                     type="button"
                     onClick={() => removeLine(idx)}
+                    aria-label={`Remove item ${idx + 1}`}
                     className="text-gray-400 hover:text-red-500 p-1.5 transition-colors"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
@@ -162,7 +169,7 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
 
           {sale.editHistory && sale.editHistory.length > 0 && (
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Edit History</label>
+              <span className="block text-sm font-semibold text-gray-700 mb-2">Edit History</span>
               <EditHistoryList entries={sale.editHistory} />
             </div>
           )}

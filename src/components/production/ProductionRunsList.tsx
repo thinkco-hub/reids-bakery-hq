@@ -188,6 +188,7 @@ export default function ProductionRunsList({
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            aria-label="Search production runs by recipe name"
             className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
             placeholder="Search recipes..."
           />
@@ -224,6 +225,7 @@ export default function ProductionRunsList({
                         <td className="px-5 py-4 text-right whitespace-nowrap">
                           <button
                             onClick={() => setSelectedRunId(run.id)}
+                            aria-label={`${status === "completed" ? "View" : "View or complete"} ${recipe ? recipe.name : "run"} for ${run.plannedDate}`}
                             className="text-gray-500 hover:text-[#F17D0C] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                           >
                             {status === "completed" ? "View" : "View / Complete"}
@@ -231,6 +233,7 @@ export default function ProductionRunsList({
                           {status !== "completed" && (
                             <button
                               onClick={() => setPendingDelete(run)}
+                              aria-label={`Delete ${recipe ? recipe.name : "run"} for ${run.plannedDate}`}
                               className="text-gray-400 hover:text-red-500 hover:bg-red-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                             >
                               Delete

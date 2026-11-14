@@ -173,6 +173,7 @@ export default function ReconciliationReview({
                             onClick={() => onResolve(c.id, "apply")}
                             className="text-[#F17D0C] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                             title="Adjust system stock to match the counted quantity"
+                            aria-label={`Apply counted quantity for ${itemName(c)}`}
                           >
                             Apply
                           </button>
@@ -180,6 +181,7 @@ export default function ReconciliationReview({
                             onClick={() => onResolve(c.id, "dismiss")}
                             className="text-gray-400 hover:bg-gray-100 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                             title="Keep system stock as-is, discard this count"
+                            aria-label={`Dismiss count for ${itemName(c)}`}
                           >
                             Dismiss
                           </button>

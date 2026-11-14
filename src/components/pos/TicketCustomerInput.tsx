@@ -21,13 +21,17 @@ export function TicketCustomerFields({
   onNameChange,
   onContactChange,
 }: TicketCustomerFieldsProps) {
+  const fieldId = useId();
+  const nameId = `${fieldId}-name`;
+  const contactId = `${fieldId}-contact`;
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label htmlFor={nameId} className="block text-sm font-semibold text-gray-700 mb-2">
           Customer Name
         </label>
         <input
+          id={nameId}
           type="text"
           placeholder="Enter customer name..."
           value={name}
@@ -36,10 +40,11 @@ export function TicketCustomerFields({
         />
       </div>
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label htmlFor={contactId} className="block text-sm font-semibold text-gray-700 mb-2">
           Customer Contact
         </label>
         <input
+          id={contactId}
           type="tel"
           inputMode="numeric"
           placeholder="09XXXXXXXXX"

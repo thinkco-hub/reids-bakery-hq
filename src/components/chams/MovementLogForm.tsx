@@ -75,8 +75,9 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
       <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Branch</label>
+            <label htmlFor="movement-branch" className="block text-sm font-semibold text-gray-700 mb-1.5">Branch</label>
             <SelectField
+              id="movement-branch"
               value={branchId}
               onChange={(e) => setBranchId(e.target.value)}
               className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
@@ -89,8 +90,9 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
             </SelectField>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Siopao Type</label>
+            <label htmlFor="movement-product" className="block text-sm font-semibold text-gray-700 mb-1.5">Siopao Type</label>
             <SelectField
+              id="movement-product"
               value={productId}
               onChange={(e) => setProductId(e.target.value)}
               className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
@@ -103,8 +105,9 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
             </SelectField>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Month</label>
+            <label htmlFor="movement-month" className="block text-sm font-semibold text-gray-700 mb-1.5">Month</label>
             <SelectField
+              id="movement-month"
               value={month}
               onChange={(e) => setMonth(e.target.value)}
               className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
@@ -120,8 +123,9 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Restocked</label>
+            <label htmlFor="movement-restocked" className="block text-sm font-semibold text-gray-700 mb-1.5">Restocked</label>
             <input
+              id="movement-restocked"
               type="number"
               min="0"
               step="any"
@@ -132,8 +136,9 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Spoilage</label>
+            <label htmlFor="movement-spoilage" className="block text-sm font-semibold text-gray-700 mb-1.5">Spoilage</label>
             <input
+              id="movement-spoilage"
               type="number"
               min="0"
               step="any"
@@ -144,8 +149,9 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Sold</label>
+            <label htmlFor="movement-sold" className="block text-sm font-semibold text-gray-700 mb-1.5">Sold</label>
             <input
+              id="movement-sold"
               type="number"
               min="0"
               step="any"

@@ -47,6 +47,8 @@ function ScheduleDeliveryModal({
   const [deliveryDate, setDeliveryDate] = useState(order.deliveryDate || "");
   const [assignedTo, setAssignedTo] = useState(order.assignedTo || "");
   const headingId = useId();
+  const dateFieldId = useId();
+  const staffFieldId = useId();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -66,8 +68,9 @@ function ScheduleDeliveryModal({
         <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-6">Schedule Delivery</h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Delivery Date</label>
+            <label htmlFor={dateFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Delivery Date</label>
             <input
+              id={dateFieldId}
               type="date"
               value={deliveryDate}
               onChange={(e) => setDeliveryDate(e.target.value)}
@@ -76,8 +79,9 @@ function ScheduleDeliveryModal({
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Assigned Staff / Driver</label>
+            <label htmlFor={staffFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Assigned Staff / Driver</label>
             <input
+              id={staffFieldId}
               type="text"
               value={assignedTo}
               onChange={(e) => setAssignedTo(e.target.value)}
@@ -120,6 +124,8 @@ function RecordPaymentModal({
   const [method, setMethod] = useState<PaymentMethod>(order.paymentMethod || PAYMENT_METHODS[0]);
   const [amount, setAmount] = useState(amountDue > 0 ? amountDue.toFixed(2) : "");
   const headingId = useId();
+  const methodFieldId = useId();
+  const amountFieldId = useId();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -142,8 +148,9 @@ function RecordPaymentModal({
         <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-6">Record Payment</h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Payment Method</label>
+            <label htmlFor={methodFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Payment Method</label>
             <SelectField
+              id={methodFieldId}
               value={method}
               onChange={(e) => setMethod(e.target.value as PaymentMethod)}
               className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
@@ -156,8 +163,9 @@ function RecordPaymentModal({
             </SelectField>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Amount Received</label>
+            <label htmlFor={amountFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Amount Received</label>
             <input
+              id={amountFieldId}
               type="number"
               min="0.01"
               max={amountDue.toFixed(2)}
@@ -270,9 +278,10 @@ export default function OrderDetail({
         <div className="flex shrink-0 items-center gap-4">
           <button
             onClick={onBack}
+            aria-label="Back to orders"
             className="w-10 h-10 flex items-center justify-center bg-[#eef0f2] hover:bg-gray-300 rounded-lg transition-colors text-gray-700 flex-shrink-0"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+            <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7 7-7M3 12h18" />
             </svg>
           </button>

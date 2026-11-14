@@ -46,6 +46,7 @@ export default function FinishedGoodsTable({ menuInventory, onRestock }: Finishe
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            aria-label="Search items by name or ID"
             className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
             placeholder="Search items by name or ID..."
           />
@@ -102,6 +103,7 @@ export default function FinishedGoodsTable({ menuInventory, onRestock }: Finishe
                         <td className="px-4 md:px-6 py-4 text-center">
                           <button
                             onClick={() => onRestock(item.id)}
+                            aria-label={`Restock ${item.name}`}
                             className="text-[#F17D0C] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                           >
                             + Restock
