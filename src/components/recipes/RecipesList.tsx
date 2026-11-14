@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { formatMoney } from "../../utils/money";
 import { computeRecipeCost, suggestedPrice } from "../../utils/pricing";
-import { SearchIcon } from "../icons";
+import SearchField from "../common/SearchField";
 import type {
   IngredientStock,
   PricingRuleInput,
@@ -75,19 +75,12 @@ export default function RecipesList({
       </div>
 
       <div className="bg-white border border-gray-200 rounded-lg p-2 mb-4 flex shadow-sm">
-        <div className="relative flex-1 w-full">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <SearchIcon className="h-5 w-5 text-gray-400" />
-          </div>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            aria-label="Search recipes by name"
-            className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
-            placeholder="Search recipes..."
-          />
-        </div>
+        <SearchField
+          value={search}
+          onChange={setSearch}
+          ariaLabel="Search recipes by name"
+          placeholder="Search recipes..."
+        />
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
