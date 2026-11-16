@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Outlet } from "react-router";
 import MobileTopBar from "../components/layout/MobileTopBar";
 import Sidebar from "../components/layout/Sidebar";
@@ -26,6 +26,10 @@ export default function LayoutRoute() {
   } = useShell();
   const { cartQty, ticketCustomer, openCustomerPicker, clearTicket } = usePosSlice();
 
+  // The drawer hands focus back to the control that opened it, which lives in
+  // the top bar rather than in the sidebar.
+  const navTriggerRef = useRef<HTMLButtonElement>(null);
+
   // Wide, mouse-driven viewports keep the pinned sidebar rail; phones and
   // tablets (including touch devices that report a desktop viewport) use the
   // hamburger drawer, so the top bar and the drawer share one test.
@@ -37,6 +41,7 @@ export default function LayoutRoute() {
       {!isDesktopRail && (
         <MobileTopBar
           onOpenMobileNav={() => setIsSidebarOpen(true)}
+          triggerRef={navTriggerRef}
           pos={
             isPosRoute && isPhoneViewport(windowWidth)
               ? {
@@ -56,6 +61,7 @@ export default function LayoutRoute() {
         windowWidth={windowWidth}
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
+        triggerRef={navTriggerRef}
         isInventoryExpanded={isInventoryExpanded}
         setIsInventoryExpanded={setIsInventoryExpanded}
         isReportsExpanded={isReportsExpanded}

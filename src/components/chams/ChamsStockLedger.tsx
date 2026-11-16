@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import LedgerView from "./LedgerView";
 import BeginningInventoryForm from "./BeginningInventoryForm";
 import MovementLogForm from "./MovementLogForm";
 import RemainingCountForm from "./RemainingCountForm";
 import LedgerHistory from "./LedgerHistory";
 import { canUseSidebarRail } from "../../utils/responsive";
+import { useDrawerA11y } from "../../hooks/useDrawerA11y";
 import { monthKey, shiftMonthKey } from "../../utils/dates";
 import type {
   ChamsBeginning,
@@ -193,6 +194,20 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
     ? "opacity-0 group-hover:opacity-100"
     : "opacity-100";
 
+  // The ledger keeps its own chrome, so it mirrors the bakery shell's drawer
+  // contract rather than sharing its state.
+  const navTriggerRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const drawerA11y = useDrawerA11y({
+    containerRef: drawerRef,
+    triggerRef: navTriggerRef,
+    closeRef,
+    isOpen: isSidebarOpen,
+    isDrawerLayout: !isDesktopRail,
+    onClose: () => setIsSidebarOpen(false),
+  });
+
   const handleNavClick = (tab: ChamsTabId) => {
     setActiveChamsTab(tab);
     setIsSidebarOpen(false);
@@ -240,6 +255,7 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
       {!isDesktopRail && (
         <div className="bg-[#1B2A4A] text-[#EAF0FB] p-4 flex justify-between items-center shadow-md z-30 w-full">
           <button
+            ref={navTriggerRef}
             onClick={() => setIsSidebarOpen(true)}
             aria-label="Open navigation"
             className="p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2A4A] bg-[#3B5BA5]/20 rounded-md"
@@ -266,7 +282,9 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
       )}
 
       {/* SIDEBAR */}
-      <aside
+      <div
+        ref={drawerRef}
+        {...drawerA11y}
         className={`
         inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out
         flex flex-col shadow-2xl group
@@ -303,6 +321,7 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
           </button>
           {!isDesktopRail && (
             <button
+              ref={closeRef}
               onClick={() => setIsSidebarOpen(false)}
               aria-label="Close navigation"
               className="p-1 text-[#EAF0FB]/60 hover:text-white"
@@ -354,7 +373,7 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
             </span>
           </button>
         </div>
-      </aside>
+      </div>
 
       {/* MAIN CONTENT AREA */}
       <main className="flex-1 relative z-10 w-full flex flex-col p-4 md:p-8 overflow-y-auto">

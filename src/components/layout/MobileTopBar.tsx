@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import type { RefObject } from "react";
 import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
 import type { TicketCustomer } from "../../types/domain";
 
@@ -13,6 +14,8 @@ export interface MobileTicketBar {
 
 interface MobileTopBarProps {
   onOpenMobileNav: () => void;
+  /** The hamburger itself, so the drawer can hand focus back to it on close. */
+  triggerRef: RefObject<HTMLButtonElement>;
   /** Pass the ticket details on the POS tab, and null on every other tab. */
   pos: MobileTicketBar | null;
 }
@@ -23,7 +26,7 @@ interface MobileTopBarProps {
  * navigation drawer rather than here, which frees the phone row up for the
  * ticket controls the POS needs within thumb reach at all times.
  */
-export default function MobileTopBar({ onOpenMobileNav, pos }: MobileTopBarProps) {
+export default function MobileTopBar({ onOpenMobileNav, triggerRef, pos }: MobileTopBarProps) {
   const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
 
   const confirmClear = () => {
@@ -34,6 +37,7 @@ export default function MobileTopBar({ onOpenMobileNav, pos }: MobileTopBarProps
   return (
     <div className="bg-[#562D07] text-[#FDF9F3] p-4 flex items-center gap-3 shadow-md z-30">
       <button
+        ref={triggerRef}
         onClick={onOpenMobileNav}
         aria-label="Open navigation"
         className="p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#562D07] bg-[#F3B978]/20 rounded-md flex-shrink-0"

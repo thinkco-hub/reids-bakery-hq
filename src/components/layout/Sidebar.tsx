@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router";
 import type { User } from "../../types/domain";
-import type { Dispatch, SetStateAction } from "react";
+import type { Dispatch, RefObject, SetStateAction } from "react";
 import {
   canAccessChams,
   canAccessReconciliation,
   canAccessTab,
 } from "../../utils/permissions";
 import { canUseSidebarRail } from "../../utils/responsive";
+import { useDrawerA11y } from "../../hooks/useDrawerA11y";
 import { CHAMS_PATH, PATH_BY_TAB, isWithinPath } from "../../routes";
 
 interface SidebarProps {
@@ -16,6 +17,8 @@ interface SidebarProps {
   windowWidth: number;
   isSidebarOpen: boolean;
   setIsSidebarOpen: Dispatch<SetStateAction<boolean>>;
+  /** The hamburger in the top bar; focus returns to it when the drawer closes. */
+  triggerRef: RefObject<HTMLButtonElement>;
   isInventoryExpanded: boolean;
   /** null hands the group back to the route it owns. */
   setIsInventoryExpanded: Dispatch<SetStateAction<boolean | null>>;
@@ -52,6 +55,7 @@ export default function Sidebar({
   windowWidth,
   isSidebarOpen,
   setIsSidebarOpen,
+  triggerRef,
   isInventoryExpanded,
   setIsInventoryExpanded,
   isReportsExpanded,
@@ -65,10 +69,12 @@ export default function Sidebar({
 
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const reportsPath = PATH_BY_TAB["reports-dashboard"];
-  // The Reports header only expands its submenu, it never navigates, so there is
-  // no NavLink here to ask whether the group is active.
-  const isReportsActive = isWithinPath(reportsPath, pathname);
+  // Neither group header is a link that could ask NavLink for isActive: Reports
+  // only expands, and the Inventory row is a link beside a separate toggle.
+  const isReportsActive = isWithinPath(PATH_BY_TAB["reports-dashboard"], pathname);
+  const isInventoryActive = isWithinPath(PATH_BY_TAB.inventory, pathname);
+  const inventorySubmenuId = useId();
+  const reportsSubmenuId = useId();
 
   // --- SIDEBAR RESPONSIVE HELPERS ---
   // Phones and tablets open the sidebar from the hamburger as an off-canvas
@@ -88,10 +94,21 @@ export default function Sidebar({
   const sidebarLabelCls =
     !isDesktopRail || desktopRailExpanded ? "opacity-100" : "opacity-0";
 
-  // Sub-menus follow their expand flags, except on the collapsed desktop rail
-  // where there is no room for them.
-  const submenuCls =
-    isDesktopRail && !desktopRailExpanded ? "hidden" : "block";
+  // Sub-menus stay mounted so their toggle's aria-controls always resolves, and
+  // `hidden` is what takes a collapsed one out of the tab order. The collapsed
+  // desktop rail has no room for a sub-menu at all.
+  const submenuHidden = isDesktopRail && !desktopRailExpanded;
+
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const drawerA11y = useDrawerA11y({
+    containerRef: drawerRef,
+    triggerRef,
+    closeRef,
+    isOpen: isSidebarOpen,
+    isDrawerLayout: !isDesktopRail,
+    onClose: () => setIsSidebarOpen(false),
+  });
 
   return (
     <>
@@ -104,7 +121,9 @@ export default function Sidebar({
       )}
 
       {/* SIDEBAR */}
-      <aside
+      <div
+        ref={drawerRef}
+        {...drawerA11y}
         onMouseMove={(e) => {
           if (!isDesktopRail) return;
           // Expand only while the cursor is inside the collapsed rail's 80px.
@@ -159,6 +178,7 @@ export default function Sidebar({
           </button>
           {!isDesktopRail && (
             <button
+              ref={closeRef}
               onClick={() => setIsSidebarOpen(false)}
               aria-label="Close navigation"
               className="p-1 text-[#FDF9F3]/60 hover:text-white"
@@ -269,19 +289,12 @@ export default function Sidebar({
 
           {canAccessTab(role, "inventory") && (
             <div className="flex flex-col">
-              <NavLink
-                to={PATH_BY_TAB.inventory}
-                onClick={() => {
-                  if (canReconcile) {
-                    // Reconciliation roles: first click expands the submenu;
-                    // the main view stays reachable via the item itself below.
-                    setIsInventoryExpanded(!isInventoryExpanded);
-                  }
-                  onNavSelect();
-                }}
-                className={({ isActive }) => itemCls(isActive, "justify-between")}
-              >
-                <div className="flex items-center">
+              <div className={itemCls(isInventoryActive)}>
+                <NavLink
+                  to={PATH_BY_TAB.inventory}
+                  onClick={onNavSelect}
+                  className="flex items-center min-w-0 flex-1"
+                >
                   <div className="flex items-center justify-center w-8 flex-shrink-0">
                     <svg
                       className="w-6 h-6"
@@ -294,35 +307,42 @@ export default function Sidebar({
                   <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                     Inventory
                   </span>
-                </div>
-                {canReconcile && (
-                  <svg
-                    onClick={(e) => {
-                      // Chevron tap toggles the submenu without navigating
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setIsInventoryExpanded(!isInventoryExpanded);
-                    }}
-                    className={`w-4 h-4 ml-2 transition-transform duration-200 ${
-                      isInventoryExpanded ? "rotate-180" : ""
-                    } ${sidebarLabelCls}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                </NavLink>
+                {/* No toggle on the collapsed rail: its labels are invisible there. */}
+                {canReconcile && !submenuHidden && (
+                  <button
+                    onClick={() => setIsInventoryExpanded(!isInventoryExpanded)}
+                    aria-label="Toggle inventory submenu"
+                    aria-expanded={isInventoryExpanded}
+                    aria-controls={inventorySubmenuId}
+                    // Negative margins keep the chevron in place; the target is 40px.
+                    className="-my-3 -mr-3 ml-2 p-3 flex-shrink-0"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
+                    <svg
+                      className={`w-4 h-4 transition-transform duration-200 ${
+                        isInventoryExpanded ? "rotate-180" : ""
+                      } ${sidebarLabelCls}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
                 )}
-              </NavLink>
+              </div>
 
-              {canReconcile && isInventoryExpanded && (
+              {canReconcile && (
                 <div
-                  className={`mt-1 space-y-1 bg-[#4a2605] rounded-lg overflow-hidden transition-all shadow-inner ${submenuCls}`}
+                  id={inventorySubmenuId}
+                  hidden={submenuHidden || !isInventoryExpanded}
+                  className="mt-1 space-y-1 bg-[#4a2605] rounded-lg overflow-hidden transition-all shadow-inner"
                 >
                   <NavLink
                     to={PATH_BY_TAB["inventory-reconciliation"]}
@@ -404,6 +424,8 @@ export default function Sidebar({
             <div className="flex flex-col">
               <button
                 onClick={() => setIsReportsExpanded(!isReportsExpanded)}
+                aria-expanded={isReportsExpanded}
+                aria-controls={reportsSubmenuId}
                 className={itemCls(isReportsActive, "justify-between")}
               >
                 <div className="flex items-center">
@@ -428,41 +450,42 @@ export default function Sidebar({
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
 
-              {isReportsExpanded && (
-                <div
-                  className={`mt-1 space-y-1 bg-[#4a2605] rounded-lg overflow-hidden transition-all shadow-inner ${submenuCls}`}
+              <div
+                id={reportsSubmenuId}
+                hidden={submenuHidden || !isReportsExpanded}
+                className="mt-1 space-y-1 bg-[#4a2605] rounded-lg overflow-hidden transition-all shadow-inner"
+              >
+                <NavLink
+                  to={PATH_BY_TAB["reports-dashboard"]}
+                  end
+                  onClick={onNavSelect}
+                  className={({ isActive }) => subItemCls(isActive)}
                 >
-                  <NavLink
-                    to={PATH_BY_TAB["reports-dashboard"]}
-                    end
-                    onClick={onNavSelect}
-                    className={({ isActive }) => subItemCls(isActive)}
-                  >
-                    Sales Dashboard
-                  </NavLink>
-                  <NavLink
-                    to={PATH_BY_TAB["reports-closing"]}
-                    end
-                    onClick={onNavSelect}
-                    className={({ isActive }) => subItemCls(isActive)}
-                  >
-                    End-of-Day Closing
-                  </NavLink>
-                  <NavLink
-                    to={PATH_BY_TAB["reports-inventory"]}
-                    end
-                    onClick={onNavSelect}
-                    className={({ isActive }) => subItemCls(isActive)}
-                  >
-                    Closing Inventory
-                  </NavLink>
-                </div>
-              )}
+                  Sales Dashboard
+                </NavLink>
+                <NavLink
+                  to={PATH_BY_TAB["reports-closing"]}
+                  end
+                  onClick={onNavSelect}
+                  className={({ isActive }) => subItemCls(isActive)}
+                >
+                  End-of-Day Closing
+                </NavLink>
+                <NavLink
+                  to={PATH_BY_TAB["reports-inventory"]}
+                  end
+                  onClick={onNavSelect}
+                  className={({ isActive }) => subItemCls(isActive)}
+                >
+                  Closing Inventory
+                </NavLink>
+              </div>
             </div>
           )}
 
@@ -545,7 +568,7 @@ export default function Sidebar({
             </span>
           </button>
         </div>
-      </aside>
+      </div>
     </>
   );
 }
