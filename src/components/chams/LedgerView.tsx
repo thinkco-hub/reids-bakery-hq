@@ -3,7 +3,7 @@ import { formatMonthLabel, shiftMonthKey } from "../../utils/dates";
 import { buildLedgerForMonth, computeBranchRevenueForMonth } from "../../utils/ledger";
 import { formatMoney } from "../../utils/money";
 import { discrepancyLabel } from "../../utils/counts";
-import { SearchIcon } from "../icons";
+import SearchField from "../common/SearchField";
 import type {
   ChamsBeginning,
   ChamsBranch,
@@ -113,19 +113,12 @@ export default function LedgerView({ branches, products, beginnings, movements, 
       </div>
 
       <div className="bg-white border border-gray-200 rounded-lg p-2 mb-4 shadow-sm">
-        <div className="relative flex-1 w-full">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <SearchIcon className="h-5 w-5 text-gray-400" />
-          </div>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            aria-label="Search ledger by branch or siopao type"
-            className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
-            placeholder="Search branch or siopao type..."
-          />
-        </div>
+        <SearchField
+          value={search}
+          onChange={setSearch}
+          ariaLabel="Search ledger by branch or siopao type"
+          placeholder="Search branch or siopao type..."
+        />
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">

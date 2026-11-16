@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SearchIcon } from "../icons";
+import SearchField from "../common/SearchField";
 import { getAuditLog } from "../../utils/auditLog";
 import { toISODate, todayISO } from "../../utils/dates";
 import { roleLabel } from "../../utils/permissions";
@@ -74,19 +74,12 @@ export default function AuditLogsView() {
       </header>
 
       <div className="bg-white border border-gray-200 rounded-lg p-2 mb-4 flex flex-col md:flex-row items-center gap-2 shadow-sm">
-        <div className="relative flex-1 w-full">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <SearchIcon className="h-5 w-5 text-gray-400" />
-          </div>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            aria-label="Search audit logs by user, action or details"
-            className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
-            placeholder="Search user, action or details..."
-          />
-        </div>
+        <SearchField
+          value={search}
+          onChange={setSearch}
+          ariaLabel="Search audit logs by user, action or details"
+          placeholder="Search user, action or details..."
+        />
         <div className="w-full h-px md:w-px md:h-8 bg-gray-200 my-2 md:my-0 block"></div>
         <div className="flex items-center gap-2 w-full md:w-auto px-2">
           <label htmlFor="audit-date-filter" className="text-sm text-gray-500 font-medium whitespace-nowrap">Date:</label>

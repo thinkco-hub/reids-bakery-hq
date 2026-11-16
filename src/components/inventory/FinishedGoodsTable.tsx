@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import InventoryStatsBar from "./InventoryStatsBar";
 import StockStatusBadge from "./StockStatusBadge";
-import { SearchIcon } from "../icons";
+import SearchField from "../common/SearchField";
 import { STOCK_STATUS_LABELS } from "../../utils/status";
 import { groupByStatus, getStockStatus } from "../../utils/stock";
 import type { MenuItemStock, StockStatus } from "../../types/domain";
@@ -38,19 +38,12 @@ export default function FinishedGoodsTable({ menuInventory, onRestock }: Finishe
       <InventoryStatsBar items={menuInventory} activeFilter={statusFilter} onFilterChange={setStatusFilter} />
 
       <div className="bg-white border border-gray-200 rounded-lg p-2 mb-4 shadow-sm flex">
-        <div className="relative flex-1 w-full">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <SearchIcon className="h-5 w-5 text-gray-400" />
-          </div>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            aria-label="Search items by name or ID"
-            className="block w-full pl-10 pr-3 py-2 border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
-            placeholder="Search items by name or ID..."
-          />
-        </div>
+        <SearchField
+          value={search}
+          onChange={setSearch}
+          ariaLabel="Search items by name or ID"
+          placeholder="Search items by name or ID..."
+        />
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-[#F3B978] mb-6 md:mb-8 overflow-hidden w-full">
