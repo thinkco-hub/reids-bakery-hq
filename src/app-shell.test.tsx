@@ -272,6 +272,23 @@ describe("nested routes", () => {
       "items-center"
     );
   });
+
+  it("stacks submenu links as full-width rows", async () => {
+    const user = userEvent.setup();
+    setViewportWidth(375);
+    renderShellAt("/orders");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Orders" });
+
+    const drawer = await openDrawerAtPhoneWidth(user);
+    await user.click(within(drawer).getByRole("button", { name: "Reports" }));
+    // Inline anchors ignore w-full and the vertical padding: the links flowed
+    // side by side and the panel's overflow-hidden clipped them.
+    expect(within(drawer).getByRole("link", { name: "Sales Dashboard" })).toHaveClass(
+      "block",
+      "w-full"
+    );
+  });
 });
 
 describe("phone drawer focus", () => {

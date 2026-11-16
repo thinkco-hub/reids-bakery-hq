@@ -42,7 +42,8 @@ function itemCls(active: boolean, extra = "") {
 }
 
 function subItemCls(active: boolean) {
-  return `w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
+  // block: these are router links now, and an inline anchor ignores w-full/py.
+  return `w-full block text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
     active
       ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
       : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
