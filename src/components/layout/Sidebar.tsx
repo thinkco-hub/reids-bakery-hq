@@ -34,7 +34,7 @@ const COLLAPSED_RAIL_PX = 80;
 
 /** A top-level item; `extra` carries the group headers' justify-between. */
 function itemCls(active: boolean, extra = "") {
-  return `w-full flex ${extra}items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
+  return `w-full flex items-center ${extra} p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
     active
       ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
       : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"

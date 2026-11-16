@@ -257,6 +257,21 @@ describe("nested routes", () => {
     expect(within(drawer).queryByRole("link", { name: "Reconciliation" })).toBeNull();
     expect(pathInAddressBar()).toBe("/inventory");
   });
+
+  it("keeps the Reports header's layout utilities as separate classes", async () => {
+    const user = userEvent.setup();
+    setViewportWidth(375);
+    renderShellAt("/orders");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Orders" });
+
+    const drawer = await openDrawerAtPhoneWidth(user);
+    // A missing space once fused these into one dead token, justify-betweenitems-center.
+    expect(within(drawer).getByRole("button", { name: "Reports" })).toHaveClass(
+      "justify-between",
+      "items-center"
+    );
+  });
 });
 
 describe("phone drawer focus", () => {
