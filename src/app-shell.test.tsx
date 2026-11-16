@@ -175,15 +175,30 @@ describe("sign-out", () => {
 });
 
 describe("nested routes", () => {
+  /**
+   * The disclosure is only reachable in the drawer: the collapsed desktop rail
+   * hides its submenus and their toggles, so these run at a phone width with the
+   * drawer open rather than against a rail that shows nothing.
+   */
+  async function openDrawerAtPhoneWidth(user: UserEvent) {
+    await user.click(screen.getByRole("button", { name: "Open navigation" }));
+    return screen.getByRole("dialog", { name: "Navigation" });
+  }
+
   it("opens the Inventory submenu for a nested route loaded cold", async () => {
     const user = userEvent.setup();
+    setViewportWidth(375);
     renderShell("/inventory/reconciliation");
     await signInAsAdmin(user);
 
     await screen.findByRole("heading", { name: "Inventory Reconciliation" });
-    // Nothing clicked a chevron here: the route is what opened the group.
+    const drawer = await openDrawerAtPhoneWidth(user);
+    // Nothing clicked a toggle here: the route is what opened the group.
     expect(
-      within(sidebar()).getByRole("link", { name: "Reconciliation" })
+      within(drawer).getByRole("button", { name: "Toggle inventory submenu" })
+    ).toHaveAttribute("aria-expanded", "true");
+    expect(
+      within(drawer).getByRole("link", { name: "Reconciliation" })
     ).toBeInTheDocument();
   });
 
@@ -213,8 +228,8 @@ describe("nested routes", () => {
     await signInAsAdmin(user);
     await screen.findByRole("heading", { name: "Inventory: Menu Items" });
 
-    await user.click(screen.getByRole("button", { name: "Open navigation" }));
-    await user.click(within(sidebar()).getByRole("link", { name: "Reconciliation" }));
+    const drawer = await openDrawerAtPhoneWidth(user);
+    await user.click(within(drawer).getByRole("link", { name: "Reconciliation" }));
 
     expect(
       await screen.findByRole("heading", { name: "Inventory Reconciliation" })
@@ -222,22 +237,68 @@ describe("nested routes", () => {
     expect(pathInAddressBar()).toBe("/inventory/reconciliation");
     // Off-canvas is the only thing that hides the drawer, so the transform is
     // the state under test — the submenu link itself stays in the document.
-    expect(sidebar().className).toContain("-translate-x-full");
+    expect(drawer.className).toContain("-translate-x-full");
+    expect(drawer).toHaveAttribute("aria-hidden", "true");
   });
 
   it("keeps a clicked group closed on the very route that would open it", async () => {
     const user = userEvent.setup();
+    setViewportWidth(375);
     renderShellAt("/inventory");
     await signInAsAdmin(user);
 
-    await within(sidebar()).findByRole("link", { name: "Reconciliation" });
-    // The second svg in the group header is the chevron: it toggles, it does not navigate.
+    const drawer = await openDrawerAtPhoneWidth(user);
+    await within(drawer).findByRole("link", { name: "Reconciliation" });
+    // The toggle sits beside the link: it expands the group without navigating.
     await user.click(
-      within(sidebar()).getByRole("link", { name: "Inventory" }).querySelectorAll("svg")[1]
+      within(drawer).getByRole("button", { name: "Toggle inventory submenu" })
     );
 
-    expect(within(sidebar()).queryByRole("link", { name: "Reconciliation" })).toBeNull();
+    expect(within(drawer).queryByRole("link", { name: "Reconciliation" })).toBeNull();
     expect(pathInAddressBar()).toBe("/inventory");
+  });
+});
+
+describe("phone drawer focus", () => {
+  it("keeps a closed drawer out of the accessibility tree and returns focus on Escape", async () => {
+    const user = userEvent.setup();
+    setViewportWidth(375);
+    renderShellAt("/orders");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Orders" });
+
+    const hamburger = screen.getByRole("button", { name: "Open navigation" });
+    // byRole skips hidden nodes, so the closed panel is read off the DOM.
+    const panel = document.querySelector('[role="complementary"]');
+    if (!(panel instanceof HTMLElement)) throw new Error("No sidebar");
+    // Off-canvas is not enough: the closed drawer must not be a landmark or a
+    // source of tab stops for the page behind it.
+    expect(screen.queryByRole("complementary")).toBeNull();
+    expect(panel).toHaveAttribute("inert");
+    expect(panel).toHaveAttribute("aria-hidden", "true");
+
+    await user.click(hamburger);
+    const open = screen.getByRole("dialog", { name: "Navigation" });
+    expect(open).toHaveAttribute("aria-modal", "true");
+    expect(open).not.toHaveAttribute("inert");
+    expect(screen.getByRole("button", { name: "Close navigation" })).toHaveFocus();
+
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog", { name: "Navigation" })).toBeNull();
+    expect(hamburger).toHaveFocus();
+  });
+
+  it("leaves the pinned desktop rail in the page, open drawer state or not", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/orders");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Orders" });
+
+    const rail = sidebar();
+    expect(rail).not.toHaveAttribute("inert");
+    expect(rail).not.toHaveAttribute("aria-hidden");
+    expect(rail).toHaveAttribute("role", "complementary");
+    expect(screen.queryByRole("button", { name: "Open navigation" })).toBeNull();
   });
 });
 
