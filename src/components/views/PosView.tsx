@@ -130,8 +130,8 @@ export default function PosView({
                   className={`relative w-full aspect-square rounded-xl shadow-sm hover:shadow-md transition-all transform active:scale-95 flex flex-col justify-end ${product.color} overflow-hidden group`}
                 >
                   {/* Any catalogue colour can be the swatch, so the label brings its own plate. */}
-                  <span className="flex flex-col gap-0.5 bg-white px-3 py-2 border-t border-black/10">
-                    <span className="text-left text-base font-bold leading-tight text-[#121212] group-hover:underline">
+                  <span className="flex flex-col gap-0.5 bg-white px-3 py-2 text-left border-t border-black/10">
+                    <span className="text-base font-bold leading-tight text-[#121212] group-hover:underline">
                       {product.name}
                     </span>
                     <span className="text-sm font-bold text-[var(--color-brand-text)]">
