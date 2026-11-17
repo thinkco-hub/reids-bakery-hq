@@ -78,7 +78,7 @@ export default function UserManagementView({
           role={feedback.type === "error" ? "alert" : "status"}
           className={`mb-4 px-4 py-3 rounded-lg text-sm font-medium border ${
             feedback.type === "error"
-              ? "bg-red-50 text-red-600 border-red-200"
+              ? "bg-red-50 text-red-700 border-red-200"
               : "bg-green-50 text-green-700 border-green-200"
           }`}
         >
@@ -157,7 +157,7 @@ export default function UserManagementView({
                               ? "Only a Super Admin can change this user's role"
                               : undefined
                           }
-                          className="pl-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-800 focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed cursor-pointer"
+                          className="pl-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-800 focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed cursor-pointer"
                         >
                           {options.map(({ role, allowed }) => (
                             <option key={role} value={role} disabled={!allowed}>
@@ -195,7 +195,7 @@ export default function UserManagementView({
                           }
                           className={`font-semibold px-3 py-1.5 rounded-md transition-colors text-sm disabled:text-gray-400 disabled:cursor-not-allowed disabled:hover:bg-transparent ${
                             user.active
-                              ? "text-red-600 hover:bg-red-50"
+                              ? "text-red-700 hover:bg-red-50"
                               : "text-green-700 hover:bg-green-50"
                           }`}
                         >

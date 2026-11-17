@@ -74,7 +74,7 @@ function ScheduleDeliveryModal({
               type="date"
               value={deliveryDate}
               onChange={(e) => setDeliveryDate(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
               required
             />
           </div>
@@ -86,7 +86,7 @@ function ScheduleDeliveryModal({
               value={assignedTo}
               onChange={(e) => setAssignedTo(e.target.value)}
               placeholder="e.g. Juan Dela Cruz"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
               required
             />
           </div>
@@ -153,7 +153,7 @@ function RecordPaymentModal({
               id={methodFieldId}
               value={method}
               onChange={(e) => setMethod(e.target.value as PaymentMethod)}
-              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
             >
               {PAYMENT_METHODS.map((m) => (
                 <option key={m} value={m}>
@@ -172,10 +172,10 @@ function RecordPaymentModal({
               step="0.01"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
               required
             />
-            <p className="text-xs text-gray-400 mt-1">Amount due: {formatMoney(amountDue)}</p>
+            <p className="text-xs text-gray-500 mt-1">Amount due: {formatMoney(amountDue)}</p>
           </div>
         </div>
         <div className="flex gap-3 mt-8">
@@ -267,10 +267,10 @@ export default function OrderDetail({
       )}
 
       <div className="flex items-center text-[15px] mb-6 text-gray-500 font-medium tracking-wide">
-        <button onClick={onBack} className="hover:text-[#F17D0C] transition-colors">
+        <button onClick={onBack} className="hover:text-[var(--color-brand-text)] transition-colors">
           Orders
         </button>
-        <span className="mx-2 text-gray-400">&gt;</span>
+        <span className="mx-2 text-gray-500">&gt;</span>
         <span className="text-[#121212] font-bold">Order Details</span>
       </div>
 
@@ -351,7 +351,7 @@ export default function OrderDetail({
           <p className="text-sm font-bold text-red-700 mb-2">
             Insufficient finished-goods stock for {shortfalls.length} item(s)
           </p>
-          <ul className="text-sm text-red-600 space-y-1 mb-3">
+          <ul className="text-sm text-red-700 space-y-1 mb-3">
             {shortfalls.map((s) => (
               <li key={s.menuItemId}>
                 {s.name}: need {s.requestedQty}, have {s.available} (short {s.shortfall})
@@ -382,7 +382,7 @@ export default function OrderDetail({
             </div>
             <div>
               <p className="text-base font-bold text-[#121212]">{client ? client.name : order.customerName || "—"}</p>
-              <p className="text-xs text-gray-400 font-medium">
+              <p className="text-xs text-gray-500 font-medium">
                 {client?.contact ||
                   order.customerContact ||
                   (order.customerName ? "Walk-in / POS customer" : "No contact on file")}
@@ -399,7 +399,7 @@ export default function OrderDetail({
               </div>
               <div>
                 <p className="text-base font-bold text-[#121212]">{order.deliveryDate || "Not scheduled"}</p>
-                <p className="text-xs text-gray-400 font-medium">{order.assignedTo || "—"}</p>
+                <p className="text-xs text-gray-500 font-medium">{order.assignedTo || "—"}</p>
               </div>
             </div>
           </div>
@@ -497,7 +497,7 @@ export default function OrderDetail({
                   <div className="pt-0.5">
                     <h4 className="font-bold text-sm text-gray-900 leading-none">{status}</h4>
                     {status === "Delivered" && order.deliveredAt && (
-                      <p className="text-[10px] text-gray-400 mt-1.5 leading-none">{order.deliveredAt}</p>
+                      <p className="text-[10px] text-gray-500 mt-1.5 leading-none">{order.deliveredAt}</p>
                     )}
                   </div>
                 </div>

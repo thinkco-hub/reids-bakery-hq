@@ -86,12 +86,12 @@ export default function RunDetailModal({ run, recipe, ingredients, onClose, onCo
                     </td>
                     <td
                       className={`px-4 py-2.5 text-right font-semibold ${
-                        line.shortfall > 0 ? "text-red-600" : "text-gray-700"
+                        line.shortfall > 0 ? "text-red-700" : "text-gray-700"
                       }`}
                     >
                       {line.inStock} {line.unit}
                       {line.shortfall > 0 && (
-                        <span className="block text-xs font-normal text-red-500">
+                        <span className="block text-xs font-normal text-red-700">
                           short {line.shortfall} {line.unit}
                         </span>
                       )}
@@ -103,7 +103,7 @@ export default function RunDetailModal({ run, recipe, ingredients, onClose, onCo
           </div>
 
           {!isCompleted && !feasible && (
-            <p className="mt-4 text-xs text-red-600 font-medium">
+            <p className="mt-4 text-xs text-red-700 font-medium">
               Completing this run will deduct available stock down to zero for short ingredients.
             </p>
           )}
@@ -120,7 +120,7 @@ export default function RunDetailModal({ run, recipe, ingredients, onClose, onCo
             <>
               <button
                 onClick={onDelete}
-                className="min-h-[2.75rem] md:min-h-0 px-4 py-3 rounded-xl border border-red-200 text-red-600 font-bold whitespace-nowrap hover:bg-red-50 transition-colors"
+                className="min-h-[2.75rem] md:min-h-0 px-4 py-3 rounded-xl border border-red-200 text-red-700 font-bold whitespace-nowrap hover:bg-red-50 transition-colors"
               >
                 Delete
               </button>

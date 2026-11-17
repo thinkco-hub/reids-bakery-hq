@@ -60,7 +60,7 @@ export default function InventoryView({
               onClick={() => setStockView("menu")}
               className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${
                 stockView === "menu"
-                  ? "bg-[#F17D0C] text-white shadow-md"
+                  ? "bg-[var(--color-brand-strong)] text-white shadow-md"
                   : "text-[#FDF9F3]/70 hover:text-white"
               }`}
             >
@@ -70,7 +70,7 @@ export default function InventoryView({
               onClick={() => setStockView("raw")}
               className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${
                 stockView === "raw"
-                  ? "bg-[#F17D0C] text-white shadow-md"
+                  ? "bg-[var(--color-brand-strong)] text-white shadow-md"
                   : "text-[#FDF9F3]/70 hover:text-white"
               }`}
             >
@@ -81,7 +81,7 @@ export default function InventoryView({
 
         <button
           onClick={() => onNavClick("inventory-closing-count")}
-          className="sm:ml-auto inline-flex items-center justify-center px-4 py-2 rounded-xl bg-[#F17D0C] text-white text-sm font-bold shadow-md hover:bg-[#d96f0a] transition-colors"
+          className="sm:ml-auto inline-flex items-center justify-center px-4 py-2 rounded-xl bg-[var(--color-brand-strong)] text-white text-sm font-bold shadow-md hover:bg-[var(--color-brand-strong-hover)] transition-colors"
         >
           Closing Count
         </button>

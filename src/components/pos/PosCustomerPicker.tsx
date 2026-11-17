@@ -87,7 +87,7 @@ export default function PosCustomerPicker({
       <div className="flex-shrink-0 bg-white border-b border-gray-200 p-3">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <SearchIcon className="h-5 w-5 text-gray-400" />
+            <SearchIcon className="h-5 w-5 text-gray-500" />
           </div>
           <input
             ref={searchRef}
@@ -97,7 +97,7 @@ export default function PosCustomerPicker({
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search customers..."
             aria-label="Search customers"
-            className="block w-full min-h-[2.75rem] pl-10 pr-3 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#F17D0C] outline-none"
+            className="block w-full min-h-[2.75rem] pl-10 pr-3 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-[var(--color-brand-text)] outline-none"
           />
         </div>
       </div>
@@ -105,7 +105,7 @@ export default function PosCustomerPicker({
       <div className="flex-shrink-0 bg-white border-b border-gray-200">
         <button
           onClick={() => setIsFormOpen(true)}
-          className="w-full min-h-[3rem] px-4 py-3 font-bold text-[#F17D0C] uppercase tracking-wide text-sm hover:bg-orange-50 active:bg-orange-100 transition-colors"
+          className="w-full min-h-[3rem] px-4 py-3 font-bold text-[var(--color-brand-text)] uppercase tracking-wide text-sm hover:bg-orange-50 active:bg-orange-100 transition-colors"
         >
           Add new customer
         </button>
@@ -162,7 +162,7 @@ function ClientRow({
         </span>
         {attached && (
           <svg
-            className="w-6 h-6 flex-shrink-0 text-[#F17D0C]"
+            className="w-6 h-6 flex-shrink-0 text-[var(--color-brand-text)]"
             fill="none"
             stroke="currentColor"
             strokeWidth={2.5}

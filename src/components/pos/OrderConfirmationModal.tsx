@@ -47,7 +47,7 @@ export default function OrderConfirmationModal({
       className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto overscroll-contain animate-fadeIn"
     >
       <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center text-white bg-[#F17D0C]">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-white bg-[var(--color-brand-strong)]">
             <svg
               className="w-5 h-5"
               fill="none"
@@ -91,7 +91,7 @@ export default function OrderConfirmationModal({
 
         <div className="flex justify-between items-center mb-6 text-xl font-bold text-[#121212] px-2">
           <span>Total to Charge:</span>
-          <span className="text-[#F17D0C]">{formatMoney(cartTotal)}</span>
+          <span className="text-[var(--color-brand-text)]">{formatMoney(cartTotal)}</span>
         </div>
 
         <div className="mb-6">
@@ -104,7 +104,7 @@ export default function OrderConfirmationModal({
                 onClick={() => onSaleTypeChange(type)}
                 className={`py-2.5 rounded-lg border text-sm font-semibold transition-colors ${
                   modal.saleType === type
-                    ? "border-[#F17D0C] bg-orange-50 text-[#F17D0C]"
+                    ? "border-[var(--color-brand-text)] bg-orange-50 text-[var(--color-brand-text)]"
                     : "border-gray-300 text-gray-700 hover:bg-gray-50"
                 }`}
               >
@@ -134,14 +134,14 @@ export default function OrderConfirmationModal({
               min={tomorrowISO}
               value={modal.deliveryDate}
               onChange={(e) => onFieldChange("deliveryDate", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
             />
             {modal.deliveryDate && modal.deliveryDate <= todayISO ? (
-              <p role="alert" className="text-xs font-semibold text-red-600 mt-1.5">
+              <p role="alert" className="text-xs font-semibold text-red-700 mt-1.5">
                 Delivery date must be after today. Choose Walk-in for a same-day sale.
               </p>
             ) : (
-              <p className="text-xs text-gray-400 mt-1.5">
+              <p className="text-xs text-gray-500 mt-1.5">
                 {modal.deliveryDate
                   ? "This order will be tracked in Orders (production & delivery)."
                   : "Pick a delivery date after today to place this order."}
@@ -160,7 +160,7 @@ export default function OrderConfirmationModal({
                 onClick={() => onFieldChange("paymentMethod", method)}
                 className={`py-2.5 rounded-lg border text-sm font-semibold transition-colors ${
                   modal.paymentMethod === method
-                    ? "border-[#F17D0C] bg-orange-50 text-[#F17D0C]"
+                    ? "border-[var(--color-brand-text)] bg-orange-50 text-[var(--color-brand-text)]"
                     : "border-gray-300 text-gray-700 hover:bg-gray-50"
                 }`}
               >
@@ -180,7 +180,7 @@ export default function OrderConfirmationModal({
             placeholder="Special instructions, allergies, packaging..."
             value={modal.notes}
             onChange={(e) => onFieldChange("notes", e.target.value)}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800 resize-none"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 resize-none"
           />
         </div>
 
@@ -197,7 +197,7 @@ export default function OrderConfirmationModal({
             className={`flex-1 py-3 rounded-xl text-white font-bold transition-colors ${
               disabled
                 ? "bg-gray-300 cursor-not-allowed"
-                : "bg-[#F17D0C] hover:bg-[#d86b06]"
+                : "bg-[var(--color-brand-strong)] hover:bg-[var(--color-brand-strong-hover)]"
             }`}
           >
             Confirm Order

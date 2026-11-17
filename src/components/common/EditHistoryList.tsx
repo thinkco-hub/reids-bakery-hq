@@ -16,7 +16,7 @@ export default function EditHistoryList({ entries }: { entries: EditHistoryEntry
               <li key={change.field} className="text-gray-800">
                 <span className="font-semibold">{change.label}: </span>
                 <span className="text-gray-500 line-through">{change.from}</span>
-                <span className="mx-1.5 text-gray-400">&rarr;</span>
+                <span className="mx-1.5 text-gray-500">&rarr;</span>
                 <span className="font-medium text-[#562D07]">{change.to}</span>
               </li>
             ))}

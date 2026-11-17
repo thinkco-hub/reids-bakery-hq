@@ -28,8 +28,8 @@ export const STOCK_STATUS_LABELS: Record<StockStatus, string> = {
 };
 
 export const STOCK_STATUS_BADGE_CLASSES: Record<StockStatus, string> = {
-  out: "bg-red-50 text-red-600",
-  low: "bg-[#F17D0C]/10 text-[#F17D0C]",
+  out: "bg-red-50 text-red-700",
+  low: "bg-orange-50 text-[var(--color-brand-text)]",
   ok: "bg-[#562D07]/10 text-[#562D07]",
 };
 
@@ -41,8 +41,8 @@ export const COUNT_STATUS_LABELS: Record<CountStatus, string> = {
 };
 
 export const COUNT_STATUS_BADGE_CLASSES: Record<CountStatus, string> = {
-  pending: "text-orange-600 bg-orange-50",
-  resolved: "text-gray-500 bg-gray-100",
+  pending: "text-orange-700 bg-orange-50",
+  resolved: "text-gray-600 bg-gray-100",
 };
 
 export const COUNT_RESOLUTION_LABELS: Record<CountResolution, string> = {

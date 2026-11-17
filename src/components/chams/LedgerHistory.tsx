@@ -20,7 +20,7 @@ function TrendBars({ rows }: { rows: LedgerRow[] }) {
               style={{ height }}
               title={`${r.branchName} — ${r.productName} — ${formatMonthLabel(r.month)}`}
             />
-            <span className="text-[10px] text-gray-400 mt-1 whitespace-nowrap">
+            <span className="text-[10px] text-gray-500 mt-1 whitespace-nowrap">
               {formatMonthLabel(r.month).split(" ")[0].slice(0, 3)}
             </span>
           </div>
@@ -115,19 +115,19 @@ export default function LedgerHistory({ branches, products, beginnings, movement
                   <td className="px-5 py-4 text-right text-green-700 font-medium">{formatMoney(r.revenue)}</td>
                   <td className="px-5 py-4 text-right font-semibold text-gray-900">{r.remainingCalculated}</td>
                   <td className="px-5 py-4 text-right text-gray-600">
-                    {r.countSubmitted ? r.remainingReported : <span className="text-gray-300">—</span>}
+                    {r.countSubmitted ? r.remainingReported : <span className="text-gray-500">—</span>}
                   </td>
                   <td className="px-5 py-4">
                     {!r.countSubmitted ? (
-                      <span className="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
+                      <span className="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
                         Not Submitted
                       </span>
                     ) : r.flagged ? (
-                      <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-full">
+                      <span className="text-xs font-bold text-red-700 bg-red-100 px-2 py-1 rounded-full">
                         {discrepancyLabel(r.discrepancy as number)}
                       </span>
                     ) : (
-                      <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                      <span className="text-xs font-bold text-green-700 bg-green-100 px-2 py-1 rounded-full">
                         Match
                       </span>
                     )}

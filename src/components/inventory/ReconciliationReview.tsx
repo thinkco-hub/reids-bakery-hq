@@ -144,7 +144,7 @@ export default function ReconciliationReview({
                     <td className="px-6 py-4 text-right text-gray-600">{c.countedQty}</td>
                     <td
                       className={`px-6 py-4 text-right font-bold ${
-                        c.discrepancy === 0 ? "text-gray-400" : c.discrepancy > 0 ? "text-green-600" : "text-red-600"
+                        c.discrepancy === 0 ? "text-gray-500" : c.discrepancy > 0 ? "text-green-700" : "text-red-700"
                       }`}
                     >
                       {discrepancyLabel(c.discrepancy)}
@@ -171,7 +171,7 @@ export default function ReconciliationReview({
                         <>
                           <button
                             onClick={() => onResolve(c.id, "apply")}
-                            className="text-[#F17D0C] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
+                            className="text-[var(--color-brand-text)] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                             title="Adjust system stock to match the counted quantity"
                             aria-label={`Apply counted quantity for ${itemName(c)}`}
                           >
@@ -179,7 +179,7 @@ export default function ReconciliationReview({
                           </button>
                           <button
                             onClick={() => onResolve(c.id, "dismiss")}
-                            className="text-gray-400 hover:bg-gray-100 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
+                            className="text-gray-500 hover:bg-gray-100 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                             title="Keep system stock as-is, discard this count"
                             aria-label={`Dismiss count for ${itemName(c)}`}
                           >
@@ -187,7 +187,7 @@ export default function ReconciliationReview({
                           </button>
                         </>
                       ) : (
-                        <span className="text-gray-300">—</span>
+                        <span className="text-gray-500">—</span>
                       )}
                     </td>
                   </tr>

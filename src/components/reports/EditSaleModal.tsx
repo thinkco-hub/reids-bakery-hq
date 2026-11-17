@@ -72,7 +72,7 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
     >
       <form onSubmit={handleSubmit}>
         <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-1">Edit Sale {sale.id}</h2>
-        <p className="text-xs text-gray-400 mb-6">
+        <p className="text-xs text-gray-500 mb-6">
           Totals (incl. 5% tax), reports and reprinted receipts follow the edited items.
         </p>
 
@@ -85,7 +85,7 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
                 type="text"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                 required
               />
             </div>
@@ -97,11 +97,11 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
                 value={customerContact}
                 onChange={(e) => setCustomerContact(toContactDigits(e.target.value))}
                 placeholder="11-digit mobile number"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                 required
               />
               {customerContact.length > 0 && !isValidCustomerContact(customerContact) && (
-                <p className="text-xs text-gray-400 mt-1">Enter the full 11-digit number.</p>
+                <p className="text-xs text-gray-500 mt-1">Enter the full 11-digit number.</p>
               )}
             </div>
           </div>
@@ -112,7 +112,7 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
               <button
                 type="button"
                 onClick={addLine}
-                className="text-sm font-bold text-[#F17D0C] hover:underline"
+                className="text-sm font-bold text-[var(--color-brand-text)] hover:underline"
               >
                 + Add Item
               </button>
@@ -125,7 +125,7 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
                     onChange={(e) => changeItem(idx, e.target.value)}
                     aria-label={`Item ${idx + 1}`}
                     wrapperClassName="flex-1"
-                    className="w-full pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800 text-sm"
+                    className="w-full pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 text-sm"
                   >
                     {!products.some((p) => p.id === line.item.id) && (
                       <option value={line.item.id}>{line.item.name}</option>
@@ -143,13 +143,13 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
                     aria-label={`Quantity for item ${idx + 1}`}
                     value={line.qty}
                     onChange={(e) => updateQty(idx, e.target.value)}
-                    className="w-20 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800 text-sm"
+                    className="w-20 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 text-sm"
                   />
                   <button
                     type="button"
                     onClick={() => removeLine(idx)}
                     aria-label={`Remove item ${idx + 1}`}
-                    className="text-gray-400 hover:text-red-500 p-1.5 transition-colors"
+                    className="text-gray-500 hover:text-red-500 p-1.5 transition-colors"
                   >
                     <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -162,7 +162,7 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
 
           <div className="flex justify-between items-center bg-gray-50 rounded-lg px-4 py-3">
             <span className="text-sm font-semibold text-gray-700">New Total (incl. tax)</span>
-            <span className="text-lg font-bold text-[#F17D0C]">
+            <span className="text-lg font-bold text-[var(--color-brand-text)]">
               {formatMoney(computeSaleTotals(cleanItems).total)}
             </span>
           </div>

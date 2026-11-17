@@ -147,10 +147,10 @@ export default function RecipeEditor({
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <div className="flex items-center text-[15px] mb-6 text-gray-500 font-medium tracking-wide">
-        <button onClick={onCancel} className="hover:text-[#F17D0C] transition-colors">
+        <button onClick={onCancel} className="hover:text-[var(--color-brand-text)] transition-colors">
           Recipes
         </button>
-        <span className="mx-2 text-gray-400">&gt;</span>
+        <span className="mx-2 text-gray-500">&gt;</span>
         <span className="text-[#121212] font-bold">{isNew ? "New Recipe" : "Edit Recipe"}</span>
       </div>
 
@@ -167,7 +167,7 @@ export default function RecipeEditor({
                     type="text"
                     value={form.name}
                     onChange={(e) => updateField("name", e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                     required
                   />
                 </div>
@@ -177,7 +177,7 @@ export default function RecipeEditor({
                     id={categoryFieldId}
                     value={form.category}
                     onChange={(e) => updateCategory(e.target.value as PosItemCategory)}
-                    className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                    className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                   >
                     {CATEGORY_OPTIONS.map((cat) => (
                       <option key={cat} value={cat}>
@@ -195,7 +195,7 @@ export default function RecipeEditor({
                     step="any"
                     value={form.price}
                     onChange={(e) => updateField("price", e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                     required
                   />
                 </div>
@@ -208,7 +208,7 @@ export default function RecipeEditor({
                     step="any"
                     value={form.qty}
                     onChange={(e) => updateField("qty", e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                     required
                   />
                 </div>
@@ -221,7 +221,7 @@ export default function RecipeEditor({
                     step="any"
                     value={form.target}
                     onChange={(e) => updateField("target", e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                     required
                   />
                 </div>
@@ -233,14 +233,14 @@ export default function RecipeEditor({
                     placeholder="e.g. 24 Hours"
                     value={form.shelfLife}
                     onChange={(e) => updateField("shelfLife", e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                     required
                   />
                 </div>
                 <div className="sm:col-span-2 grid grid-cols-2 gap-4">
                   <div>
                     <label htmlFor={yieldQtyFieldId} className="block text-sm font-semibold text-gray-700 mb-1">
-                      Yield Qty <span className="text-gray-400 font-normal">(if made in batches)</span>
+                      Yield Qty <span className="text-gray-500 font-normal">(if made in batches)</span>
                     </label>
                     <input
                       id={yieldQtyFieldId}
@@ -249,7 +249,7 @@ export default function RecipeEditor({
                       step="any"
                       value={form.yieldQty}
                       onChange={(e) => updateField("yieldQty", e.target.value)}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                     />
                   </div>
                   <div>
@@ -259,7 +259,7 @@ export default function RecipeEditor({
                       type="text"
                       value={form.yieldUnit}
                       onChange={(e) => updateField("yieldUnit", e.target.value)}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                     />
                   </div>
                 </div>
@@ -270,14 +270,14 @@ export default function RecipeEditor({
               <div className="flex justify-between items-center mb-4">
                 <div>
                   <h3 className="text-lg font-bold text-[#121212]">Ingredients (per batch)</h3>
-                  <p className="text-xs text-gray-400 font-medium mt-0.5">
+                  <p className="text-xs text-gray-500 font-medium mt-0.5">
                     Optional — leave empty for simple items with no BOM.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={addLine}
-                  className="text-sm font-bold text-[#F17D0C] hover:underline"
+                  className="text-sm font-bold text-[var(--color-brand-text)] hover:underline"
                 >
                   + Add Ingredient
                 </button>
@@ -296,7 +296,7 @@ export default function RecipeEditor({
                         }}
                         aria-label={`Ingredient ${idx + 1}`}
                         wrapperClassName="flex-1 w-full"
-                        className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                        className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                       >
                         <option value="">Select ingredient...</option>
                         {ingredients.map((i) => (
@@ -313,7 +313,7 @@ export default function RecipeEditor({
                         aria-label={`Quantity for ingredient ${idx + 1}`}
                         value={line.qty}
                         onChange={(e) => updateLine(idx, "qty", e.target.value)}
-                        className="w-full sm:w-28 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                        className="w-full sm:w-28 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                       />
                       <span className="w-16 text-sm text-gray-500 font-medium">
                         {ingredient?.unit || line.unit || ""}
@@ -321,7 +321,7 @@ export default function RecipeEditor({
                       <button
                         type="button"
                         onClick={() => removeLine(idx)}
-                        className="text-gray-400 hover:text-red-500 p-2 transition-colors"
+                        className="text-gray-500 hover:text-red-500 p-2 transition-colors"
                         title="Remove"
                         aria-label={`Remove ingredient ${idx + 1}`}
                       >
@@ -359,7 +359,7 @@ export default function RecipeEditor({
 
                 <div className="mt-5 pt-5 border-t border-gray-200">
                   <h4 className="text-sm font-bold text-[#121212] mb-3">
-                    Suggested Prices <span className="text-gray-400 font-normal">(customizable margin)</span>
+                    Suggested Prices <span className="text-gray-500 font-normal">(customizable margin)</span>
                   </h4>
                   <div className="space-y-3">
                     {marginTiers.map((margin, idx) => {
@@ -381,12 +381,12 @@ export default function RecipeEditor({
                                 aria-label={`${TIER_LABELS[idx]} margin percent`}
                                 value={margin}
                                 onChange={(e) => updateMarginTier(idx, e.target.value)}
-                                className="w-14 px-1.5 py-1 border border-gray-300 rounded text-xs font-bold text-gray-800 text-right focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none"
+                                className="w-14 px-1.5 py-1 border border-gray-300 rounded text-xs font-bold text-gray-800 text-right focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
                               />
                               <span className="text-xs text-gray-500 font-medium">% margin</span>
                             </div>
                           </div>
-                          <span className="text-lg font-bold text-[#F17D0C]">{formatMoney(tierPrice)}</span>
+                          <span className="text-lg font-bold text-[var(--color-brand-text)]">{formatMoney(tierPrice)}</span>
                         </div>
                       );
                     })}

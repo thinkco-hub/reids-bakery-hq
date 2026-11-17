@@ -73,7 +73,7 @@ export default function LoginPage({ onLogin, getLockedUntil }: LoginPageProps) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800 disabled:bg-gray-100 disabled:text-gray-400"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 disabled:bg-gray-100 disabled:text-gray-400"
               autoComplete="username"
               disabled={isLocked}
               required
@@ -86,7 +86,7 @@ export default function LoginPage({ onLogin, getLockedUntil }: LoginPageProps) {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800 disabled:bg-gray-100 disabled:text-gray-400"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 disabled:bg-gray-100 disabled:text-gray-400"
               autoComplete="current-password"
               disabled={isLocked}
               required
@@ -95,7 +95,7 @@ export default function LoginPage({ onLogin, getLockedUntil }: LoginPageProps) {
         </div>
 
         {(isLocked || error) && (
-          <p className="mt-4 text-sm font-semibold text-red-600">
+          <p className="mt-4 text-sm font-semibold text-red-700">
             {isLocked ? `Too many failed attempts. Try again in ${secondsLeft}s.` : error}
           </p>
         )}

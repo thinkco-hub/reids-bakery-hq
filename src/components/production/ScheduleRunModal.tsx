@@ -7,7 +7,7 @@ import type { Recipe, ScheduleRunData } from "../../types/domain";
 import SelectField from "../common/SelectField";
 
 const SELECT_BASE =
-  "rounded-lg border border-gray-300 py-2.5 text-gray-800 outline-none focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C]";
+  "rounded-lg border border-gray-300 py-2.5 text-gray-800 outline-none focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)]";
 
 interface ScheduleRunModalProps {
   recipes: Recipe[];
@@ -85,7 +85,7 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
                   step={isBatchMode ? "1" : "any"}
                   value={form.qty}
                   onChange={(e) => setForm({ ...form, qty: e.target.value })}
-                  className="min-w-0 flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                  className="min-w-0 flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                   required
                 />
                 <SelectField
@@ -114,7 +114,7 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
                 type="date"
                 value={form.plannedDate}
                 onChange={(e) => setForm({ ...form, plannedDate: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                 required
               />
             </div>
@@ -125,7 +125,7 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
                 rows={2}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                 placeholder="Optional..."
               />
             </div>

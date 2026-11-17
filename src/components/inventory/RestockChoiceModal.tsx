@@ -9,7 +9,7 @@ interface RestockChoiceModalProps {
 }
 
 const optionCls =
-  "w-full text-left px-4 py-3.5 rounded-xl border border-gray-300 hover:border-[#F17D0C] hover:bg-orange-50 transition-colors";
+  "w-full text-left px-4 py-3.5 rounded-xl border border-gray-300 hover:border-[var(--color-brand-text)] hover:bg-orange-50 transition-colors";
 
 export default function RestockChoiceModal({
   itemName,

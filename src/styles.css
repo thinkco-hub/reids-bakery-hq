@@ -14,6 +14,16 @@
 }
 
 
+/* Brand orange splits by role: #F17D0C is a fill (2.73:1 against white, so it
+   can never carry text or a focus ring on a light surface), while the darker
+   steps below carry white CTA labels and orange text at WCAG AA. */
+@theme {
+  --color-brand: #f17d0c;
+  --color-brand-strong: #b45309;
+  --color-brand-strong-hover: #9a3412;
+  --color-brand-text: #b45309;
+}
+
 /* Restores the fade-in entrance animation that was lost when the project
    migrated to Tailwind CSS v4 (animate-fadeIn is used across the app).
    Keyframes live inside @theme so Tailwind emits them with the utility.

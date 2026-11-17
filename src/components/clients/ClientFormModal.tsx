@@ -51,7 +51,7 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
               type="text"
               value={form.name}
               onChange={(e) => update("name", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
               required
             />
           </div>
@@ -65,7 +65,7 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
                 placeholder="09XXXXXXXXX"
                 value={form.contact}
                 onChange={(e) => update("contact", toContactDigits(e.target.value))}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
               />
             </div>
             <div>
@@ -75,7 +75,7 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
                 type="email"
                 value={form.email}
                 onChange={(e) => update("email", e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
               />
             </div>
           </div>
@@ -86,7 +86,7 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
               type="text"
               value={form.address}
               onChange={(e) => update("address", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
             />
           </div>
           <div>
@@ -99,7 +99,7 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
               onChange={(e) => update("standingOrder", e.target.value)}
               rows={3}
               placeholder="e.g. 20 Butter Croissants every Monday"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
             />
           </div>
         </div>

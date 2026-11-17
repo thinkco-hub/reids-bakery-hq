@@ -84,7 +84,7 @@ export default function ClientsList({ clients, orders, onAdd, onUpdate, onView }
                     <td className="px-6 py-4 font-medium text-gray-900">{client.name}</td>
                     <td className="px-6 py-4 text-gray-600">
                       <div>{client.contact || "—"}</div>
-                      {client.email && <div className="text-xs text-gray-400">{client.email}</div>}
+                      {client.email && <div className="text-xs text-gray-500">{client.email}</div>}
                     </td>
                     <td className="px-6 py-4 text-gray-600 max-w-xs truncate">{client.standingOrder || "—"}</td>
                     <td className="px-6 py-4 text-right text-gray-600">{orderCount(client.id)}</td>
@@ -99,7 +99,7 @@ export default function ClientsList({ clients, orders, onAdd, onUpdate, onView }
                       <button
                         onClick={() => onView(client)}
                         aria-label={`View ${client.name}`}
-                        className="text-[#F17D0C] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
+                        className="text-[var(--color-brand-text)] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                       >
                         View
                       </button>

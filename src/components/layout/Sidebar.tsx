@@ -573,7 +573,7 @@ export default function Sidebar({
             className={`px-3 mb-2 overflow-hidden whitespace-nowrap ${sidebarLabelCls} transition-opacity duration-300`}
           >
             <p className="text-sm font-bold text-white truncate">{currentUser.name}</p>
-            <p className="text-xs text-[#FDF9F3]/50 truncate">{currentUser.email}</p>
+            <p className="text-xs text-[#FDF9F3]/70 truncate">{currentUser.email}</p>
           </div>
           <button
             onClick={onLogout}
