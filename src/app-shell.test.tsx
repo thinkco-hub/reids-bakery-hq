@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter, useLocation, useNavigate } from "react-router";
 import userEvent from "@testing-library/user-event";
 import type { UserEvent } from "@testing-library/user-event";
@@ -331,6 +331,59 @@ describe("phone drawer focus", () => {
     expect(rail).not.toHaveAttribute("aria-hidden");
     expect(rail).toHaveAttribute("role", "complementary");
     expect(screen.queryByRole("button", { name: "Open navigation" })).toBeNull();
+  });
+});
+
+describe("desktop rail expansion", () => {
+  it("keeps the rail open while the pointer clicks its far-edge chevron", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/orders");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Orders" });
+
+    const rail = sidebar();
+    expect(
+      within(rail).queryByRole("button", { name: "Toggle inventory submenu" })
+    ).toBeNull();
+
+    // Explicit enter/leave pairs: user-event's pointer synthesis emits a
+    // null-relatedTarget mouseout in jsdom, which no browser dispatches.
+    fireEvent.mouseOver(rail, { relatedTarget: document.body });
+    const toggle = within(rail).getByRole("button", {
+      name: "Toggle inventory submenu",
+    });
+    // The chevron sits past the collapsed rail's 80px: reaching it must not
+    // collapse the rail under the cursor.
+    fireEvent.mouseOver(toggle, { relatedTarget: rail });
+    fireEvent.mouseDown(toggle);
+    fireEvent.click(toggle);
+    expect(
+      within(rail).getByRole("link", { name: "Reconciliation" })
+    ).toBeInTheDocument();
+
+    fireEvent.mouseOut(rail, { relatedTarget: document.body });
+    expect(
+      within(rail).queryByRole("button", { name: "Toggle inventory submenu" })
+    ).toBeNull();
+  });
+
+  it("opens the rail for keyboard focus and closes it when focus leaves", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/orders");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Orders" });
+
+    const rail = sidebar();
+    const reports = within(rail).getByRole("button", { name: "Reports" });
+    fireEvent.focusIn(reports);
+    expect(
+      within(rail).getByRole("button", { name: "Toggle inventory submenu" })
+    ).toBeInTheDocument();
+
+    fireEvent.focusOut(reports, { relatedTarget: document.body });
+    expect(
+      within(rail).queryByRole("button", { name: "Toggle inventory submenu" })
+    ).toBeNull();
   });
 });
 

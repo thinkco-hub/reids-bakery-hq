@@ -29,9 +29,6 @@ interface SidebarProps {
   onNavSelect: () => void;
 }
 
-/** Width (px) of the collapsed sidebar rail = desktop hover zone (Tailwind w-20). */
-const COLLAPSED_RAIL_PX = 80;
-
 /** A top-level item; `extra` carries the group headers' justify-between. */
 function itemCls(active: boolean, extra = "") {
   return `w-full flex items-center ${extra} p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
@@ -83,12 +80,18 @@ export default function Sidebar({
   // relies on hover to reveal its labels.
   const isDesktopRail = canUseSidebarRail(windowWidth);
 
-  // Desktop rail: expand ONLY while the cursor is within the collapsed rail's
-  // 80px width. Hovering the expanded part of the rail collapses it again, so
-  // the rail can never "trap" the cursor and cover content sitting right next
-  // to it (e.g. the POS category chips near the left edge).
-  const [isDesktopRailHovered, setIsDesktopRailHovered] = useState(false);
-  const desktopRailExpanded = isDesktopRail && isDesktopRailHovered;
+  // Desktop rail: expanded while the pointer is anywhere inside the panel or
+  // focus is inside it, collapsed once both leave. Testing clientX against the
+  // collapsed width instead collapses the rail under its own labels and
+  // chevrons, putting the right half of the open rail out of mouse reach.
+  const [isRailPointerInside, setIsRailPointerInside] = useState(false);
+  const [isRailFocusInside, setIsRailFocusInside] = useState(false);
+  // Focus pins the rail open only for keyboard users: a mouse click leaves
+  // focus on the row too, and pinning that would keep the overlay covering
+  // content after the cursor has left.
+  const railInputModality = useRef<"pointer" | "keyboard">("keyboard");
+  const desktopRailExpanded =
+    isDesktopRail && (isRailPointerInside || isRailFocusInside);
 
   // Shared class for sidebar labels/chevrons: always shown in the drawer, hidden
   // on the collapsed desktop rail until hover expands it.
@@ -125,13 +128,28 @@ export default function Sidebar({
       <div
         ref={drawerRef}
         {...drawerA11y}
-        onMouseMove={(e) => {
-          if (!isDesktopRail) return;
-          // Expand only while the cursor is inside the collapsed rail's 80px.
-          setIsDesktopRailHovered(e.clientX < COLLAPSED_RAIL_PX);
+        onMouseDown={() => {
+          railInputModality.current = "pointer";
+        }}
+        onMouseEnter={() => {
+          if (isDesktopRail) setIsRailPointerInside(true);
         }}
         onMouseLeave={() => {
-          if (isDesktopRail) setIsDesktopRailHovered(false);
+          if (isDesktopRail) setIsRailPointerInside(false);
+        }}
+        onKeyDown={(e) => {
+          railInputModality.current = "keyboard";
+          drawerA11y.onKeyDown?.(e);
+        }}
+        onFocus={() => {
+          if (isDesktopRail && railInputModality.current === "keyboard") {
+            setIsRailFocusInside(true);
+          }
+        }}
+        onBlur={(e) => {
+          if (isDesktopRail && !e.currentTarget.contains(e.relatedTarget)) {
+            setIsRailFocusInside(false);
+          }
         }}
         className={`
         inset-y-0 left-0 z-50 transform transition-all ease-in-out flex flex-col
@@ -142,8 +160,8 @@ export default function Sidebar({
               ? // Expanded = overlay so content never shifts; smooth 300ms growth
                 "absolute w-64 duration-300"
               : // Collapsed = quick 150ms ease-back so the rail doesn't linger
-                // over the POS chips after the cursor crosses the 80px line,
-                // while still animating smoothly instead of snapping shut
+                // over the POS chips once the cursor leaves it, while still
+                // animating smoothly instead of snapping shut
                 "relative w-20 duration-150"
             : // Drawer = fixed, so the page keeps its full width underneath it
               `fixed w-64 duration-300 ${
