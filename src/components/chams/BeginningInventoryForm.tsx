@@ -121,7 +121,7 @@ export default function BeginningInventoryForm({ branches, products, beginnings,
             onChange={(e) => setOpeningCount(e.target.value)}
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
           />
-          <p className="text-xs text-gray-400 mt-1.5">
+          <p className="text-xs text-gray-500 mt-1.5">
             {hasExisting
               ? "This month already has a confirmed opening count. Editing and saving will overwrite it."
               : "No opening count set for this combo/month yet — defaults to 0. Only set this to onboard a new branch/siopao type or to correct an error."}

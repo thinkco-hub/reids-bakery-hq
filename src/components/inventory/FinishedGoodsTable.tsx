@@ -97,7 +97,7 @@ export default function FinishedGoodsTable({ menuInventory, onRestock }: Finishe
                           <button
                             onClick={() => onRestock(item.id)}
                             aria-label={`Restock ${item.name}`}
-                            className="text-[#F17D0C] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
+                            className="text-[var(--color-brand-text)] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                           >
                             + Restock
                           </button>

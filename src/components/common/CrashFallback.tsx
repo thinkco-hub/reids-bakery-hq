@@ -33,7 +33,7 @@ export default function CrashFallback() {
         </Link>
 
         {detail && (
-          <p className="text-xs text-gray-400 font-mono mt-4 break-words">{detail}</p>
+          <p className="text-xs text-gray-500 font-mono mt-4 break-words">{detail}</p>
         )}
       </div>
     </div>

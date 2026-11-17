@@ -97,7 +97,7 @@ export default function PosMobile({
               <button
                 onClick={onRemoveCustomer}
                 aria-label={`Remove ${customer.name} from the ticket`}
-                className="flex-shrink-0 min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-gray-100 transition-colors"
+                className="flex-shrink-0 min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center rounded-lg text-gray-500 hover:text-red-500 hover:bg-gray-100 transition-colors"
               >
                 <svg
                   className="w-5 h-5"
@@ -168,7 +168,7 @@ export default function PosMobile({
               }
               aria-label="Filter items by category"
               wrapperClassName="flex-1 min-w-0"
-              className="min-h-[2.75rem] w-full pl-3 pr-10 bg-gray-100 border border-gray-200 rounded-lg text-sm font-bold text-gray-800 focus:ring-2 focus:ring-[#F17D0C] outline-none"
+              className="min-h-[2.75rem] w-full pl-3 pr-10 bg-gray-100 border border-gray-200 rounded-lg text-sm font-bold text-gray-800 focus:ring-2 focus:ring-[var(--color-brand-text)] outline-none"
             >
               {POS_CATEGORIES.map((cat) => (
                 <option key={cat} value={cat}>
@@ -212,7 +212,7 @@ export default function PosMobile({
                 onChange={(e) => setPosSearch(e.target.value)}
                 placeholder="Search items..."
                 aria-label="Search items"
-                className="w-full min-h-[2.75rem] px-3 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#F17D0C] outline-none"
+                className="w-full min-h-[2.75rem] px-3 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-[var(--color-brand-text)] outline-none"
               />
             </div>
           )}
@@ -238,7 +238,7 @@ export default function PosMobile({
                             className={`block h-12 w-12 rounded-lg ${product.color}`}
                           />
                           {qty > 0 && (
-                            <span className="absolute -right-1.5 -bottom-1.5 min-w-[1.4rem] h-[1.4rem] px-1 rounded-full bg-[#F17D0C] text-white text-xs font-bold flex items-center justify-center shadow">
+                            <span className="absolute -right-1.5 -bottom-1.5 min-w-[1.4rem] h-[1.4rem] px-1 rounded-full bg-[var(--color-brand-strong)] text-white text-xs font-bold flex items-center justify-center shadow">
                               {qty}
                             </span>
                           )}
@@ -283,7 +283,7 @@ function TicketButton({
       className={`w-full min-h-[3.25rem] py-2.5 rounded-xl font-bold shadow-lg transition-all transform active:scale-[0.98] flex flex-col items-center justify-center leading-tight ${
         disabled
           ? "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
-          : "bg-[#F17D0C] hover:bg-[#d86b06] text-white"
+          : "bg-[var(--color-brand-strong)] hover:bg-[var(--color-brand-strong-hover)] text-white"
       }`}
     >
       <span className="text-[1.05rem]">{label}</span>

@@ -61,7 +61,7 @@ export default function EndOfDayClosing({
           value={date}
           onChange={(e) => setDate(e.target.value)}
           aria-label="Closing date"
-          className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-700 focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none bg-white shadow-sm"
+          className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-700 focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none bg-white shadow-sm"
         />
       </header>
 
@@ -81,12 +81,12 @@ export default function EndOfDayClosing({
         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
           <p className="text-gray-500 text-sm font-medium mb-1">Gross Sales</p>
           <p className="text-2xl font-bold text-[#121212]">{formatMoney(closing.grossSales)}</p>
-          <p className="text-xs text-gray-400 mt-1">{closing.daySales.length} transaction(s)</p>
+          <p className="text-xs text-gray-500 mt-1">{closing.daySales.length} transaction(s)</p>
         </div>
         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
           <p className="text-gray-500 text-sm font-medium mb-1">Total Expenses</p>
           <p className="text-2xl font-bold text-red-500">{formatMoney(closing.totalExpenses)}</p>
-          <p className="text-xs text-gray-400 mt-1">{closing.dayExpenses.length} entr{closing.dayExpenses.length === 1 ? "y" : "ies"}</p>
+          <p className="text-xs text-gray-500 mt-1">{closing.dayExpenses.length} entr{closing.dayExpenses.length === 1 ? "y" : "ies"}</p>
         </div>
         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
           <p className="text-gray-500 text-sm font-medium mb-1">Net Profit</p>
@@ -121,7 +121,7 @@ export default function EndOfDayClosing({
               aria-label="Expense description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
             />
             <input
               type="number"
@@ -131,7 +131,7 @@ export default function EndOfDayClosing({
               aria-label="Expense amount"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="sm:w-40 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none"
+              className="sm:w-40 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
             />
             <button
               type="submit"
@@ -143,7 +143,7 @@ export default function EndOfDayClosing({
         )}
 
         {closing.dayExpenses.length === 0 ? (
-          <p className="text-sm text-gray-400 py-4 text-center">No expenses logged for this date.</p>
+          <p className="text-sm text-gray-500 py-4 text-center">No expenses logged for this date.</p>
         ) : (
           <ul className="divide-y divide-gray-100">
             {closing.dayExpenses.map((exp) => (
@@ -154,7 +154,7 @@ export default function EndOfDayClosing({
                   {!alreadyClosed && (
                     <button
                       onClick={() => onDeleteExpense(exp.id)}
-                      className="text-gray-400 hover:text-red-500 transition-colors"
+                      className="text-gray-500 hover:text-red-500 transition-colors"
                       title="Remove expense"
                       aria-label={`Remove expense ${exp.description}`}
                     >
@@ -173,7 +173,7 @@ export default function EndOfDayClosing({
       {!alreadyClosed && (
         <button
           onClick={handleCloseDay}
-          className="w-full py-3.5 rounded-xl text-white font-bold shadow-lg bg-[#F17D0C] hover:bg-[#d86b06] transition-colors"
+          className="w-full py-3.5 rounded-xl text-white font-bold shadow-lg bg-[var(--color-brand-strong)] hover:bg-[var(--color-brand-strong-hover)] transition-colors"
         >
           Close {date} — Lock In Net Profit of {formatMoney(closing.netProfit)}
         </button>
@@ -202,8 +202,8 @@ export default function EndOfDayClosing({
                     <tr key={c.id} className="hover:bg-gray-50/50">
                       <td className="px-6 py-3 font-medium text-gray-900">{c.date}</td>
                       <td className="px-6 py-3 text-right text-gray-700">{formatMoney(c.grossSales)}</td>
-                      <td className="px-6 py-3 text-right text-red-500">{formatMoney(c.totalExpenses)}</td>
-                      <td className={`px-6 py-3 text-right font-semibold ${c.netProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
+                      <td className="px-6 py-3 text-right text-red-700">{formatMoney(c.totalExpenses)}</td>
+                      <td className={`px-6 py-3 text-right font-semibold ${c.netProfit >= 0 ? "text-green-700" : "text-red-700"}`}>
                         {formatMoney(c.netProfit)}
                       </td>
                     </tr>

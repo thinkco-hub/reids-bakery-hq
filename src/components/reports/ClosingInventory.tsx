@@ -47,14 +47,14 @@ function StatCard({
     <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
       <p className="text-gray-500 text-xs md:text-sm font-medium mb-1">{label}</p>
       <p className={`text-xl md:text-2xl font-bold ${accent || "text-[#121212]"}`}>{value}</p>
-      {sub && <p className="text-xs text-gray-400 mt-1">{sub}</p>}
+      {sub && <p className="text-xs text-gray-500 mt-1">{sub}</p>}
     </div>
   );
 }
 
 function DiscrepancyBadge({ row }: { row: ClosingInventoryRow }) {
   if (!row.periodCountCount) {
-    return <span className="text-gray-300">—</span>;
+    return <span className="text-gray-500">—</span>;
   }
   const cls =
     row.discrepancyQty === 0
@@ -119,7 +119,7 @@ function ClosingSection({
                         Counted {row.lastCountDate}
                       </span>
                     ) : (
-                      <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                      <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full">
                         System
                       </span>
                     )}
@@ -270,7 +270,7 @@ export default function ClosingInventory({ menuInventory, ingredients, inventory
         <StatCard
           label="Total Closing Stock Value"
           value={formatMoney(summary.totalValue)}
-          accent="text-[#F17D0C]"
+          accent="text-[var(--color-brand-text)]"
         />
         <StatCard
           label="Menu Items Value"
@@ -323,7 +323,7 @@ export default function ClosingInventory({ menuInventory, ingredients, inventory
         />
       )}
 
-      <p className="text-xs text-gray-400 leading-relaxed mt-2">
+      <p className="text-xs text-gray-500 leading-relaxed mt-2">
         Closing Qty is taken from the latest physical count on or before {period.end} (submitted via
         Inventory → Closing Count). Items without any count fall back to current system stock and are
         marked "System". Menu items are valued at selling price; raw materials at unit cost.

@@ -27,7 +27,7 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
           <h2 id={headingId} className="text-xl font-bold text-[#121212]">Sale Complete</h2>
           <p className="text-gray-500 text-sm mt-1">{receipt.id}</p>
           {receipt.type === "Order" && (
-            <p className="text-xs font-semibold text-[#F17D0C] mt-2 bg-orange-50 rounded-full px-3 py-1 inline-block">
+            <p className="text-xs font-semibold text-[var(--color-brand-text)] mt-2 bg-orange-50 rounded-full px-3 py-1 inline-block">
               Added to Orders — tracked through production &amp; delivery
             </p>
           )}
@@ -66,7 +66,7 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
           {receipt.items.map((item) => (
             <li key={item.id} className="py-2 flex justify-between text-sm">
               <span className="text-gray-700">
-                <span className="text-gray-400 mr-2">{item.qty}x</span>
+                <span className="text-gray-500 mr-2">{item.qty}x</span>
                 {item.name}
               </span>
               <span className="font-semibold text-gray-900">
@@ -91,7 +91,7 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
             }`}
           >
             <span>Total</span>
-            <span className="text-[#F17D0C]">{formatMoney(receipt.total)}</span>
+            <span className="text-[var(--color-brand-text)]">{formatMoney(receipt.total)}</span>
           </div>
           {receipt.notes && (
             <div className="flex justify-between text-sm pt-1">
@@ -118,7 +118,7 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
               );
               downloadReceiptPdf(receipt);
             }}
-            className="flex-1 py-3 rounded-xl text-white font-bold bg-[#F17D0C] hover:bg-[#d86b06] transition-colors"
+            className="flex-1 py-3 rounded-xl text-white font-bold bg-[var(--color-brand-strong)] hover:bg-[var(--color-brand-strong-hover)] transition-colors"
           >
             Download Receipt
           </button>

@@ -54,13 +54,13 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
             type="date"
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="px-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-600 focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none flex-1 md:flex-none cursor-pointer"
+            className="px-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-600 focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none flex-1 md:flex-none cursor-pointer"
           />
           {dateFilter && (
             <button
               onClick={() => setDateFilter("")}
               aria-label="Clear date filter"
-              className="text-gray-400 hover:text-red-500 p-1 transition-colors"
+              className="text-gray-500 hover:text-red-500 p-1 transition-colors"
               title="Clear Date Filter"
             >
               <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,7 +133,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
                         <div className="flex items-center gap-2">
                           <OrderStatusBadge status={order.status} />
                           {shortfall && (
-                            <span className="px-2 py-0.5 rounded-full bg-red-50 text-red-600 text-[10px] font-bold whitespace-nowrap">
+                            <span className="px-2 py-0.5 rounded-full bg-red-50 text-red-700 text-[10px] font-bold whitespace-nowrap">
                               Shortfall
                             </span>
                           )}
@@ -149,7 +149,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
                         <button
                           onClick={() => onView(order)}
                           aria-label={`View order ${order.id}`}
-                          className="text-gray-400 hover:text-[#F17D0C] transition-colors p-2 rounded-md hover:bg-orange-50"
+                          className="text-gray-500 hover:text-[var(--color-brand-text)] transition-colors p-2 rounded-md hover:bg-orange-50"
                           title="View Order Details"
                         >
                           <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

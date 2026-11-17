@@ -68,7 +68,7 @@ export default function RecipesList({
             aria-label="Target margin percent"
             value={pricingRules.targetMarginPercent}
             onChange={(e) => onEditRule({ targetMarginPercent: e.target.value })}
-            className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800 text-right font-bold"
+            className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 text-right font-bold"
           />
           <span className="text-gray-500 font-medium">% target margin</span>
         </div>
@@ -134,7 +134,7 @@ export default function RecipesList({
                           <td className="px-6 py-4 text-right font-medium text-gray-900">
                             {formatMoney(costPerUnit)}
                           </td>
-                          <td className="px-6 py-4 text-right font-bold text-[#F17D0C]">
+                          <td className="px-6 py-4 text-right font-bold text-[var(--color-brand-text)]">
                             {formatMoney(price)}
                           </td>
                         </>
@@ -146,8 +146,8 @@ export default function RecipesList({
                             <span
                               className={`ml-2 text-xs font-bold px-1.5 py-0.5 rounded ${
                                 delta >= 0
-                                  ? "bg-green-50 text-green-600"
-                                  : "bg-red-50 text-red-600"
+                                  ? "bg-green-50 text-green-700"
+                                  : "bg-red-50 text-red-700"
                               }`}
                             >
                               {delta >= 0 ? "+" : ""}
@@ -160,7 +160,7 @@ export default function RecipesList({
                         <button
                           onClick={() => onEdit(recipe)}
                           aria-label={`Edit ${recipe.name}`}
-                          className="text-gray-500 hover:text-[#F17D0C] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
+                          className="text-gray-500 hover:text-[var(--color-brand-text)] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                         >
                           Edit
                         </button>

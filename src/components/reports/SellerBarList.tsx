@@ -4,13 +4,13 @@ import type { ItemSalesLine } from "../../types/domain";
 
 export default function SellerBarList({
   items,
-  barColor = "bg-[#F17D0C]",
+  barColor = "bg-[var(--color-brand)]",
 }: {
   items: ItemSalesLine[];
   barColor?: string;
 }) {
   if (items.length === 0) {
-    return <p className="text-sm text-gray-400 py-6 text-center">No item sales in this range.</p>;
+    return <p className="text-sm text-gray-500 py-6 text-center">No item sales in this range.</p>;
   }
 
   const maxQty = Math.max(...items.map((i) => i.qty), 1);

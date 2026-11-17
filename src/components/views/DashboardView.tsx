@@ -60,7 +60,7 @@ export default function DashboardView({
           </p>
         </div>
         <div className="self-center md:self-auto bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm flex items-center text-sm font-medium text-gray-600">
-          <CalendarIcon className="w-4 h-4 mr-2 text-[#F17D0C]" />
+          <CalendarIcon className="w-4 h-4 mr-2 text-[var(--color-brand-text)]" />
           {todayLabel}
         </div>
       </header>
@@ -88,8 +88,8 @@ export default function DashboardView({
                 title="Versus yesterday"
                 className={`text-xs font-bold px-2 py-1 rounded-full ${
                   revenueChangePercent >= 0
-                    ? "text-green-500 bg-green-50"
-                    : "text-red-500 bg-red-50"
+                    ? "text-green-700 bg-green-50"
+                    : "text-red-700 bg-red-50"
                 }`}
               >
                 {revenueChangePercent >= 0 ? "+" : ""}
@@ -147,7 +147,7 @@ export default function DashboardView({
               </svg>
             </div>
             {lowStockAlerts.length > 0 && (
-              <span className="text-red-500 text-xs font-bold bg-red-50 px-2 py-1 rounded-full">
+              <span className="text-red-700 text-xs font-bold bg-red-50 px-2 py-1 rounded-full">
                 Action Req
               </span>
             )}
@@ -194,7 +194,7 @@ export default function DashboardView({
             </h3>
             <button
               onClick={() => onNavClick("orders")}
-              className="text-sm text-[#F17D0C] font-medium hover:underline"
+              className="text-sm text-[var(--color-brand-text)] font-medium hover:underline"
             >
               View All
             </button>
@@ -239,14 +239,14 @@ export default function DashboardView({
           <div className="p-5 border-b border-gray-100 flex justify-between items-center">
             <h3 className="text-lg font-bold text-[#121212] flex items-center">
               Inventory Alerts
-              <span className="ml-2 bg-red-100 text-red-600 py-0.5 px-2 rounded-full text-xs">
+              <span className="ml-2 bg-red-100 text-red-700 py-0.5 px-2 rounded-full text-xs">
                 {lowStockAlerts.length}
               </span>
             </h3>
           </div>
           <div className="p-0 flex-1 overflow-y-auto max-h-[400px]">
             {lowStockAlerts.length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-10 text-gray-400">
+              <div className="flex flex-col items-center justify-center p-10 text-gray-500">
                 <svg
                   className="w-12 h-12 mb-3 text-green-200"
                   fill="none"
@@ -281,10 +281,10 @@ export default function DashboardView({
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="text-right">
-                        <span className="font-bold text-red-600 block leading-tight">
+                        <span className="font-bold text-red-700 block leading-tight">
                           {item.qty} {item.unit || ""}
                         </span>
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-gray-500">
                           Target: {item.target}
                         </span>
                       </div>

@@ -87,7 +87,7 @@ function IngredientFormModal({
               type="text"
               value={form.name}
               onChange={(e) => update("name", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
               required
             />
           </div>
@@ -103,7 +103,7 @@ function IngredientFormModal({
                 step="any"
                 value={form.qty}
                 onChange={(e) => update("qty", e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                 required
               />
             </div>
@@ -115,7 +115,7 @@ function IngredientFormModal({
                 placeholder="kg, Liters..."
                 value={form.unit}
                 onChange={(e) => update("unit", e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                 required
               />
             </div>
@@ -132,7 +132,7 @@ function IngredientFormModal({
                 step="any"
                 value={form.target}
                 onChange={(e) => update("target", e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                 required
               />
             </div>
@@ -147,7 +147,7 @@ function IngredientFormModal({
                 step="any"
                 value={form.unitCost}
                 onChange={(e) => update("unitCost", e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
               />
             </div>
           </div>
@@ -158,7 +158,7 @@ function IngredientFormModal({
               type="text"
               value={form.supplier}
               onChange={(e) => update("supplier", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
             />
           </div>
         </div>
@@ -295,7 +295,7 @@ export default function RawMaterialsTable({ ingredients, onRestock, onAdd, onUpd
                         <td className="px-4 md:px-6 py-4 font-semibold text-[#121212]">{item.name}</td>
                         <td className="px-4 md:px-6 py-4 text-sm text-[#562D07]/70 font-medium">{item.id}</td>
                         <td className="px-4 md:px-6 py-4 font-bold text-[#121212] text-lg">
-                          {item.qty} <span className="text-xs font-medium text-gray-400">{item.unit}</span>
+                          {item.qty} <span className="text-xs font-medium text-gray-500">{item.unit}</span>
                         </td>
                         <td className="px-4 md:px-6 py-4 text-sm text-[#562D07]/70 font-medium">
                           {item.target} {item.unit}
@@ -318,7 +318,7 @@ export default function RawMaterialsTable({ ingredients, onRestock, onAdd, onUpd
                           <button
                             onClick={() => onRestock(item.id)}
                             aria-label={`Restock ${item.name}`}
-                            className="text-[#F17D0C] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
+                            className="text-[var(--color-brand-text)] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                           >
                             + Restock
                           </button>

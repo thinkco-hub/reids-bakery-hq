@@ -89,7 +89,7 @@ export default function AuditLogsView() {
             value={dateFilter}
             max={today}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="px-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-600 focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none flex-1 md:flex-none cursor-pointer"
+            className="px-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-600 focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none flex-1 md:flex-none cursor-pointer"
           />
           {dateFilter !== today && (
             <button
@@ -146,7 +146,7 @@ export default function AuditLogsView() {
                       <span
                         className={`px-2 py-0.5 rounded-full text-xs font-bold whitespace-nowrap ${
                           WARNING_ACTIONS.has(entry.action)
-                            ? "bg-red-50 text-red-600"
+                            ? "bg-red-50 text-red-700"
                             : "bg-orange-50 text-[#562D07]"
                         }`}
                       >

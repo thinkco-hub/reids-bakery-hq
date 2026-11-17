@@ -19,10 +19,10 @@ export default function ClientDetail({ client, orders, onBack, onViewOrder }: Cl
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <div className="flex items-center text-[15px] mb-6 text-gray-500 font-medium tracking-wide">
-        <button onClick={onBack} className="hover:text-[#F17D0C] transition-colors">
+        <button onClick={onBack} className="hover:text-[var(--color-brand-text)] transition-colors">
           Clients
         </button>
-        <span className="mx-2 text-gray-400">&gt;</span>
+        <span className="mx-2 text-gray-500">&gt;</span>
         <span className="text-[#121212] font-bold">{client.name}</span>
       </div>
 

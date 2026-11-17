@@ -101,7 +101,7 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
                 value={isClientOrder ? client?.name || "—" : customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 disabled={isClientOrder}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800 disabled:bg-gray-100 disabled:text-gray-500"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 disabled:bg-gray-100 disabled:text-gray-500"
                 required={!isClientOrder}
               />
             </div>
@@ -114,10 +114,10 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
                 onChange={(e) => setCustomerContact(toContactDigits(e.target.value))}
                 disabled={isClientOrder}
                 placeholder="11-digit mobile number"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800 disabled:bg-gray-100 disabled:text-gray-500"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 disabled:bg-gray-100 disabled:text-gray-500"
               />
               {!isClientOrder && customerContact.length > 0 && !contactOk && (
-                <p className="text-xs text-gray-400 mt-1">Enter the full 11-digit number.</p>
+                <p className="text-xs text-gray-500 mt-1">Enter the full 11-digit number.</p>
               )}
             </div>
           </div>
@@ -128,7 +128,7 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
               <button
                 type="button"
                 onClick={addLine}
-                className="text-sm font-bold text-[#F17D0C] hover:underline"
+                className="text-sm font-bold text-[var(--color-brand-text)] hover:underline"
               >
                 + Add Item
               </button>
@@ -141,7 +141,7 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
                     onChange={(e) => changeItem(idx, e.target.value)}
                     aria-label={`Item ${idx + 1}`}
                     wrapperClassName="flex-1"
-                    className="w-full pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800 text-sm"
+                    className="w-full pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 text-sm"
                   >
                     <option value="">Select item...</option>
                     {!menuInventory.some((m) => m.id === line.menuItemId) && line.menuItemId && (
@@ -160,13 +160,13 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
                     aria-label={`Quantity for item ${idx + 1}`}
                     value={line.qty}
                     onChange={(e) => updateLine(idx, { qty: e.target.value })}
-                    className="w-20 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800 text-sm"
+                    className="w-20 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 text-sm"
                   />
                   <button
                     type="button"
                     onClick={() => removeLine(idx)}
                     aria-label={`Remove item ${idx + 1}`}
-                    className="text-gray-400 hover:text-red-500 p-1.5 transition-colors"
+                    className="text-gray-500 hover:text-red-500 p-1.5 transition-colors"
                   >
                     <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

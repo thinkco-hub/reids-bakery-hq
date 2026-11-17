@@ -229,9 +229,9 @@ export default function ReportsDashboard({
               setPreset("custom");
             }}
             aria-label="Report start date"
-            className="px-3 py-1.5 border border-gray-200 rounded-md text-sm text-gray-600 focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none"
+            className="px-3 py-1.5 border border-gray-200 rounded-md text-sm text-gray-600 focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
           />
-          <span className="text-gray-400 text-sm">to</span>
+          <span className="text-gray-500 text-sm">to</span>
           <input
             type="date"
             value={customEnd}
@@ -240,13 +240,13 @@ export default function ReportsDashboard({
               setPreset("custom");
             }}
             aria-label="Report end date"
-            className="px-3 py-1.5 border border-gray-200 rounded-md text-sm text-gray-600 focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none"
+            className="px-3 py-1.5 border border-gray-200 rounded-md text-sm text-gray-600 focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
-        <StatCard label="Total Revenue" value={formatMoney(summary.totalRevenue)} accent="text-[#F17D0C]" />
+        <StatCard label="Total Revenue" value={formatMoney(summary.totalRevenue)} accent="text-[var(--color-brand-text)]" />
         <StatCard label="Transactions" value={summary.totalTransactions} />
         <StatCard label="Avg Ticket" value={formatMoney(summary.avgTicket)} />
         <StatCard label="Tax Collected" value={formatMoney(summary.totalTax)} />
@@ -260,7 +260,7 @@ export default function ReportsDashboard({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
           <h3 className="text-lg font-bold text-[#121212] mb-4">Best Sellers</h3>
-          <SellerBarList items={bestSellers} barColor="bg-[#F17D0C]" />
+          <SellerBarList items={bestSellers} barColor="bg-[var(--color-brand)]" />
         </div>
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
           <h3 className="text-lg font-bold text-[#121212] mb-4">Worst Sellers</h3>
@@ -271,7 +271,7 @@ export default function ReportsDashboard({
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
         <h3 className="text-lg font-bold text-[#121212] mb-4">Revenue by Payment Method</h3>
         {byPaymentMethod.length === 0 ? (
-          <p className="text-sm text-gray-400">No transactions in this range.</p>
+          <p className="text-sm text-gray-500">No transactions in this range.</p>
         ) : (
           <div className="flex flex-col lg:flex-row lg:items-center gap-6">
             <PaymentDonut data={byPaymentMethod} />
@@ -292,14 +292,14 @@ export default function ReportsDashboard({
           <h3 className="text-lg font-bold text-[#121212]">Sales Log</h3>
           <div className="relative sm:w-72">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchIcon className="h-5 w-5 text-gray-400" />
+              <SearchIcon className="h-5 w-5 text-gray-500" />
             </div>
             <input
               type="text"
               value={logSearch}
               onChange={(e) => setLogSearch(e.target.value)}
               aria-label="Search sales by sale number or customer"
-              className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 outline-none focus:ring-1 focus:ring-[#F17D0C] focus:border-[#F17D0C]"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-500 outline-none focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)]"
               placeholder="Search sale # or customer..."
             />
           </div>
@@ -333,7 +333,7 @@ export default function ReportsDashboard({
                       {!!sale.editHistory?.length && (
                         <span
                           title={`Edited ${sale.editHistory.length} time${sale.editHistory.length === 1 ? "" : "s"}`}
-                          className="ml-2 inline-block px-1.5 py-0.5 rounded-full bg-orange-50 text-[#F17D0C] text-[10px] font-bold uppercase tracking-wide"
+                          className="ml-2 inline-block px-1.5 py-0.5 rounded-full bg-orange-50 text-[var(--color-brand-text)] text-[10px] font-bold uppercase tracking-wide"
                         >
                           Edited
                         </span>
@@ -351,7 +351,7 @@ export default function ReportsDashboard({
                           onClick={() => setEditingSale(sale)}
                           title="Edit sale details"
                           aria-label={`Edit sale ${sale.id}`}
-                          className="p-2 rounded-lg text-gray-400 hover:text-[#562D07] hover:bg-orange-50 transition-colors"
+                          className="p-2 rounded-lg text-gray-500 hover:text-[#562D07] hover:bg-orange-50 transition-colors"
                         >
                           <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
@@ -369,7 +369,7 @@ export default function ReportsDashboard({
                         onClick={() => onReprintSale?.(sale)}
                         title="View / Print Receipt"
                         aria-label={`View receipt for sale ${sale.id}`}
-                        className="p-2 rounded-lg text-gray-400 hover:text-[#F17D0C] hover:bg-orange-50 transition-colors"
+                        className="p-2 rounded-lg text-gray-500 hover:text-[var(--color-brand-text)] hover:bg-orange-50 transition-colors"
                       >
                         <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path

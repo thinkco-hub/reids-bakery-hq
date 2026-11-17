@@ -169,7 +169,7 @@ export default function ProductionRunsList({
               type="button"
               onClick={() => setStatusFilter(card.key)}
               className={`text-left bg-white p-4 md:p-5 rounded-2xl border shadow-sm transition-all ${
-                isActive ? "border-[#F17D0C] ring-2 ring-[#F17D0C]/30" : "border-gray-100 hover:border-gray-300"
+                isActive ? "border-[var(--color-brand-text)] ring-2 ring-[var(--color-brand-text)]/30" : "border-gray-100 hover:border-gray-300"
               }`}
             >
               <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">{card.label}</p>
@@ -219,7 +219,7 @@ export default function ProductionRunsList({
                           <button
                             onClick={() => setSelectedRunId(run.id)}
                             aria-label={`${status === "completed" ? "View" : "View or complete"} ${recipe ? recipe.name : "run"} for ${run.plannedDate}`}
-                            className="text-gray-500 hover:text-[#F17D0C] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
+                            className="text-gray-500 hover:text-[var(--color-brand-text)] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                           >
                             {status === "completed" ? "View" : "View / Complete"}
                           </button>
@@ -227,7 +227,7 @@ export default function ProductionRunsList({
                             <button
                               onClick={() => setPendingDelete(run)}
                               aria-label={`Delete ${recipe ? recipe.name : "run"} for ${run.plannedDate}`}
-                              className="text-gray-400 hover:text-red-500 hover:bg-red-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
+                              className="text-gray-500 hover:text-red-500 hover:bg-red-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                             >
                               Delete
                             </button>

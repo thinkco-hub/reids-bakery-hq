@@ -29,7 +29,7 @@ const CARD_STYLES = {
         d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
       />
     ),
-    iconBg: "bg-[#F17D0C]/10 text-[#F17D0C]",
+    iconBg: "bg-[#F17D0C]/10 text-[var(--color-brand-text)]",
   },
   out: {
     icon: (
@@ -69,7 +69,7 @@ export default function InventoryStatsBar({ items, activeFilter, onFilterChange 
             onClick={() => onFilterChange(key)}
             className={`text-left bg-white p-4 md:p-5 rounded-2xl border shadow-sm transition-all ${
               isActive
-                ? "border-[#F17D0C] ring-2 ring-[#F17D0C]/30"
+                ? "border-[var(--color-brand-text)] ring-2 ring-[var(--color-brand-text)]/30"
                 : "border-gray-100 hover:border-gray-300"
             }`}
           >

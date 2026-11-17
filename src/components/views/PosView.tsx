@@ -99,7 +99,7 @@ export default function PosView({
                 value={posCategory}
                 onChange={(e) => setPosCategory(e.target.value as PosCategory)}
                 aria-label="Filter items by category"
-                className="min-h-[2.75rem] w-56 pl-3 bg-gray-100 border border-gray-200 rounded-lg text-sm font-bold text-gray-800 focus:ring-2 focus:ring-[#F17D0C] outline-none"
+                className="min-h-[2.75rem] w-56 pl-3 bg-gray-100 border border-gray-200 rounded-lg text-sm font-bold text-gray-800 focus:ring-2 focus:ring-[var(--color-brand-text)] outline-none"
               >
                 {POS_CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
@@ -114,9 +114,9 @@ export default function PosView({
                   onChange={(e) => setPosSearch(e.target.value)}
                   placeholder="Search items..."
                   aria-label="Search POS items"
-                  className="pl-10 pr-4 py-2 bg-gray-100 border-none rounded-full text-sm focus:ring-2 focus:ring-[#F17D0C] outline-none"
+                  className="pl-10 pr-4 py-2 bg-gray-100 border-none rounded-full text-sm focus:ring-2 focus:ring-[var(--color-brand-text)] outline-none"
                 />
-                <SearchIcon className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
+                <SearchIcon className="w-5 h-5 text-gray-500 absolute left-3 top-2.5" />
               </div>
             </div>
           </div>
@@ -127,13 +127,16 @@ export default function PosView({
                 <button
                   key={product.id}
                   onClick={() => addToCart(product)}
-                  className={`relative w-full aspect-square rounded-xl shadow-sm hover:shadow-md transition-all transform active:scale-95 flex flex-col justify-between p-3 ${product.color} text-white overflow-hidden group`}
+                  className={`relative w-full aspect-square rounded-xl shadow-sm hover:shadow-md transition-all transform active:scale-95 flex flex-col justify-end ${product.color} overflow-hidden group`}
                 >
-                  <span className="self-end text-sm font-bold opacity-90 drop-shadow-sm">
-                    {formatMoney(product.price)}
-                  </span>
-                  <span className="self-start text-left text-base font-bold leading-tight drop-shadow-sm group-hover:underline">
-                    {product.name}
+                  {/* Any catalogue colour can be the swatch, so the label brings its own plate. */}
+                  <span className="flex flex-col gap-0.5 bg-white px-3 py-2 border-t border-black/10">
+                    <span className="text-left text-base font-bold leading-tight text-[#121212] group-hover:underline">
+                      {product.name}
+                    </span>
+                    <span className="text-sm font-bold text-[var(--color-brand-text)]">
+                      {formatMoney(product.price)}
+                    </span>
                   </span>
                 </button>
               ))}
@@ -167,7 +170,7 @@ export default function PosView({
               disabled={cart.length === 0}
               className={`transition-colors p-[0.5em] min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center rounded-lg ${
                 cart.length > 0
-                  ? "text-gray-400 hover:text-red-500 hover:bg-red-50"
+                  ? "text-gray-500 hover:text-red-500 hover:bg-red-50"
                   : "text-gray-300 cursor-not-allowed"
               }`}
               title="Clear Ticket"
@@ -218,7 +221,7 @@ export default function PosView({
                 <button
                   onClick={onRemoveCustomer}
                   aria-label={`Remove ${customer.name} from the ticket`}
-                  className="flex-shrink-0 min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-gray-100 transition-colors"
+                  className="flex-shrink-0 min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center rounded-lg text-gray-500 hover:text-red-500 hover:bg-gray-100 transition-colors"
                 >
                   <svg
                     className="w-[1.15em] h-[1.15em]"
@@ -258,7 +261,7 @@ export default function PosView({
 
           <div className="flex-1 overflow-y-auto bg-white min-h-[100px]">
             {cart.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-gray-400 text-center">
+              <div className="h-full flex flex-col items-center justify-center text-gray-500 text-center">
                 <svg
                   className="w-[clamp(3.5rem,22cqw,5.5rem)] h-[clamp(3.5rem,22cqw,5.5rem)] mb-[clamp(0.6rem,2.5cqw,1.2rem)] opacity-20"
                   fill="currentColor"
@@ -308,7 +311,7 @@ export default function PosView({
               onClick={openConfirmModal}
               className={`w-full min-h-[3rem] py-[var(--tk-pad)] rounded-xl text-[length:var(--tk-title)] font-bold shadow-lg transition-all transform active:scale-[0.98] ${
                 cart.length > 0
-                  ? "bg-[#F17D0C] hover:bg-[#d86b06] text-white"
+                  ? "bg-[var(--color-brand-strong)] hover:bg-[var(--color-brand-strong-hover)] text-white"
                   : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
               }`}
             >

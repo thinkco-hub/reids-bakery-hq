@@ -48,7 +48,7 @@ export default function RestockModal({
             </label>
             <SelectField
               id={itemFieldId}
-              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
               value={modal.selectedItemId}
               onChange={(e) => onItemChange(e.target.value)}
             >
@@ -71,7 +71,7 @@ export default function RestockModal({
               placeholder="Enter amount..."
               value={modal.amountToAdd}
               onChange={(e) => onAmountChange(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F17D0C] focus:border-[#F17D0C] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
             />
           </div>
 
@@ -79,13 +79,13 @@ export default function RestockModal({
           <div className="flex gap-2">
             <button
               onClick={() => onQuickAdd(5)}
-              className="flex-1 py-2 bg-orange-50 text-[#F17D0C] font-bold rounded-lg border border-orange-200 hover:bg-orange-100 transition-colors"
+              className="flex-1 py-2 bg-orange-50 text-[var(--color-brand-text)] font-bold rounded-lg border border-orange-200 hover:bg-orange-100 transition-colors"
             >
               + 5
             </button>
             <button
               onClick={() => onQuickAdd(10)}
-              className="flex-1 py-2 bg-orange-50 text-[#F17D0C] font-bold rounded-lg border border-orange-200 hover:bg-orange-100 transition-colors"
+              className="flex-1 py-2 bg-orange-50 text-[var(--color-brand-text)] font-bold rounded-lg border border-orange-200 hover:bg-orange-100 transition-colors"
             >
               + 10
             </button>
