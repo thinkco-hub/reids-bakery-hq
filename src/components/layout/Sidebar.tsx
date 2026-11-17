@@ -29,12 +29,9 @@ interface SidebarProps {
   onNavSelect: () => void;
 }
 
-/** Width (px) of the collapsed sidebar rail = desktop hover zone (Tailwind w-20). */
-const COLLAPSED_RAIL_PX = 80;
-
 /** A top-level item; `extra` carries the group headers' justify-between. */
 function itemCls(active: boolean, extra = "") {
-  return `w-full flex ${extra}items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
+  return `w-full flex items-center ${extra} p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
     active
       ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
       : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
@@ -42,7 +39,8 @@ function itemCls(active: boolean, extra = "") {
 }
 
 function subItemCls(active: boolean) {
-  return `w-full text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
+  // block: these are router links now, and an inline anchor ignores w-full/py.
+  return `w-full block text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
     active
       ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
       : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
@@ -82,12 +80,22 @@ export default function Sidebar({
   // relies on hover to reveal its labels.
   const isDesktopRail = canUseSidebarRail(windowWidth);
 
-  // Desktop rail: expand ONLY while the cursor is within the collapsed rail's
-  // 80px width. Hovering the expanded part of the rail collapses it again, so
-  // the rail can never "trap" the cursor and cover content sitting right next
-  // to it (e.g. the POS category chips near the left edge).
-  const [isDesktopRailHovered, setIsDesktopRailHovered] = useState(false);
-  const desktopRailExpanded = isDesktopRail && isDesktopRailHovered;
+  // Desktop rail: expanded while the pointer is anywhere inside the panel or
+  // focus is inside it, collapsed once both leave. Testing clientX against the
+  // collapsed width instead collapses the rail under its own labels and
+  // chevrons, putting the right half of the open rail out of mouse reach.
+  const [isRailPointerInside, setIsRailPointerInside] = useState(false);
+  const [isRailFocusInside, setIsRailFocusInside] = useState(false);
+  // Focus pins the rail open only for keyboard users: a mouse click leaves
+  // focus on the row too, and pinning that would keep the overlay covering
+  // content after the cursor has left.
+  const railInputModality = useRef<"pointer" | "keyboard">("keyboard");
+  const desktopRailExpanded =
+    isDesktopRail && (isRailPointerInside || isRailFocusInside);
+  const collapseRail = () => {
+    setIsRailPointerInside(false);
+    setIsRailFocusInside(false);
+  };
 
   // Shared class for sidebar labels/chevrons: always shown in the drawer, hidden
   // on the collapsed desktop rail until hover expands it.
@@ -120,32 +128,55 @@ export default function Sidebar({
         />
       )}
 
+      {/* Fixed gutter: the rail grows over it as an overlay, so the content
+          beside it never moves while the rail opens or closes. */}
+      {isDesktopRail && <div className="w-20 flex-shrink-0" aria-hidden="true" />}
+
+      {/* RAIL SCRIM — the drawer's dismiss veil, for the open rail */}
+      {isDesktopRail && desktopRailExpanded && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+          onClick={collapseRail}
+        />
+      )}
+
       {/* SIDEBAR */}
       <div
         ref={drawerRef}
         {...drawerA11y}
-        onMouseMove={(e) => {
-          if (!isDesktopRail) return;
-          // Expand only while the cursor is inside the collapsed rail's 80px.
-          setIsDesktopRailHovered(e.clientX < COLLAPSED_RAIL_PX);
+        onMouseDown={() => {
+          railInputModality.current = "pointer";
+        }}
+        onMouseEnter={() => {
+          if (isDesktopRail) setIsRailPointerInside(true);
         }}
         onMouseLeave={() => {
-          if (isDesktopRail) setIsDesktopRailHovered(false);
+          if (isDesktopRail) setIsRailPointerInside(false);
+        }}
+        onKeyDown={(e) => {
+          railInputModality.current = "keyboard";
+          drawerA11y.onKeyDown?.(e);
+        }}
+        onFocus={() => {
+          if (isDesktopRail && railInputModality.current === "keyboard") {
+            setIsRailFocusInside(true);
+          }
+        }}
+        onBlur={(e) => {
+          if (isDesktopRail && !e.currentTarget.contains(e.relatedTarget)) {
+            setIsRailFocusInside(false);
+          }
         }}
         className={`
-        inset-y-0 left-0 z-50 transform transition-all ease-in-out flex flex-col
+        inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out flex flex-col
         bg-[#562D07] text-[#FDF9F3] shadow-2xl
         ${
           isDesktopRail
-            ? desktopRailExpanded
-              ? // Expanded = overlay so content never shifts; smooth 300ms growth
-                "absolute w-64 duration-300"
-              : // Collapsed = quick 150ms ease-back so the rail doesn't linger
-                // over the POS chips after the cursor crosses the 80px line,
-                // while still animating smoothly instead of snapping shut
-                "relative w-20 duration-150"
+            ? // Same 300ms ease-in-out growth as the Chams rail, but absolute
+              // over the gutter so only the sidebar moves.
+              `absolute ${desktopRailExpanded ? "w-64" : "w-20"}`
             : // Drawer = fixed, so the page keeps its full width underneath it
-              `fixed w-64 duration-300 ${
+              `fixed w-64 ${
                 isSidebarOpen ? "translate-x-0" : "-translate-x-full"
               }`
         }
