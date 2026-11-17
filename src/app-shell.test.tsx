@@ -385,6 +385,47 @@ describe("desktop rail expansion", () => {
       within(rail).queryByRole("button", { name: "Toggle inventory submenu" })
     ).toBeNull();
   });
+
+  it("veils the page behind the open rail and dismisses it on scrim click", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/orders");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Orders" });
+
+    const rail = sidebar();
+    // The gutter is what keeps the content beside the rail from moving.
+    const gutter = document.querySelector(".w-20.flex-shrink-0");
+    expect(gutter).not.toBeNull();
+
+    fireEvent.mouseOver(rail, { relatedTarget: document.body });
+    const scrim = document.querySelector(".bg-black\\/50");
+    if (!scrim) throw new Error("No rail scrim");
+    expect(gutter).not.toBeNull();
+
+    fireEvent.click(scrim);
+    expect(
+      within(rail).queryByRole("button", { name: "Toggle inventory submenu" })
+    ).toBeNull();
+    expect(document.querySelector(".bg-black\\/50")).toBeNull();
+  });
+
+  it("gives the Chams rail the same veil and dismiss", async () => {
+    const user = userEvent.setup();
+    renderShellAt("/chams");
+    await signInAsAdmin(user);
+    await screen.findByRole("button", { name: /Chams Ledger/ });
+
+    const rail = sidebar();
+    expect(rail.className).toContain("w-20");
+    fireEvent.mouseOver(rail, { relatedTarget: document.body });
+    expect(rail.className).toContain("w-72");
+
+    const scrim = document.querySelector(".bg-black\\/50");
+    if (!scrim) throw new Error("No rail scrim");
+    fireEvent.click(scrim);
+    expect(rail.className).toContain("w-20");
+    expect(document.querySelector(".bg-black\\/50")).toBeNull();
+  });
 });
 
 describe("order detail routes", () => {

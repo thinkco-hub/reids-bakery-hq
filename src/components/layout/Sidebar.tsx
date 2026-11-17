@@ -92,6 +92,10 @@ export default function Sidebar({
   const railInputModality = useRef<"pointer" | "keyboard">("keyboard");
   const desktopRailExpanded =
     isDesktopRail && (isRailPointerInside || isRailFocusInside);
+  const collapseRail = () => {
+    setIsRailPointerInside(false);
+    setIsRailFocusInside(false);
+  };
 
   // Shared class for sidebar labels/chevrons: always shown in the drawer, hidden
   // on the collapsed desktop rail until hover expands it.
@@ -124,6 +128,18 @@ export default function Sidebar({
         />
       )}
 
+      {/* Fixed gutter: the rail grows over it as an overlay, so the content
+          beside it never moves while the rail opens or closes. */}
+      {isDesktopRail && <div className="w-20 flex-shrink-0" aria-hidden="true" />}
+
+      {/* RAIL SCRIM — the drawer's dismiss veil, for the open rail */}
+      {isDesktopRail && desktopRailExpanded && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+          onClick={collapseRail}
+        />
+      )}
+
       {/* SIDEBAR */}
       <div
         ref={drawerRef}
@@ -152,19 +168,15 @@ export default function Sidebar({
           }
         }}
         className={`
-        inset-y-0 left-0 z-50 transform transition-all ease-in-out flex flex-col
+        inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out flex flex-col
         bg-[#562D07] text-[#FDF9F3] shadow-2xl
         ${
           isDesktopRail
-            ? desktopRailExpanded
-              ? // Expanded = overlay so content never shifts; smooth 300ms growth
-                "absolute w-64 duration-300"
-              : // Collapsed = quick 150ms ease-back so the rail doesn't linger
-                // over the POS chips once the cursor leaves it, while still
-                // animating smoothly instead of snapping shut
-                "relative w-20 duration-150"
+            ? // Same 300ms ease-in-out growth as the Chams rail, but absolute
+              // over the gutter so only the sidebar moves.
+              `absolute ${desktopRailExpanded ? "w-64" : "w-20"}`
             : // Drawer = fixed, so the page keeps its full width underneath it
-              `fixed w-64 duration-300 ${
+              `fixed w-64 ${
                 isSidebarOpen ? "translate-x-0" : "-translate-x-full"
               }`
         }

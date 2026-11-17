@@ -190,9 +190,17 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
   // Same rule as the Bakery HQ shell: only a mouse-driven viewport gets the
   // pinned hover rail, everything else uses the hamburger drawer.
   const isDesktopRail = canUseSidebarRail(windowWidth);
-  const sidebarLabelCls = isDesktopRail
-    ? "opacity-0 group-hover:opacity-100"
-    : "opacity-100";
+  // Same expansion model as the bakery rail: pointer inside or keyboard focus
+  // inside, collapsed once both leave; the scrim dismisses it on click.
+  const [isRailPointerInside, setIsRailPointerInside] = useState(false);
+  const [isRailFocusInside, setIsRailFocusInside] = useState(false);
+  const railInputModality = useRef<"pointer" | "keyboard">("keyboard");
+  const railExpanded = isDesktopRail && (isRailPointerInside || isRailFocusInside);
+  const collapseRail = () => {
+    setIsRailPointerInside(false);
+    setIsRailFocusInside(false);
+  };
+  const sidebarLabelCls = !isDesktopRail || railExpanded ? "opacity-100" : "opacity-0";
 
   // The ledger keeps its own chrome, so it mirrors the bakery shell's drawer
   // contract rather than sharing its state.
@@ -281,16 +289,51 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
         />
       )}
 
+      {/* Fixed gutter: the rail grows over it as an overlay, so the content
+          beside it never moves while the rail opens or closes. */}
+      {isDesktopRail && <div className="w-20 flex-shrink-0" aria-hidden="true" />}
+
+      {/* RAIL SCRIM — the drawer's dismiss veil, for the open rail */}
+      {isDesktopRail && railExpanded && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+          onClick={collapseRail}
+        />
+      )}
+
       {/* SIDEBAR */}
       <div
         ref={drawerRef}
         {...drawerA11y}
+        onMouseDown={() => {
+          railInputModality.current = "pointer";
+        }}
+        onMouseEnter={() => {
+          if (isDesktopRail) setIsRailPointerInside(true);
+        }}
+        onMouseLeave={() => {
+          if (isDesktopRail) setIsRailPointerInside(false);
+        }}
+        onKeyDown={(e) => {
+          railInputModality.current = "keyboard";
+          drawerA11y.onKeyDown?.(e);
+        }}
+        onFocus={() => {
+          if (isDesktopRail && railInputModality.current === "keyboard") {
+            setIsRailFocusInside(true);
+          }
+        }}
+        onBlur={(e) => {
+          if (isDesktopRail && !e.currentTarget.contains(e.relatedTarget)) {
+            setIsRailFocusInside(false);
+          }
+        }}
         className={`
         inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out
-        flex flex-col shadow-2xl group
+        flex flex-col shadow-2xl
         ${
           isDesktopRail
-            ? "relative w-20 lg:hover:w-72"
+            ? `absolute ${railExpanded ? "w-72" : "w-20"}`
             : `fixed w-72 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`
         }
         bg-[#1B2A4A] text-[#EAF0FB]
