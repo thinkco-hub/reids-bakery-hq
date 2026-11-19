@@ -88,16 +88,16 @@ export default function RecipesList({
           <table className="w-full text-left border-collapse min-w-[760px]">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-                <th className="px-6 py-4">Recipe</th>
-                <th className="px-6 py-4">Yield</th>
+                <th scope="col" className="px-6 py-4">Recipe</th>
+                <th scope="col" className="px-6 py-4">Yield</th>
                 {canViewIngredientCosts && (
                   <>
-                    <th className="px-6 py-4 text-right">COGS / Unit</th>
-                    <th className="px-6 py-4 text-right">Suggested Price</th>
+                    <th scope="col" className="px-6 py-4 text-right">COGS / Unit</th>
+                    <th scope="col" className="px-6 py-4 text-right">Suggested Price</th>
                   </>
                 )}
-                <th className="px-6 py-4 text-right">Actual Price</th>
-                <th className="px-4 py-4 text-center">Action</th>
+                <th scope="col" className="px-6 py-4 text-right">Actual Price</th>
+                <th scope="col" className="px-4 py-4 text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 text-sm">
@@ -125,7 +125,7 @@ export default function RecipesList({
                   const delta = actualPrice - price;
                   return (
                     <tr key={recipe.id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-6 py-4 font-medium text-gray-900">{recipe.name}</td>
+                      <th scope="row" className="px-6 py-4 text-left font-medium text-gray-900">{recipe.name}</th>
                       <td className="px-6 py-4 text-gray-600">
                         {recipe.yieldQty} {recipe.yieldUnit}
                       </td>

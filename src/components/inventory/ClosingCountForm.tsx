@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useAnnounce } from "../common/Announcer";
 import { todayISO } from "../../utils/dates";
 import type { FormEvent } from "react";
 import type {
@@ -76,6 +77,7 @@ export default function ClosingCountForm({ menuInventory, ingredients, onSubmit,
   const [menuCounts, setMenuCounts] = useState<CountMap>({});
   const [ingredientCounts, setIngredientCounts] = useState<CountMap>({});
   const [submittedMsg, setSubmittedMsg] = useState("");
+  const announce = useAnnounce();
 
   const updateMenuCount = (id: string, value: string) => setMenuCounts((prev) => ({ ...prev, [id]: value }));
   const updateIngredientCount = (id: string, value: string) =>
@@ -108,7 +110,9 @@ export default function ClosingCountForm({ menuInventory, ingredients, onSubmit,
     onSubmit({ date, entries });
     setMenuCounts({});
     setIngredientCounts({});
-    setSubmittedMsg(`Closing count for ${date} submitted for review.`);
+    const message = `Closing count for ${date} submitted for review.`;
+    setSubmittedMsg(message);
+    announce(message);
     setTimeout(() => setSubmittedMsg(""), 4000);
   };
 

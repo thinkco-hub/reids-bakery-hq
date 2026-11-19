@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import type { RefObject } from "react";
 import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
+import { useAnnounce } from "../common/Announcer";
 import type { TicketCustomer } from "../../types/domain";
 
 /** Ticket header shown in place of the app title while the POS tab is open. */
@@ -28,10 +29,12 @@ interface MobileTopBarProps {
  */
 export default function MobileTopBar({ onOpenMobileNav, triggerRef, pos }: MobileTopBarProps) {
   const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
+  const announce = useAnnounce();
 
   const confirmClear = () => {
     pos?.onClearTicket();
     setIsClearConfirmOpen(false);
+    announce("Ticket cleared.");
   };
 
   return (
@@ -60,7 +63,7 @@ export default function MobileTopBar({ onOpenMobileNav, triggerRef, pos }: Mobil
       {pos ? (
         <>
           <div className="flex items-center gap-2 min-w-0 flex-1">
-            <h1 className="text-lg font-bold">Ticket</h1>
+            <span className="text-lg font-bold">Ticket</span>
             <span className="min-w-[1.75rem] px-1 py-0.5 rounded border border-[#FDF9F3]/40 text-center font-mono text-sm">
               {pos.ticketCount}
             </span>
@@ -153,7 +156,7 @@ export default function MobileTopBar({ onOpenMobileNav, triggerRef, pos }: Mobil
           )}
         </>
       ) : (
-        <h1 className="text-lg font-bold">Bakery HQ</h1>
+        <span className="text-lg font-bold">Bakery HQ</span>
       )}
     </div>
   );

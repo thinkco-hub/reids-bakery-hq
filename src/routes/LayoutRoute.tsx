@@ -38,6 +38,13 @@ export default function LayoutRoute() {
 
   return (
     <>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-[#562D07] focus:px-4 focus:py-2 focus:font-bold focus:text-white"
+      >
+        Skip to main content
+      </a>
+
       {!isDesktopRail && (
         <MobileTopBar
           onOpenMobileNav={() => setIsSidebarOpen(true)}
@@ -70,10 +77,15 @@ export default function LayoutRoute() {
       />
 
       <main
+        id="main"
+        tabIndex={-1}
         className={`flex-1 relative z-10 w-full flex flex-col ${
           isPosRoute ? "p-0 overflow-hidden bg-gray-100" : "p-4 md:p-8 overflow-y-auto"
         }`}
       >
+        {/* The view titles are h2s; this is the one page heading, and it sits in
+            the landmark the skip link targets. */}
+        <h1 className="sr-only">Reid's Bakery HQ</h1>
         {/* Each route guards its own tab; see src/components/RequireAccess.tsx. */}
         <Outlet />
       </main>

@@ -4,6 +4,7 @@ import { MemoryRouter, useLocation, useNavigate } from "react-router";
 import userEvent from "@testing-library/user-event";
 import type { UserEvent } from "@testing-library/user-event";
 import App from "./App";
+import { AnnouncerProvider, useAnnounce } from "./components/common/Announcer";
 import { PATH_BY_TAB } from "./routes";
 import { canAccessTab } from "./utils/permissions";
 import type { NavTabId } from "./types/domain";
@@ -737,8 +738,8 @@ describe("unknown route", () => {
     renderShellAt("/chams");
     await signInAsAdmin(user);
 
-    // The rail sidebar is the only Chams branding at a tablet width: the <h1>
-    // sits in the drawer top bar, which the rail viewport does not render.
+    // The rail sidebar is the only visible Chams branding at a tablet width:
+    // the drawer top bar that repeats it is not rendered on the rail.
     expect(
       await screen.findByRole("button", { name: /Chams Ledger/ })
     ).toBeInTheDocument();
@@ -763,5 +764,88 @@ describe("unknown route", () => {
     expect(
       screen.queryByRole("heading", { name: "Something went wrong" })
     ).not.toBeInTheDocument();
+  });
+});
+
+describe("page landmarks", () => {
+  it("gives the page one heading and a skip link that can focus main", async () => {
+    const user = userEvent.setup();
+    renderShell();
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Dashboard" });
+
+    // The view title stays an h2; the shell owns the single page heading.
+    const headings = screen.getAllByRole("heading", { level: 1 });
+    expect(headings).toHaveLength(1);
+    expect(headings[0]).toHaveTextContent("Reid's Bakery HQ");
+
+    const main = screen.getByRole("main");
+    expect(screen.getByRole("link", { name: "Skip to main content" })).toHaveAttribute(
+      "href",
+      `#${main.id}`
+    );
+    expect(main).toHaveAttribute("tabindex", "-1");
+  });
+});
+
+describe("sign-in feedback", () => {
+  it("announces a rejected sign-in and describes both fields with it", async () => {
+    const user = userEvent.setup();
+    renderShell();
+
+    const email = screen.getByLabelText("Email");
+    const password = screen.getByLabelText("Password");
+    await user.clear(email);
+    await user.type(email, "admin@rbc.test");
+    await user.type(password, "not-the-password");
+    await user.click(screen.getByRole("button", { name: "Log In" }));
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Invalid email or password.");
+    expect(email).toHaveAttribute("aria-describedby", alert.id);
+    expect(password).toHaveAttribute("aria-describedby", alert.id);
+    expect(document.activeElement).toBe(email);
+  });
+});
+
+describe("shell announcer", () => {
+  function ClearTicket() {
+    const announce = useAnnounce();
+    return <button onClick={() => announce("Ticket cleared.")}>Clear Ticket</button>;
+  }
+
+  function renderAnnouncer() {
+    return render(
+      <AnnouncerProvider>
+        <ClearTicket />
+      </AnnouncerProvider>
+    );
+  }
+
+  it("speaks a mutation through a polite region outside the app root", async () => {
+    const user = userEvent.setup();
+    renderAnnouncer();
+
+    const region = screen.getByRole("status");
+    expect(region).toHaveAttribute("aria-live", "polite");
+    // An open dialog sets #root inert, so the region has to live beyond it.
+    expect(region.parentElement).toBe(document.body);
+    expect(region.textContent).toBe("");
+
+    await user.click(screen.getByRole("button", { name: "Clear Ticket" }));
+    expect(region).toHaveTextContent("Ticket cleared.");
+  });
+
+  it("re-speaks a repeated message instead of leaving the region untouched", async () => {
+    const user = userEvent.setup();
+    renderAnnouncer();
+    const button = screen.getByRole("button", { name: "Clear Ticket" });
+
+    await user.click(button);
+    const spoken = screen.getByRole("status").firstElementChild;
+    await user.click(button);
+
+    expect(screen.getByRole("status").firstElementChild).not.toBe(spoken);
+    expect(screen.getByRole("status")).toHaveTextContent("Ticket cleared.");
   });
 });

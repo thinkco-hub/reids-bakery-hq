@@ -8,11 +8,10 @@ import {
   usePosSlice,
   useVisibleIngredients,
 } from "../store/slices";
-import { orderPath } from "../routes";
 import { useShell } from "./shell";
 
 export default function DashboardRoute() {
-  const { currentUser, goToTab, openPath } = useShell();
+  const { currentUser, goToTab } = useShell();
   const { orders } = useOrdersSlice();
   const { clients } = useClientsSlice();
   const { sales } = usePosSlice();
@@ -35,7 +34,6 @@ export default function DashboardRoute() {
         pendingOrdersCount={pendingOrdersCount}
         readyOrdersCount={readyOrdersCount}
         onNavClick={goToTab}
-        onViewOrder={(order) => openPath(orderPath(order.id))}
       />
     </RequireTab>
   );

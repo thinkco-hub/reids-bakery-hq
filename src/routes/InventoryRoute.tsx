@@ -1,6 +1,7 @@
 import React from "react";
 import InventoryView from "../components/views/InventoryView";
 import RestockModal from "../components/inventory/RestockModal";
+import { useAnnounce } from "../components/common/Announcer";
 import { RequireTab } from "../components/RequireAccess";
 import {
   useCanViewIngredients,
@@ -29,6 +30,13 @@ export default function InventoryRoute() {
   } = useCatalogueSlice();
   const canViewIngredients = useCanViewIngredients();
   const visibleIngredients = useVisibleIngredients();
+  const announce = useAnnounce();
+
+  const confirmRestock = () => {
+    const item = restockItems.find((entry) => entry.id === restockModal.selectedItemId);
+    submitRestock();
+    if (item) announce(`Restocked ${item.name} by ${restockModal.amountToAdd}.`);
+  };
 
   return (
     <RequireTab role={currentUser.role} tab="inventory">
@@ -58,7 +66,7 @@ export default function InventoryRoute() {
           }
           onQuickAdd={handleRestockQuickAdd}
           onClose={closeRestockModal}
-          onConfirm={submitRestock}
+          onConfirm={confirmRestock}
           disabled={isRestockConfirmDisabled}
         />
       )}

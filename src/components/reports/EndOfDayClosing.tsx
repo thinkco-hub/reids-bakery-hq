@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useAnnounce } from "../common/Announcer";
 import { computeDailyClosing } from "../../utils/closing";
 import { todayISO } from "../../utils/dates";
 import { formatMoney } from "../../utils/money";
@@ -26,6 +27,7 @@ export default function EndOfDayClosing({
   const [date, setDate] = useState(todayISO());
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
+  const announce = useAnnounce();
 
   const closing = useMemo(() => computeDailyClosing(date, sales, expenses), [date, sales, expenses]);
   const alreadyClosed = dayClosings.find((c) => c.date === date);
@@ -47,6 +49,7 @@ export default function EndOfDayClosing({
       totalExpenses: closing.totalExpenses,
       netProfit: closing.netProfit,
     });
+    announce(`${date} closed. Net profit ${formatMoney(closing.netProfit)} locked in.`);
   };
 
   return (
@@ -153,7 +156,10 @@ export default function EndOfDayClosing({
                   <span className="font-semibold text-gray-900">{formatMoney(Number(exp.amount))}</span>
                   {!alreadyClosed && (
                     <button
-                      onClick={() => onDeleteExpense(exp.id)}
+                      onClick={() => {
+                        onDeleteExpense(exp.id);
+                        announce(`Expense ${exp.description} removed.`);
+                      }}
                       className="text-gray-500 hover:text-red-500 transition-colors"
                       title="Remove expense"
                       aria-label={`Remove expense ${exp.description}`}
@@ -188,10 +194,10 @@ export default function EndOfDayClosing({
             <table className="w-full text-left border-collapse min-w-[560px]">
               <thead>
                 <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-                  <th className="px-6 py-3">Date</th>
-                  <th className="px-6 py-3 text-right">Gross Sales</th>
-                  <th className="px-6 py-3 text-right">Expenses</th>
-                  <th className="px-6 py-3 text-right">Net Profit</th>
+                  <th scope="col" className="px-6 py-3">Date</th>
+                  <th scope="col" className="px-6 py-3 text-right">Gross Sales</th>
+                  <th scope="col" className="px-6 py-3 text-right">Expenses</th>
+                  <th scope="col" className="px-6 py-3 text-right">Net Profit</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 text-sm">
@@ -200,7 +206,7 @@ export default function EndOfDayClosing({
                   .sort((a, b) => (a.date < b.date ? 1 : -1))
                   .map((c) => (
                     <tr key={c.id} className="hover:bg-gray-50/50">
-                      <td className="px-6 py-3 font-medium text-gray-900">{c.date}</td>
+                      <th scope="row" className="px-6 py-3 text-left font-medium text-gray-900">{c.date}</th>
                       <td className="px-6 py-3 text-right text-gray-700">{formatMoney(c.grossSales)}</td>
                       <td className="px-6 py-3 text-right text-red-700">{formatMoney(c.totalExpenses)}</td>
                       <td className={`px-6 py-3 text-right font-semibold ${c.netProfit >= 0 ? "text-green-700" : "text-red-700"}`}>

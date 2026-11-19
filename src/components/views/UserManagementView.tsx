@@ -106,11 +106,11 @@ export default function UserManagementView({
           <table className="w-full text-left border-collapse min-w-[760px]">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-                <th className="px-6 py-4">User</th>
-                <th className="px-6 py-4">Email</th>
-                <th className="px-6 py-4">Role</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Actions</th>
+                <th scope="col" className="px-6 py-4">User</th>
+                <th scope="col" className="px-6 py-4">Email</th>
+                <th scope="col" className="px-6 py-4">Role</th>
+                <th scope="col" className="px-6 py-4">Status</th>
+                <th scope="col" className="px-6 py-4">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 text-sm">
@@ -137,14 +137,14 @@ export default function UserManagementView({
 
                   return (
                     <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-6 py-4">
+                      <th scope="row" className="px-6 py-4 text-left font-normal">
                         <span className="font-medium text-gray-900">{user.name}</span>
                         {user.id === currentUser.id && (
                           <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-bold bg-orange-50 text-[#562D07]">
                             You
                           </span>
                         )}
-                      </td>
+                      </th>
                       <td className="px-6 py-4 text-gray-600">{user.email}</td>
                       <td className="px-6 py-4">
                         <SelectField

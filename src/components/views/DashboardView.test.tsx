@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router";
 import DashboardView from "./DashboardView";
+import { initialOrders } from "../../data/initialOrders";
+import { orderPath } from "../../routes";
 import { addDaysISO, todayISO } from "../../utils/dates";
-import type { Sale } from "../../types/domain";
+import type { Order, Sale } from "../../types/domain";
 
 const noop = () => {};
 
@@ -28,18 +31,19 @@ function saleOn(dateKey: string, total: number): Sale {
   };
 }
 
-function renderDashboard(sales: Sale[]) {
+function renderDashboard(sales: Sale[], orders: Order[] = []) {
   return render(
-    <DashboardView
-      orders={[]}
-      clients={[]}
-      sales={sales}
-      lowStockAlerts={[]}
-      pendingOrdersCount={0}
-      readyOrdersCount={0}
-      onNavClick={noop}
-      onViewOrder={noop}
-    />
+    <MemoryRouter>
+      <DashboardView
+        orders={orders}
+        clients={[]}
+        sales={sales}
+        lowStockAlerts={[]}
+        pendingOrdersCount={0}
+        readyOrdersCount={0}
+        onNavClick={noop}
+      />
+    </MemoryRouter>
   );
 }
 
@@ -64,5 +68,17 @@ describe("dashboard revenue card", () => {
     renderDashboard([]);
     expect(screen.getByText("₱0.00")).toBeInTheDocument();
     expect(screen.queryByTitle("Versus yesterday")).toBeNull();
+  });
+});
+
+describe("dashboard recent orders", () => {
+  it("opens an order from its number, so the row needs no click handler", () => {
+    const [order] = initialOrders;
+    renderDashboard([], [order]);
+
+    const link = screen.getByRole("link", { name: order.id });
+    expect(link).toHaveAttribute("href", orderPath(order.id));
+    expect(link.closest("tr")).not.toHaveClass("cursor-pointer");
+    expect(link.closest("th")).toHaveAttribute("scope", "row");
   });
 });
