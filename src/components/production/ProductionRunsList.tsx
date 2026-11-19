@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ScheduleRunModal from "./ScheduleRunModal";
 import RunDetailModal from "./RunDetailModal";
 import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
+import { useAnnounce } from "../common/Announcer";
 import SearchField from "../common/SearchField";
 import { getRunStatus } from "../../utils/production";
 import {
@@ -46,6 +47,7 @@ export default function ProductionRunsList({
   const [isScheduling, setIsScheduling] = useState(false);
   const [selectedRunId, setSelectedRunId] = useState<ProductionRunId | null>(null);
   const [pendingDelete, setPendingDelete] = useState<ProductionRun | null>(null);
+  const announce = useAnnounce();
 
   const withStatus = productionRuns.map((run) => {
     const recipe = catalogue.find((r) => r.id === run.recipeId) || null;
@@ -93,11 +95,13 @@ export default function ProductionRunsList({
   const handleSchedule = (data: ScheduleRunData) => {
     onSchedule(data);
     setIsScheduling(false);
+    announce(`Production run scheduled for ${data.plannedDate}.`);
   };
 
   const handleComplete = (id: ProductionRunId) => {
     onComplete(id);
     setSelectedRunId(null);
+    announce("Production run completed.");
   };
 
   const pendingRecipe = pendingDelete
@@ -109,6 +113,7 @@ export default function ProductionRunsList({
     onDelete(pendingDelete.id);
     setPendingDelete(null);
     setSelectedRunId(null);
+    announce(`${pendingRecipe ? pendingRecipe.name : "Production run"} deleted.`);
   };
 
   return (

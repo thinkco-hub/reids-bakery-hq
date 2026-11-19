@@ -108,15 +108,20 @@ export default function AuditLogsView() {
       </p>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto w-full">
+        <div
+          className="overflow-x-auto w-full"
+          tabIndex={0}
+          role="region"
+          aria-label="Audit log entries"
+        >
           <table className="w-full text-left border-collapse min-w-[860px]">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-                <th className="px-6 py-4">Time</th>
-                <th className="px-6 py-4">User</th>
-                <th className="px-6 py-4">Action</th>
-                <th className="px-6 py-4">Entity</th>
-                <th className="px-6 py-4">Details</th>
+                <th scope="col" className="px-6 py-4">Time</th>
+                <th scope="col" className="px-6 py-4">User</th>
+                <th scope="col" className="px-6 py-4">Action</th>
+                <th scope="col" className="px-6 py-4">Entity</th>
+                <th scope="col" className="px-6 py-4">Details</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 text-sm">

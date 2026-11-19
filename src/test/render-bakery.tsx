@@ -2,6 +2,7 @@ import { render } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import type { ReactNode } from "react";
 import { initialUsers } from "../data/initialUsers";
+import { AnnouncerProvider } from "../components/common/Announcer";
 import { BakeryProvider } from "../store/BakeryProvider";
 import type { BakerySeed } from "../store/BakeryProvider";
 import { ShellProvider } from "../routes/shell";
@@ -45,11 +46,13 @@ export function bakeryTree(ui: ReactNode, options: RenderBakeryOptions = {}) {
   const { initialPath = "/", currentUser = defaultUser, seed } = options;
   return (
     <MemoryRouter initialEntries={[initialPath]}>
-      <ShellProvider value={fixtureShell(currentUser)}>
-        <BakeryProvider currentUser={currentUser} seed={seed}>
-          {ui}
-        </BakeryProvider>
-      </ShellProvider>
+      <AnnouncerProvider>
+        <ShellProvider value={fixtureShell(currentUser)}>
+          <BakeryProvider currentUser={currentUser} seed={seed}>
+            {ui}
+          </BakeryProvider>
+        </ShellProvider>
+      </AnnouncerProvider>
     </MemoryRouter>
   );
 }

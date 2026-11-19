@@ -1,6 +1,8 @@
 import React from "react";
+import { Link } from "react-router";
 import OrderStatusBadge from "../orders/OrderStatusBadge";
 import { CalendarIcon } from "../icons";
+import { orderPath } from "../../routes";
 import { addDaysISO, formatDate, toISODate } from "../../utils/dates";
 import { formatMoney } from "../../utils/money";
 import { computeOrderTotal } from "../../utils/orders";
@@ -24,7 +26,6 @@ interface DashboardViewProps {
   pendingOrdersCount: number;
   readyOrdersCount: number;
   onNavClick: (tab: NavTabId) => void;
-  onViewOrder: (order: Order) => void;
 }
 
 export default function DashboardView({
@@ -35,7 +36,6 @@ export default function DashboardView({
   pendingOrdersCount,
   readyOrdersCount,
   onNavClick,
-  onViewOrder,
 }: DashboardViewProps) {
   const today = new Date();
   const todayLabel = formatDate(today);
@@ -199,26 +199,32 @@ export default function DashboardView({
               View All
             </button>
           </div>
-          <div className="p-0 flex-1 overflow-x-auto">
+          <div
+            className="p-0 flex-1 overflow-x-auto"
+            tabIndex={0}
+            role="region"
+            aria-label="Recent orders"
+          >
             <table className="w-full text-left border-collapse min-w-[500px]">
               <thead>
                 <tr className="bg-gray-50/50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  <th className="px-5 py-3">Order #</th>
-                  <th className="px-5 py-3">Client</th>
-                  <th className="px-5 py-3">Status</th>
-                  <th className="px-5 py-3 text-right">Total</th>
+                  <th scope="col" className="px-5 py-3">Order #</th>
+                  <th scope="col" className="px-5 py-3">Client</th>
+                  <th scope="col" className="px-5 py-3">Status</th>
+                  <th scope="col" className="px-5 py-3 text-right">Total</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-sm">
                 {orders.slice(0, 4).map((order) => (
-                  <tr
-                    key={order.id}
-                    className="hover:bg-orange-50/50 transition-colors cursor-pointer"
-                    onClick={() => onViewOrder(order)}
-                  >
-                    <td className="px-5 py-4 font-medium text-gray-900">
-                      {order.id}
-                    </td>
+                  <tr key={order.id} className="hover:bg-orange-50/50 transition-colors">
+                    <th scope="row" className="px-5 py-4 text-left font-medium text-gray-900">
+                      <Link
+                        to={orderPath(order.id)}
+                        className="rounded hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-text)]"
+                      >
+                        {order.id}
+                      </Link>
+                    </th>
                     <td className="px-5 py-4 text-gray-800">
                       {clients.find((c) => c.id === order.clientId)?.name || order.customerName || "—"}
                     </td>
@@ -244,7 +250,12 @@ export default function DashboardView({
               </span>
             </h3>
           </div>
-          <div className="p-0 flex-1 overflow-y-auto max-h-[400px]">
+          <div
+            className="p-0 flex-1 overflow-y-auto max-h-[400px]"
+            tabIndex={0}
+            role="region"
+            aria-label="Inventory alerts"
+          >
             {lowStockAlerts.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-10 text-gray-500">
                 <svg

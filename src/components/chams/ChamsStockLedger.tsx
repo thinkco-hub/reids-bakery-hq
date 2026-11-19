@@ -259,6 +259,13 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
 
   return (
     <>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-[#1B2A4A] focus:px-4 focus:py-2 focus:font-bold focus:text-white"
+      >
+        Skip to main content
+      </a>
+
       {/* TOP BAR — drawer layouts only (phone and tablet) */}
       {!isDesktopRail && (
         <div className="bg-[#1B2A4A] text-[#EAF0FB] p-4 flex justify-between items-center shadow-md z-30 w-full">
@@ -276,7 +283,7 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2 p-1">
               <span className="text-[#1B2A4A] font-bold text-xs">CH</span>
             </div>
-            <h1 className="text-lg font-bold">Chams Ledger</h1>
+            <span className="text-lg font-bold">Chams Ledger</span>
           </button>
         </div>
       )}
@@ -419,7 +426,12 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
       </div>
 
       {/* MAIN CONTENT AREA */}
-      <main className="flex-1 relative z-10 w-full flex flex-col p-4 md:p-8 overflow-y-auto">
+      <main
+        id="main"
+        tabIndex={-1}
+        className="flex-1 relative z-10 w-full flex flex-col p-4 md:p-8 overflow-y-auto"
+      >
+        <h1 className="sr-only">Chams Ledger</h1>
         {activeChamsTab === "ledger" && (
           <LedgerView
             branches={branches}

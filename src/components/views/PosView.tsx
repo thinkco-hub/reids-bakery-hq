@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
+import { useAnnounce } from "../common/Announcer";
 import PosMobile from "../pos/PosMobile";
 import SelectField from "../common/SelectField";
 import TicketLineItem from "../pos/TicketLineItem";
@@ -63,10 +64,12 @@ export default function PosView({
   openConfirmModal,
 }: PosViewProps) {
   const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
+  const announce = useAnnounce();
 
   const confirmClear = () => {
     clearTicket();
     setIsClearConfirmOpen(false);
+    announce("Ticket cleared.");
   };
 
   return (
@@ -161,9 +164,9 @@ export default function PosView({
                   d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                 />
               </svg>
-              <h3 className="font-bold text-[length:var(--tk-title)]">
+              <h2 className="font-bold text-[length:var(--tk-title)]">
                 Current Ticket
-              </h3>
+              </h2>
             </div>
             <button
               onClick={() => setIsClearConfirmOpen(true)}

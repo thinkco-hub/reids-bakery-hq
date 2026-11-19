@@ -85,7 +85,12 @@ function ClosingSection({
           {title}
         </h3>
       </div>
-      <div className="overflow-x-auto w-full">
+      <div
+        className="overflow-x-auto w-full"
+        tabIndex={0}
+        role="region"
+        aria-label={`${title} closing inventory`}
+      >
         <table className="w-full text-left border-collapse min-w-[760px]">
           <thead>
             <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">

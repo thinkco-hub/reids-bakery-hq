@@ -1,6 +1,7 @@
 import React from "react";
 import { Route, Routes, useNavigate } from "react-router";
 import LoginPage from "./components/auth/LoginPage";
+import { AnnouncerProvider } from "./components/common/Announcer";
 import UnknownRoute from "./components/common/UnknownRoute";
 import { useAuth } from "./hooks/useAuth";
 import { useNavigation } from "./hooks/useNavigation";
@@ -68,52 +69,54 @@ export default function BakeryCommandCenter() {
   };
 
   return (
-    <ShellProvider value={shell}>
-      <BakeryProvider currentUser={currentUser}>
-        <div
-          className={`flex flex-col ${
-            canUseSidebarRail(navigation.windowWidth) ? "md:flex-row" : ""
-          } h-screen bg-[#FDF9F3] font-sans text-[#121212] overflow-hidden relative`}
-        >
-          <Routes>
-            <Route path="/" element={<LayoutRoute />}>
-              <Route index element={<DashboardRoute />} />
-              <Route path="pos" element={<PosRoute />} />
-              <Route path="orders">
-                <Route index element={<OrdersRoute />} />
-                <Route path=":orderId" element={<OrderDetailRoute />} />
+    <AnnouncerProvider>
+      <ShellProvider value={shell}>
+        <BakeryProvider currentUser={currentUser}>
+          <div
+            className={`flex flex-col ${
+              canUseSidebarRail(navigation.windowWidth) ? "md:flex-row" : ""
+            } h-screen bg-[#FDF9F3] font-sans text-[#121212] overflow-hidden relative`}
+          >
+            <Routes>
+              <Route path="/" element={<LayoutRoute />}>
+                <Route index element={<DashboardRoute />} />
+                <Route path="pos" element={<PosRoute />} />
+                <Route path="orders">
+                  <Route index element={<OrdersRoute />} />
+                  <Route path=":orderId" element={<OrderDetailRoute />} />
+                </Route>
+                <Route path="clients">
+                  <Route index element={<ClientsRoute />} />
+                  <Route path=":clientId" element={<ClientDetailRoute />} />
+                </Route>
+                <Route path="inventory">
+                  <Route index element={<InventoryRoute />} />
+                  <Route path="closing-count" element={<ClosingCountRoute />} />
+                  <Route path="reconciliation" element={<ReconciliationRoute />} />
+                </Route>
+                <Route path="recipes">
+                  <Route index element={<RecipesRoute />} />
+                  <Route path="new" element={<RecipeNewRoute />} />
+                  <Route path=":recipeId" element={<RecipeDetailRoute />} />
+                </Route>
+                <Route path="production-runs" element={<ProductionRoute />} />
+                <Route path="calendar" element={<CalendarRoute />} />
+                <Route path="reports">
+                  <Route index element={<ReportsRoute />} />
+                  <Route path="closing" element={<ReportsClosingRoute />} />
+                  <Route path="inventory" element={<ReportsInventoryRoute />} />
+                </Route>
+                <Route path="audit-logs" element={<AuditLogsRoute />} />
+                <Route path="roles" element={<RolesRoute />} />
+                {/* Inside the layout so the sidebar survives a bad URL, and not
+                    behind a tab guard: no tab is involved. */}
+                <Route path="*" element={<UnknownRoute />} />
               </Route>
-              <Route path="clients">
-                <Route index element={<ClientsRoute />} />
-                <Route path=":clientId" element={<ClientDetailRoute />} />
-              </Route>
-              <Route path="inventory">
-                <Route index element={<InventoryRoute />} />
-                <Route path="closing-count" element={<ClosingCountRoute />} />
-                <Route path="reconciliation" element={<ReconciliationRoute />} />
-              </Route>
-              <Route path="recipes">
-                <Route index element={<RecipesRoute />} />
-                <Route path="new" element={<RecipeNewRoute />} />
-                <Route path=":recipeId" element={<RecipeDetailRoute />} />
-              </Route>
-              <Route path="production-runs" element={<ProductionRoute />} />
-              <Route path="calendar" element={<CalendarRoute />} />
-              <Route path="reports">
-                <Route index element={<ReportsRoute />} />
-                <Route path="closing" element={<ReportsClosingRoute />} />
-                <Route path="inventory" element={<ReportsInventoryRoute />} />
-              </Route>
-              <Route path="audit-logs" element={<AuditLogsRoute />} />
-              <Route path="roles" element={<RolesRoute />} />
-              {/* Inside the layout so the sidebar survives a bad URL, and not
-                  behind a tab guard: no tab is involved. */}
-              <Route path="*" element={<UnknownRoute />} />
-            </Route>
-            <Route path={CHAMS_PATH} element={<ChamsRoute />} />
-          </Routes>
-        </div>
-      </BakeryProvider>
-    </ShellProvider>
+              <Route path={CHAMS_PATH} element={<ChamsRoute />} />
+            </Routes>
+          </div>
+        </BakeryProvider>
+      </ShellProvider>
+    </AnnouncerProvider>
   );
 }
