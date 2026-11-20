@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
 import { discrepancyLabel } from "../../utils/counts";
 import {
   COUNT_RESOLUTION_LABELS,
@@ -36,6 +37,16 @@ export default function ReconciliationReview({
   onApplyAll,
 }: ReconciliationReviewProps) {
   const [filter, setFilter] = useState<ReconciliationFilter>("flagged");
+  const [confirmingApplyAll, setConfirmingApplyAll] = useState(false);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  // Apply All disables itself once nothing is pending, so the dialog cannot return focus to it.
+  const focusHeadingOnConfirm = useRef(false);
+
+  useEffect(() => {
+    if (!focusHeadingOnConfirm.current) return;
+    focusHeadingOnConfirm.current = false;
+    headingRef.current?.focus();
+  }, [confirmingApplyAll]);
 
   const itemName = (c: InventoryCount) => {
     const list = c.itemType === "ingredient" ? ingredients : menuInventory;
@@ -45,13 +56,9 @@ export default function ReconciliationReview({
   const flaggedPending = counts.filter((c) => c.discrepancy !== 0 && c.status === "pending");
   const resolved = counts.filter((c) => c.status === "resolved");
 
-  const handleApplyAll = () => {
-    if (
-      !window.confirm(
-        `Apply all ${flaggedPending.length} pending count${flaggedPending.length !== 1 ? "s" : ""}? This will adjust system stock to match each counted quantity.`
-      )
-    )
-      return;
+  const confirmApplyAll = () => {
+    focusHeadingOnConfirm.current = true;
+    setConfirmingApplyAll(false);
     onApplyAll();
   };
 
@@ -64,7 +71,7 @@ export default function ReconciliationReview({
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-[#562D07]">Inventory Reconciliation</h2>
+        <h2 ref={headingRef} tabIndex={-1} className="text-2xl md:text-3xl font-bold text-[#562D07]">Inventory Reconciliation</h2>
         <p className="text-[#562D07]/70 mt-1 font-medium text-sm md:text-base">
           Review discrepancies between counted and system stock
         </p>
@@ -102,7 +109,7 @@ export default function ReconciliationReview({
           ))}
         </div>
         <button
-          onClick={handleApplyAll}
+          onClick={() => setConfirmingApplyAll(true)}
           disabled={flaggedPending.length === 0}
           className="px-4 py-1.5 rounded-lg bg-[#562D07] hover:bg-[#3a1d04] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold text-sm shadow-sm transition-colors whitespace-nowrap"
         >
@@ -111,7 +118,12 @@ export default function ReconciliationReview({
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto w-full">
+        <div
+          className="overflow-x-auto w-full"
+          tabIndex={0}
+          role="region"
+          aria-label="Inventory counts"
+        >
           <table className="w-full text-left border-collapse min-w-[760px]">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
@@ -197,6 +209,16 @@ export default function ReconciliationReview({
           </table>
         </div>
       </div>
+
+      {confirmingApplyAll && (
+        <DeleteConfirmDialog
+          title={`Apply ${flaggedPending.length} pending count${flaggedPending.length !== 1 ? "s" : ""}?`}
+          message="This will adjust system stock to match each counted quantity."
+          confirmLabel="Apply all"
+          onConfirm={confirmApplyAll}
+          onCancel={() => setConfirmingApplyAll(false)}
+        />
+      )}
     </div>
   );
 }

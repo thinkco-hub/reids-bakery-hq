@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAnnounce } from "../common/Announcer";
+import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
 import { computeDailyClosing } from "../../utils/closing";
 import { todayISO } from "../../utils/dates";
 import { formatMoney } from "../../utils/money";
@@ -27,7 +28,18 @@ export default function EndOfDayClosing({
   const [date, setDate] = useState(todayISO());
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
+  const [pendingExpense, setPendingExpense] = useState<Expense | null>(null);
+  const [confirmingClose, setConfirmingClose] = useState(false);
+  const expensesHeadingRef = useRef<HTMLHeadingElement>(null);
+  // Confirming either action destroys its own trigger, so the dialog has nothing to return focus to.
+  const focusHeadingOnConfirm = useRef(false);
   const announce = useAnnounce();
+
+  useEffect(() => {
+    if (!focusHeadingOnConfirm.current) return;
+    focusHeadingOnConfirm.current = false;
+    expensesHeadingRef.current?.focus();
+  }, [pendingExpense, confirmingClose]);
 
   const closing = useMemo(() => computeDailyClosing(date, sales, expenses), [date, sales, expenses]);
   const alreadyClosed = dayClosings.find((c) => c.date === date);
@@ -42,7 +54,17 @@ export default function EndOfDayClosing({
     setAmount("");
   };
 
-  const handleCloseDay = () => {
+  const confirmRemoveExpense = () => {
+    if (!pendingExpense) return;
+    focusHeadingOnConfirm.current = true;
+    onDeleteExpense(pendingExpense.id);
+    announce(`Expense ${pendingExpense.description} removed.`);
+    setPendingExpense(null);
+  };
+
+  const confirmCloseDay = () => {
+    focusHeadingOnConfirm.current = true;
+    setConfirmingClose(false);
     onCloseDay({
       date,
       grossSales: closing.grossSales,
@@ -114,7 +136,7 @@ export default function EndOfDayClosing({
       )}
 
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
-        <h3 className="text-base font-bold text-[#121212] mb-4">Expenses for {date}</h3>
+        <h3 ref={expensesHeadingRef} tabIndex={-1} className="text-base font-bold text-[#121212] mb-4">Expenses for {date}</h3>
 
         {!alreadyClosed && (
           <form onSubmit={handleAddExpense} className="flex flex-col sm:flex-row gap-2 mb-4">
@@ -156,10 +178,7 @@ export default function EndOfDayClosing({
                   <span className="font-semibold text-gray-900">{formatMoney(Number(exp.amount))}</span>
                   {!alreadyClosed && (
                     <button
-                      onClick={() => {
-                        onDeleteExpense(exp.id);
-                        announce(`Expense ${exp.description} removed.`);
-                      }}
+                      onClick={() => setPendingExpense(exp)}
                       className="text-gray-500 hover:text-red-500 transition-colors"
                       title="Remove expense"
                       aria-label={`Remove expense ${exp.description}`}
@@ -178,7 +197,7 @@ export default function EndOfDayClosing({
 
       {!alreadyClosed && (
         <button
-          onClick={handleCloseDay}
+          onClick={() => setConfirmingClose(true)}
           className="w-full py-3.5 rounded-xl text-white font-bold shadow-lg bg-[var(--color-brand-strong)] hover:bg-[var(--color-brand-strong-hover)] transition-colors"
         >
           Close {date} — Lock In Net Profit of {formatMoney(closing.netProfit)}
@@ -190,7 +209,12 @@ export default function EndOfDayClosing({
           <div className="p-5 border-b border-gray-100">
             <h3 className="text-base font-bold text-[#121212]">Closing History</h3>
           </div>
-          <div className="overflow-x-auto w-full">
+          <div
+            className="overflow-x-auto w-full"
+            tabIndex={0}
+            role="region"
+            aria-label="Closing history"
+          >
             <table className="w-full text-left border-collapse min-w-[560px]">
               <thead>
                 <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
@@ -218,6 +242,26 @@ export default function EndOfDayClosing({
             </table>
           </div>
         </div>
+      )}
+
+      {pendingExpense && (
+        <DeleteConfirmDialog
+          title="Remove this expense?"
+          message={`Removing "${pendingExpense.description}" (${formatMoney(Number(pendingExpense.amount))}) from ${date} cannot be undone.`}
+          confirmLabel="Remove expense"
+          onConfirm={confirmRemoveExpense}
+          onCancel={() => setPendingExpense(null)}
+        />
+      )}
+
+      {confirmingClose && (
+        <DeleteConfirmDialog
+          title={`Close ${date}?`}
+          message={`Gross sales ${formatMoney(closing.grossSales)} minus expenses ${formatMoney(closing.totalExpenses)} locks in a net profit of ${formatMoney(closing.netProfit)}. Once closed, expenses for this date can no longer be added or removed.`}
+          confirmLabel="Close day"
+          onConfirm={confirmCloseDay}
+          onCancel={() => setConfirmingClose(false)}
+        />
       )}
     </div>
   );

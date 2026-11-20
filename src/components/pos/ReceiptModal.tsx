@@ -1,4 +1,4 @@
-import React, { useId } from "react";
+import React, { useId, useState } from "react";
 import Modal from "../common/Modal";
 import { formatDateTime } from "../../utils/dates";
 import { formatMoney } from "../../utils/money";
@@ -11,6 +11,24 @@ interface ReceiptModalProps {
 
 export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
   const headingId = useId();
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+
+  const handleDownload = async () => {
+    if (exporting) return;
+    setExporting(true);
+    setExportError(null);
+    try {
+      // Lazy-load jsPDF so it stays out of the initial bundle.
+      const { downloadReceiptPdf } = await import("../../utils/receiptPdf");
+      downloadReceiptPdf(receipt);
+    } catch {
+      setExportError("The receipt PDF could not be prepared. Please try again.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <Modal
       labelledBy={headingId}
@@ -103,25 +121,32 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
           )}
         </div>
 
-        <div className="flex gap-3 print:hidden">
-          <button
-            onClick={onClose}
-            className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-colors"
-          >
-            Exit
-          </button>
-          <button
-            onClick={async () => {
-              // Lazy-load jsPDF so it stays out of the initial bundle.
-              const { downloadReceiptPdf } = await import(
-                "../../utils/receiptPdf"
-              );
-              downloadReceiptPdf(receipt);
-            }}
-            className="flex-1 py-3 rounded-xl text-white font-bold bg-[var(--color-brand-strong)] hover:bg-[var(--color-brand-strong-hover)] transition-colors"
-          >
-            Download Receipt
-          </button>
+        <div className="print:hidden">
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-colors"
+            >
+              Exit
+            </button>
+            {/* aria-disabled rather than disabled: disabling the focused button drops focus to body. */}
+            <button
+              onClick={handleDownload}
+              aria-disabled={exporting}
+              className="flex-1 py-3 rounded-xl text-white font-bold bg-[var(--color-brand-strong)] hover:bg-[var(--color-brand-strong-hover)] aria-disabled:bg-gray-300 aria-disabled:text-gray-600 aria-disabled:cursor-not-allowed transition-colors"
+            >
+              {exporting ? "Preparing…" : "Download Receipt"}
+            </button>
+          </div>
+          {/* Mounted empty: a live region inserted with its text is often skipped by screen readers. */}
+          <p role="status" className="sr-only">
+            {exporting ? "Preparing your receipt PDF…" : ""}
+          </p>
+          {exportError && (
+            <p role="alert" className="mt-3 text-center text-sm font-semibold text-red-700">
+              {exportError}
+            </p>
+          )}
         </div>
     </Modal>
   );
