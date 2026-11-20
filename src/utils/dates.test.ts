@@ -5,6 +5,8 @@ import {
   formatDateTime,
   formatDayLabel,
   formatMonthLabel,
+  formatShortDate,
+  formatTime,
   formatWeekLabel,
   getWeekRange,
   monthKey,
@@ -85,5 +87,22 @@ describe("period labels", () => {
     expect(formatDate(new Date(2026, 9, 25))).toBe("October 25, 2026");
     const stamp = new Date(2026, 9, 25, 14, 5, 6);
     expect(formatDateTime(stamp)).toBe(stamp.toLocaleString());
+  });
+});
+
+describe("short date and clock labels", () => {
+  it("formats a short chart-axis date", () => {
+    expect(formatShortDate("2026-10-25")).toBe("Oct 25");
+  });
+
+  it("formats a clock time with seconds in local time", () => {
+    const stamp = new Date(2026, 9, 25, 14, 5, 6);
+    expect(formatTime(stamp)).toBe(
+      stamp.toLocaleTimeString(undefined, {
+        hour: "numeric",
+        minute: "2-digit",
+        second: "2-digit",
+      })
+    );
   });
 });

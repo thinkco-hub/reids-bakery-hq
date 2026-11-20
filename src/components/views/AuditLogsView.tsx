@@ -1,7 +1,7 @@
 import { useState } from "react";
 import SearchField from "../common/SearchField";
 import { getAuditLog } from "../../utils/auditLog";
-import { toISODate, todayISO } from "../../utils/dates";
+import { formatTime, toISODate, todayISO } from "../../utils/dates";
 import { roleLabel } from "../../utils/permissions";
 import type { AuditActionType, AuditLogEntry } from "../../types/domain";
 
@@ -135,11 +135,7 @@ export default function AuditLogsView() {
                 filtered.map((entry) => (
                   <tr key={entry.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
-                      {new Date(entry.timestamp).toLocaleTimeString([], {
-                        hour: "numeric",
-                        minute: "2-digit",
-                        second: "2-digit",
-                      })}
+                      {formatTime(entry.timestamp)}
                     </td>
                     <td className="px-6 py-4">
                       <div className="font-medium text-gray-900">{entry.userName}</div>

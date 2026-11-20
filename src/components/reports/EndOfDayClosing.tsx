@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAnnounce } from "../common/Announcer";
 import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
 import { computeDailyClosing } from "../../utils/closing";
-import { todayISO } from "../../utils/dates";
+import { formatTime, todayISO } from "../../utils/dates";
 import { formatMoney } from "../../utils/money";
 import { getRevenueByPaymentMethod } from "../../utils/sales";
 import type { FormEvent } from "react";
@@ -97,7 +97,7 @@ export default function EndOfDayClosing({
           </svg>
           <p className="text-sm font-semibold text-green-700">
             {date} is already closed — net profit {formatMoney(alreadyClosed.netProfit)}, closed at{" "}
-            {new Date(alreadyClosed.closedAt).toLocaleTimeString()}.
+            {formatTime(alreadyClosed.closedAt)}.
           </p>
         </div>
       )}

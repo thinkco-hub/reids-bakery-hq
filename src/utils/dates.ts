@@ -117,3 +117,20 @@ export function formatDayLabel(iso: ISODate): string {
     year: "numeric",
   });
 }
+
+/** A short calendar date for chart axes, e.g. "Oct 25". */
+export function formatShortDate(iso: ISODate): string {
+  return parseISODate(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+}
+
+/** A clock time with seconds in the viewer's local time, e.g. "2:05:06 PM". */
+export function formatTime(value: ISODateTime | Date): string {
+  return new Date(value).toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+}
