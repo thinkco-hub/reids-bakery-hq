@@ -1,4 +1,5 @@
 import React, { useId } from "react";
+import type { FormEvent } from "react";
 import Modal from "../common/Modal";
 import SelectField from "../common/SelectField";
 import type { RestockModalState, StockItem } from "../../types/domain";
@@ -27,12 +28,20 @@ export default function RestockModal({
   const headingId = useId();
   const itemFieldId = useId();
   const amountFieldId = useId();
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (disabled) return;
+    onConfirm();
+  };
+
   return (
     <Modal
       labelledBy={headingId}
       onClose={onClose}
       className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto overscroll-contain animate-fadeIn"
     >
+      <form onSubmit={handleSubmit}>
         <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-1">
           Restock{" "}
           {modal.category === "menu" ? "Menu Item" : "Ingredient"}
@@ -78,12 +87,14 @@ export default function RestockModal({
           {/* Quick Increment Buttons */}
           <div className="flex gap-2">
             <button
+              type="button"
               onClick={() => onQuickAdd(5)}
               className="flex-1 py-2 bg-orange-50 text-[var(--color-brand-text)] font-bold rounded-lg border border-orange-200 hover:bg-orange-100 transition-colors"
             >
               + 5
             </button>
             <button
+              type="button"
               onClick={() => onQuickAdd(10)}
               className="flex-1 py-2 bg-orange-50 text-[var(--color-brand-text)] font-bold rounded-lg border border-orange-200 hover:bg-orange-100 transition-colors"
             >
@@ -94,13 +105,14 @@ export default function RestockModal({
 
         <div className="flex gap-3 mt-8">
           <button
+            type="button"
             onClick={onClose}
             className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-colors"
           >
             Cancel
           </button>
           <button
-            onClick={onConfirm}
+            type="submit"
             disabled={disabled}
             className={`flex-1 py-3 rounded-xl text-white font-bold transition-colors ${
               disabled
@@ -111,6 +123,7 @@ export default function RestockModal({
             Confirm Restock
           </button>
         </div>
+      </form>
     </Modal>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useId } from "react";
+import type { FormEvent } from "react";
 import Modal from "../common/Modal";
 import { TicketCustomerFields } from "./TicketCustomerInput";
 import { addDaysISO } from "../../utils/dates";
@@ -40,12 +41,19 @@ export default function OrderConfirmationModal({
   const deliveryFieldId = useId();
   const notesFieldId = useId();
 
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (disabled) return;
+    onConfirm();
+  };
+
   return (
     <Modal
       labelledBy={headingId}
       onClose={onClose}
       className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto overscroll-contain animate-fadeIn"
     >
+      <form onSubmit={handleSubmit}>
       <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-full flex items-center justify-center text-white bg-[var(--color-brand-strong)]">
             <svg
@@ -186,14 +194,15 @@ export default function OrderConfirmationModal({
 
         <div className="flex gap-3">
           <button
+            type="button"
             onClick={onClose}
             className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-colors"
           >
             Cancel
           </button>
           <button
+            type="submit"
             disabled={disabled}
-            onClick={onConfirm}
             className={`flex-1 py-3 rounded-xl text-white font-bold transition-colors ${
               disabled
                 ? "bg-gray-300 cursor-not-allowed"
@@ -203,6 +212,7 @@ export default function OrderConfirmationModal({
             Confirm Order
           </button>
         </div>
+      </form>
     </Modal>
   );
 }
