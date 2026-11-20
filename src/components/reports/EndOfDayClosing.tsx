@@ -105,17 +105,17 @@ export default function EndOfDayClosing({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
           <p className="text-gray-500 text-sm font-medium mb-1">Gross Sales</p>
-          <p className="text-2xl font-bold text-[#121212]">{formatMoney(closing.grossSales)}</p>
+          <p className="text-2xl font-bold text-[#121212] tabular-nums">{formatMoney(closing.grossSales)}</p>
           <p className="text-xs text-gray-500 mt-1">{closing.daySales.length} transaction(s)</p>
         </div>
         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
           <p className="text-gray-500 text-sm font-medium mb-1">Total Expenses</p>
-          <p className="text-2xl font-bold text-red-500">{formatMoney(closing.totalExpenses)}</p>
+          <p className="text-2xl font-bold text-red-500 tabular-nums">{formatMoney(closing.totalExpenses)}</p>
           <p className="text-xs text-gray-500 mt-1">{closing.dayExpenses.length} entr{closing.dayExpenses.length === 1 ? "y" : "ies"}</p>
         </div>
         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
           <p className="text-gray-500 text-sm font-medium mb-1">Net Profit</p>
-          <p className={`text-2xl font-bold ${closing.netProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
+          <p className={`text-2xl font-bold tabular-nums ${closing.netProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
             {formatMoney(closing.netProfit)}
           </p>
         </div>
@@ -128,7 +128,7 @@ export default function EndOfDayClosing({
             {paymentBreakdown.map((m) => (
               <div key={m.method} className="text-center p-4 bg-gray-50 rounded-xl">
                 <p className="text-xs font-medium text-gray-500 mb-1">{m.method}</p>
-                <p className="text-lg font-bold text-[#121212]">{formatMoney(m.revenue)}</p>
+                <p className="text-lg font-bold text-[#121212] tabular-nums">{formatMoney(m.revenue)}</p>
               </div>
             ))}
           </div>
@@ -231,9 +231,9 @@ export default function EndOfDayClosing({
                   .map((c) => (
                     <tr key={c.id} className="hover:bg-gray-50/50">
                       <th scope="row" className="px-6 py-3 text-left font-medium text-gray-900">{c.date}</th>
-                      <td className="px-6 py-3 text-right text-gray-700">{formatMoney(c.grossSales)}</td>
-                      <td className="px-6 py-3 text-right text-red-700">{formatMoney(c.totalExpenses)}</td>
-                      <td className={`px-6 py-3 text-right font-semibold ${c.netProfit >= 0 ? "text-green-700" : "text-red-700"}`}>
+                      <td className="px-6 py-3 text-right text-gray-700 tabular-nums">{formatMoney(c.grossSales)}</td>
+                      <td className="px-6 py-3 text-right text-red-700 tabular-nums">{formatMoney(c.totalExpenses)}</td>
+                      <td className={`px-6 py-3 text-right font-semibold tabular-nums ${c.netProfit >= 0 ? "text-green-700" : "text-red-700"}`}>
                         {formatMoney(c.netProfit)}
                       </td>
                     </tr>

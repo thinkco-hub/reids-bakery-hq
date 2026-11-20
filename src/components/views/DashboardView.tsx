@@ -100,7 +100,7 @@ export default function DashboardView({
           <h3 className="text-gray-500 text-sm font-medium mb-1">
             Today's Revenue
           </h3>
-          <p className="text-2xl font-bold text-[#121212]">
+          <p className="text-2xl font-bold text-[#121212] tabular-nums">
             {formatMoney(todayRevenue)}
           </p>
         </div>
@@ -125,7 +125,7 @@ export default function DashboardView({
           <h3 className="text-gray-500 text-sm font-medium mb-1">
             Pending Orders
           </h3>
-          <p className="text-2xl font-bold text-[#121212]">
+          <p className="text-2xl font-bold text-[#121212] tabular-nums">
             {pendingOrdersCount}
           </p>
         </div>
@@ -155,7 +155,7 @@ export default function DashboardView({
           <h3 className="text-gray-500 text-sm font-medium mb-1">
             Low Stock Alerts
           </h3>
-          <p className="text-2xl font-bold text-[#121212]">
+          <p className="text-2xl font-bold text-[#121212] tabular-nums">
             {lowStockAlerts.length}
           </p>
         </div>
@@ -180,7 +180,7 @@ export default function DashboardView({
           <h3 className="text-gray-500 text-sm font-medium mb-1">
             Ready for Dispatch
           </h3>
-          <p className="text-2xl font-bold text-[#121212]">
+          <p className="text-2xl font-bold text-[#121212] tabular-nums">
             {readyOrdersCount}
           </p>
         </div>
@@ -231,7 +231,7 @@ export default function DashboardView({
                     <td className="px-5 py-4">
                       <OrderStatusBadge status={order.status} />
                     </td>
-                    <td className="px-5 py-4 font-medium text-gray-900 text-right">
+                    <td className="px-5 py-4 font-medium text-gray-900 text-right tabular-nums">
                       {formatMoney(computeOrderTotal(order))}
                     </td>
                   </tr>
@@ -292,7 +292,7 @@ export default function DashboardView({
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="text-right">
-                        <span className="font-bold text-red-700 block leading-tight">
+                        <span className="font-bold text-red-700 block leading-tight tabular-nums">
                           {item.qty} {item.unit || ""}
                         </span>
                         <span className="text-xs text-gray-500">

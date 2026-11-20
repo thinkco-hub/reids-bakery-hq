@@ -80,15 +80,15 @@ export default function ReconciliationReview({
       <div className="grid grid-cols-3 gap-3 md:gap-4 mb-6">
         <div className="bg-white p-4 md:p-5 rounded-2xl border border-red-100 shadow-sm">
           <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">Flagged (Pending)</p>
-          <p className="text-xl md:text-2xl font-bold text-red-600">{flaggedPending.length}</p>
+          <p className="text-xl md:text-2xl font-bold text-red-600 tabular-nums">{flaggedPending.length}</p>
         </div>
         <div className="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm">
           <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">Total Counts Logged</p>
-          <p className="text-xl md:text-2xl font-bold text-[#121212]">{counts.length}</p>
+          <p className="text-xl md:text-2xl font-bold text-[#121212] tabular-nums">{counts.length}</p>
         </div>
         <div className="bg-white p-4 md:p-5 rounded-2xl border border-green-100 shadow-sm">
           <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">Resolved</p>
-          <p className="text-xl md:text-2xl font-bold text-green-600">{resolved.length}</p>
+          <p className="text-xl md:text-2xl font-bold text-green-600 tabular-nums">{resolved.length}</p>
         </div>
       </div>
 
@@ -152,10 +152,10 @@ export default function ReconciliationReview({
                     <td className="px-6 py-4 text-gray-500 text-xs font-semibold uppercase">
                       {c.itemType === "ingredient" ? "Raw Material" : "Menu Item"}
                     </td>
-                    <td className="px-6 py-4 text-right text-gray-600">{c.systemQty}</td>
-                    <td className="px-6 py-4 text-right text-gray-600">{c.countedQty}</td>
+                    <td className="px-6 py-4 text-right text-gray-600 tabular-nums">{c.systemQty}</td>
+                    <td className="px-6 py-4 text-right text-gray-600 tabular-nums">{c.countedQty}</td>
                     <td
-                      className={`px-6 py-4 text-right font-bold ${
+                      className={`px-6 py-4 text-right font-bold tabular-nums ${
                         c.discrepancy === 0 ? "text-gray-500" : c.discrepancy > 0 ? "text-green-700" : "text-red-700"
                       }`}
                     >

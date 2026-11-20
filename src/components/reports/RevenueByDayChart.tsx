@@ -37,7 +37,7 @@ export default function RevenueByDayChart({ data }: { data: RevenueByDay[] }) {
     <div className="relative">
       <div className="flex">
         {/* Y-axis labels */}
-        <div className="flex flex-col justify-between text-[11px] text-gray-500 pr-2 shrink-0 w-16 text-right" style={{ height: CHART_HEIGHT }}>
+        <div className="flex flex-col justify-between text-[11px] text-gray-500 pr-2 shrink-0 w-16 text-right tabular-nums" style={{ height: CHART_HEIGHT }}>
           {gridValues.map((v, i) => (
             <span key={i} className="leading-none -translate-y-1/2">
               {formatMoney(v)}

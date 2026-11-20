@@ -294,14 +294,14 @@ export default function RawMaterialsTable({ ingredients, onRestock, onAdd, onUpd
                       <tr key={item.id} className="hover:bg-[#FDF9F3]/50 transition-colors">
                         <td className="px-4 md:px-6 py-4 font-semibold text-[#121212]">{item.name}</td>
                         <td className="px-4 md:px-6 py-4 text-sm text-[#562D07]/70 font-medium">{item.id}</td>
-                        <td className="px-4 md:px-6 py-4 font-bold text-[#121212] text-lg">
+                        <td className="px-4 md:px-6 py-4 font-bold text-[#121212] text-lg tabular-nums">
                           {item.qty} <span className="text-xs font-medium text-gray-500">{item.unit}</span>
                         </td>
-                        <td className="px-4 md:px-6 py-4 text-sm text-[#562D07]/70 font-medium">
+                        <td className="px-4 md:px-6 py-4 text-sm text-[#562D07]/70 font-medium tabular-nums">
                           {item.target} {item.unit}
                         </td>
                         <td className="px-4 md:px-6 py-4 text-sm text-gray-600">{item.supplier || "—"}</td>
-                        <td className="px-4 md:px-6 py-4 text-sm text-gray-800 font-medium">
+                        <td className="px-4 md:px-6 py-4 text-sm text-gray-800 font-medium tabular-nums">
                           {formatMoney(Number(item.unitCost || 0))}
                         </td>
                         <td className="px-4 md:px-6 py-4">

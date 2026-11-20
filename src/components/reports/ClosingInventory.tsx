@@ -46,7 +46,7 @@ function StatCard({
   return (
     <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
       <p className="text-gray-500 text-xs md:text-sm font-medium mb-1">{label}</p>
-      <p className={`text-xl md:text-2xl font-bold ${accent || "text-[#121212]"}`}>{value}</p>
+      <p className={`text-xl md:text-2xl font-bold tabular-nums ${accent || "text-[#121212]"}`}>{value}</p>
       {sub && <p className="text-xs text-gray-500 mt-1">{sub}</p>}
     </div>
   );
@@ -116,8 +116,8 @@ function ClosingSection({
                 <tr key={row.id} className="hover:bg-gray-50/50">
                   <td className="px-6 py-3 font-medium text-gray-900">{row.name}</td>
                   <td className="px-6 py-3 text-gray-500">{row.unit}</td>
-                  <td className="px-6 py-3 text-right text-gray-500">{row.systemQty}</td>
-                  <td className="px-6 py-3 text-right font-semibold text-gray-900">{row.closingQty}</td>
+                  <td className="px-6 py-3 text-right text-gray-500 tabular-nums">{row.systemQty}</td>
+                  <td className="px-6 py-3 text-right font-semibold text-gray-900 tabular-nums">{row.closingQty}</td>
                   <td className="px-6 py-3">
                     {row.closingSource === "counted" ? (
                       <span className="text-xs font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded-full whitespace-nowrap">
@@ -129,8 +129,8 @@ function ClosingSection({
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-3 text-right text-gray-600">{formatMoney(row.unitValue)}</td>
-                  <td className="px-6 py-3 text-right font-semibold text-gray-900">
+                  <td className="px-6 py-3 text-right text-gray-600 tabular-nums">{formatMoney(row.unitValue)}</td>
+                  <td className="px-6 py-3 text-right font-semibold text-gray-900 tabular-nums">
                     {formatMoney(row.closingValue)}
                   </td>
                   <td className="px-6 py-3">
@@ -303,15 +303,15 @@ export default function ClosingInventory({ menuInventory, ingredients, inventory
       <div className="grid grid-cols-3 gap-3 md:gap-4 mb-6">
         <div className="bg-white p-4 md:p-5 rounded-2xl border border-red-100 shadow-sm">
           <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">Flagged (Pending)</p>
-          <p className="text-xl md:text-2xl font-bold text-red-600">{flaggedPending.length}</p>
+          <p className="text-xl md:text-2xl font-bold text-red-600 tabular-nums">{flaggedPending.length}</p>
         </div>
         <div className="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm">
           <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">Total Counts Logged</p>
-          <p className="text-xl md:text-2xl font-bold text-[#121212]">{inventoryCounts.length}</p>
+          <p className="text-xl md:text-2xl font-bold text-[#121212] tabular-nums">{inventoryCounts.length}</p>
         </div>
         <div className="bg-white p-4 md:p-5 rounded-2xl border border-green-100 shadow-sm">
           <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">Resolved</p>
-          <p className="text-xl md:text-2xl font-bold text-green-600">{resolved.length}</p>
+          <p className="text-xl md:text-2xl font-bold text-green-600 tabular-nums">{resolved.length}</p>
         </div>
       </div>
 
