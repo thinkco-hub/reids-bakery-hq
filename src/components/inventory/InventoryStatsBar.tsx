@@ -81,7 +81,7 @@ export default function InventoryStatsBar({ items, activeFilter, onFilterChange 
               </div>
             </div>
             <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">{label}</p>
-            <p className="text-xl md:text-2xl font-bold text-[#121212]">{counts[key]}</p>
+            <p className="text-xl md:text-2xl font-bold text-[#121212] tabular-nums">{counts[key]}</p>
           </button>
         );
       })}

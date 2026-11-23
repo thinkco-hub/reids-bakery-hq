@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { parseISODate } from "../../utils/dates";
+import { formatShortDate } from "../../utils/dates";
 import { formatMoney } from "../../utils/money";
-import type { ISODate, RevenueByDay } from "../../types/domain";
+import type { RevenueByDay } from "../../types/domain";
 
 function niceCeil(value: number) {
   if (value <= 0) return 100;
@@ -14,13 +14,6 @@ function niceCeil(value: number) {
   else if (residual <= 5) niceResidual = 5;
   else niceResidual = 10;
   return niceResidual * magnitude;
-}
-
-function formatShortDate(dateStr: ISODate) {
-  return parseISODate(dateStr).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-  });
 }
 
 const CHART_HEIGHT = 200;
@@ -44,7 +37,7 @@ export default function RevenueByDayChart({ data }: { data: RevenueByDay[] }) {
     <div className="relative">
       <div className="flex">
         {/* Y-axis labels */}
-        <div className="flex flex-col justify-between text-[11px] text-gray-500 pr-2 shrink-0 w-16 text-right" style={{ height: CHART_HEIGHT }}>
+        <div className="flex flex-col justify-between text-[11px] text-gray-500 pr-2 shrink-0 w-16 text-right tabular-nums" style={{ height: CHART_HEIGHT }}>
           {gridValues.map((v, i) => (
             <span key={i} className="leading-none -translate-y-1/2">
               {formatMoney(v)}

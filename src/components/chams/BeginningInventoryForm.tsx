@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import SelectField from "../common/SelectField";
 import { formatMonthLabel, monthKey } from "../../utils/dates";
 import type { FormEvent } from "react";
@@ -26,21 +26,20 @@ export default function BeginningInventoryForm({ branches, products, beginnings,
   const [branchId, setBranchId] = useState(branches[0]?.id || "");
   const [productId, setProductId] = useState(products[0]?.id || "");
   const [month, setMonth] = useState(MONTH_OPTIONS[0]);
-  const [openingCount, setOpeningCount] = useState("");
-  const [hasExisting, setHasExisting] = useState(false);
   const [submittedMsg, setSubmittedMsg] = useState("");
 
-  useEffect(() => {
-    const existing = beginnings.find(
-      (b) => b.branchId === branchId && b.productId === productId && b.month === month
-    );
-    setOpeningCount(existing ? String(existing.openingCount) : "0");
-    setHasExisting(!!existing);
-  }, [branchId, productId, month, beginnings]);
+  const existing = beginnings.find(
+    (b) => b.branchId === branchId && b.productId === productId && b.month === month
+  );
+  const hasExisting = !!existing;
+  // Key the count field on the combo so changing the selection remounts it with
+  // the saved value, instead of syncing state in an effect.
+  const combo = `${branchId}|${productId}|${month}`;
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit({ branchId, productId, month, openingCount: parseFloat(openingCount) || 0 });
+    const data = new FormData(e.currentTarget);
+    onSubmit({ branchId, productId, month, openingCount: parseFloat(String(data.get("openingCount"))) || 0 });
     setSubmittedMsg(`Beginning inventory for ${formatMonthLabel(month)} saved.`);
     setTimeout(() => setSubmittedMsg(""), 4000);
   };
@@ -113,12 +112,13 @@ export default function BeginningInventoryForm({ branches, products, beginnings,
         <div>
           <label htmlFor="beginning-opening" className="block text-sm font-semibold text-gray-700 mb-1.5">Opening Count</label>
           <input
+            key={combo}
             id="beginning-opening"
+            name="openingCount"
             type="number"
             min="0"
             step="any"
-            value={openingCount}
-            onChange={(e) => setOpeningCount(e.target.value)}
+            defaultValue={existing ? String(existing.openingCount) : "0"}
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
           />
           <p className="text-xs text-gray-500 mt-1.5">

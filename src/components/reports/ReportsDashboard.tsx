@@ -41,7 +41,7 @@ function StatCard({
   return (
     <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
       <p className="text-gray-500 text-xs md:text-sm font-medium mb-1">{label}</p>
-      <p className={`text-xl md:text-2xl font-bold ${accent || "text-[#121212]"}`}>{value}</p>
+      <p className={`text-xl md:text-2xl font-bold tabular-nums ${accent || "text-[#121212]"}`}>{value}</p>
     </div>
   );
 }
@@ -279,7 +279,7 @@ export default function ReportsDashboard({
               {byPaymentMethod.map((m) => (
                 <div key={m.method} className="text-center p-4 bg-gray-50 rounded-xl">
                   <p className="text-xs font-medium text-gray-500 mb-1">{m.method}</p>
-                  <p className="text-lg font-bold text-[#121212]">{formatMoney(m.revenue)}</p>
+                  <p className="text-lg font-bold text-[#121212] tabular-nums">{formatMoney(m.revenue)}</p>
                 </div>
               ))}
             </div>
@@ -348,7 +348,7 @@ export default function ReportsDashboard({
                     <td className="px-6 py-3 text-gray-600">{sale.type}</td>
                     <td className="px-6 py-3 text-gray-800">{sale.customerName}</td>
                     <td className="px-6 py-3 text-gray-600">{sale.paymentMethod}</td>
-                    <td className="px-6 py-3 text-right font-semibold text-gray-900">{formatMoney(sale.total)}</td>
+                    <td className="px-6 py-3 text-right font-semibold text-gray-900 tabular-nums">{formatMoney(sale.total)}</td>
                     <td className="px-6 py-3 text-right">
                       {/* A linked sale's order is its only editor. */}
                       {!sale.orderId && (

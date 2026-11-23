@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import SelectField from "../common/SelectField";
 import { formatMonthLabel, monthKey } from "../../utils/dates";
 import type { FormEvent } from "react";
@@ -28,29 +28,25 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
   const [branchId, setBranchId] = useState(branches[0]?.id || "");
   const [productId, setProductId] = useState(products[0]?.id || "");
   const [month, setMonth] = useState(MONTH_OPTIONS[0]);
-  const [restocked, setRestocked] = useState("");
-  const [spoilage, setSpoilage] = useState("");
-  const [sold, setSold] = useState("");
   const [submittedMsg, setSubmittedMsg] = useState("");
 
-  useEffect(() => {
-    const existing = movements.find(
-      (m) => m.branchId === branchId && m.productId === productId && m.month === month
-    );
-    setRestocked(existing ? String(existing.restocked) : "");
-    setSpoilage(existing ? String(existing.spoilage) : "");
-    setSold(existing ? String(existing.sold) : "");
-  }, [branchId, productId, month, movements]);
+  const existing = movements.find(
+    (m) => m.branchId === branchId && m.productId === productId && m.month === month
+  );
+  // Key the quantity fields on the combo so changing the selection remounts them
+  // with the saved values, instead of syncing state in an effect.
+  const combo = `${branchId}|${productId}|${month}`;
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const data = new FormData(e.currentTarget);
     onSubmit({
       branchId,
       productId,
       month,
-      restocked: parseFloat(restocked) || 0,
-      spoilage: parseFloat(spoilage) || 0,
-      sold: parseFloat(sold) || 0,
+      restocked: parseFloat(String(data.get("restocked"))) || 0,
+      spoilage: parseFloat(String(data.get("spoilage"))) || 0,
+      sold: parseFloat(String(data.get("sold"))) || 0,
     });
     setSubmittedMsg(`Stock movement for ${formatMonthLabel(month)} saved.`);
     setTimeout(() => setSubmittedMsg(""), 4000);
@@ -121,16 +117,16 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div key={combo} className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div>
             <label htmlFor="movement-restocked" className="block text-sm font-semibold text-gray-700 mb-1.5">Restocked</label>
             <input
               id="movement-restocked"
+              name="restocked"
               type="number"
               min="0"
               step="any"
-              value={restocked}
-              onChange={(e) => setRestocked(e.target.value)}
+              defaultValue={existing ? String(existing.restocked) : ""}
               placeholder="0"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
             />
@@ -139,11 +135,11 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
             <label htmlFor="movement-spoilage" className="block text-sm font-semibold text-gray-700 mb-1.5">Spoilage</label>
             <input
               id="movement-spoilage"
+              name="spoilage"
               type="number"
               min="0"
               step="any"
-              value={spoilage}
-              onChange={(e) => setSpoilage(e.target.value)}
+              defaultValue={existing ? String(existing.spoilage) : ""}
               placeholder="0"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
             />
@@ -152,11 +148,11 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
             <label htmlFor="movement-sold" className="block text-sm font-semibold text-gray-700 mb-1.5">Sold</label>
             <input
               id="movement-sold"
+              name="sold"
               type="number"
               min="0"
               step="any"
-              value={sold}
-              onChange={(e) => setSold(e.target.value)}
+              defaultValue={existing ? String(existing.sold) : ""}
               placeholder="0"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
             />

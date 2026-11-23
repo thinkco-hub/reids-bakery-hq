@@ -41,3 +41,17 @@
     }
   }
 }
+
+/* Honour the OS "reduce motion" setting: the drawer slide, button press-scale,
+   chevron spin and fade-in entrance all stop animating. Near-zero duration (not
+   none) keeps transitionend/animationend firing. Layout and sizing are untouched. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
