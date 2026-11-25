@@ -96,7 +96,7 @@ export default function TicketCustomerInput({
       labelledBy={headingId}
       onClose={onClose}
       dismissOnBackdrop={false}
-      overlayClassName="z-[100] bg-[#FDF9F3]"
+      overlayClassName="z-[100] bg-[#FDF9F3] p-0!"
       className="w-full h-full flex flex-col animate-fadeIn"
     >
       <header className="flex-shrink-0 bg-[#562D07] text-[#FDF9F3] p-4 flex items-center gap-3 shadow-md">
