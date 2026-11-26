@@ -41,13 +41,13 @@ import { canUseSidebarRail } from "./utils/responsive";
 function ViewAnnouncement() {
   const { pathname } = useLocation();
   const announce = useAnnounce();
-  const isFirstMount = useRef(true);
+  // Seeded with the landing path: the first mount is not a navigation, and
+  // StrictMode invoking the mount effect twice still sees the same pathname.
+  const lastPathname = useRef(pathname);
 
   useEffect(() => {
-    if (isFirstMount.current) {
-      isFirstMount.current = false;
-      return;
-    }
+    if (lastPathname.current === pathname) return;
+    lastPathname.current = pathname;
     const viewName = viewNameFromPath(pathname);
     document.title = `${viewName} — Reid's Bakery HQ`;
     // Main carries tabIndex=-1 and is the landmark the skip link targets.
