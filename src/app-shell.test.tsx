@@ -437,13 +437,14 @@ describe("order detail routes", () => {
     await screen.findByRole("heading", { name: "Orders" });
 
     const [firstRow] = screen.getAllByRole("button", { name: /^View order #/ });
+    const clickedId = firstRow.getAttribute("aria-label")!.replace("View order ", "");
     await user.click(firstRow);
 
     // The id has to survive as a path segment. /orders/ plus a "#1042" fragment
     // leaves the list on screen and reads to a cashier as an inert button.
-    expect(pathInAddressBar()).toBe("/orders/%231042");
+    expect(pathInAddressBar()).toBe(`/orders/${encodeURIComponent(clickedId)}`);
     expect(
-      await screen.findByRole("heading", { name: "Order #1042" })
+      await screen.findByRole("heading", { name: `Order ${clickedId}` })
     ).toBeInTheDocument();
   });
 
@@ -505,8 +506,9 @@ describe("record dismissal", () => {
     await screen.findByRole("heading", { name: "Orders" });
 
     const [firstRow] = screen.getAllByRole("button", { name: /^View order #/ });
+    const clickedId = firstRow.getAttribute("aria-label")!.replace("View order ", "");
     await user.click(firstRow);
-    expect(pathInAddressBar()).toBe("/orders/%231042");
+    expect(pathInAddressBar()).toBe(`/orders/${encodeURIComponent(clickedId)}`);
 
     await user.click(panelBack("Orders"));
     expect(pathInAddressBar()).toBe("/orders");

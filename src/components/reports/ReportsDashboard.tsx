@@ -222,7 +222,7 @@ export default function ReportsDashboard({
           </button>
         ))}
         <div className="w-px h-6 bg-gray-200 mx-1 hidden sm:block" />
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-2 min-w-0 basis-full flex-1 sm:basis-0 sm:flex-row sm:flex-wrap sm:items-center">
           <input
             type="date"
             value={customStart}

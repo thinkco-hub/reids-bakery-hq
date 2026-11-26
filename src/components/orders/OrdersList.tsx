@@ -3,9 +3,12 @@ import OrderCardList from "./OrderCardList";
 import OrderStatusBadge from "./OrderStatusBadge";
 import PaymentStatusBadge from "./PaymentStatusBadge";
 import SearchField from "../common/SearchField";
+import SelectField from "../common/SelectField";
 import { formatMoney } from "../../utils/money";
 import { computeOrderTotal, getPaymentStatus, hasShortfall, ORDER_STATUSES } from "../../utils/orders";
 import type { Client, MenuItemStock, Order, OrderStatus } from "../../types/domain";
+
+type SortKey = "created" | "date" | "total";
 
 interface OrdersListProps {
   orders: Order[];
@@ -19,6 +22,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "All">("All");
   const [dateFilter, setDateFilter] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("created");
 
   const clientName = (order: Order) =>
     clients.find((c) => c.id === order.clientId)?.name || order.customerName || "—";
@@ -31,6 +35,12 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
       order.id.toLowerCase().includes(search.toLowerCase()) ||
       clientName(order).toLowerCase().includes(search.toLowerCase());
     return matchStatus && matchDate && matchSearch;
+  });
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortKey === "total") return computeOrderTotal(b) - computeOrderTotal(a);
+    if (sortKey === "date") return b.requestedDate.localeCompare(a.requestedDate);
+    return b.createdAt.localeCompare(a.createdAt);
   });
 
   return (
@@ -99,11 +109,28 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
         })}
       </div>
 
-      {/* Container-query breakpoint: below 1024px the table swaps to a card list. */}
+      {/* Container-query breakpoint: below the 1040px table floor (+2px card border) the table swaps to a card list. */}
       <div className="@container">
-        {/* Desktop table — original structure and styling preserved; hidden only at <1024px container width. */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden @max-[1024px]:hidden">
-        <div className="overflow-x-auto w-full">
+        {/* One sort model for both views — the table and the cards read the same order. */}
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <label htmlFor="orders-sort" className="text-sm font-medium text-gray-500 whitespace-nowrap">
+            Sort by
+          </label>
+          <SelectField
+            id="orders-sort"
+            value={sortKey}
+            onChange={(e) => setSortKey(e.target.value as SortKey)}
+            className="pl-3 py-2 border border-gray-200 rounded-lg bg-white text-sm font-medium text-gray-700 focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
+          >
+            <option value="created">Newest first</option>
+            <option value="date">Requested date</option>
+            <option value="total">Total amount</option>
+          </SelectField>
+        </div>
+
+        {/* Desktop table — original structure and styling preserved; hidden only when the table cannot fit the container. */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden @max-[1042px]:hidden">
+        <div className="overflow-x-auto w-full" tabIndex={0} role="region" aria-label="Orders list">
           <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[1040px]">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
@@ -118,14 +145,14 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 text-sm">
-              {filtered.length === 0 ? (
+              {sorted.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
                     No orders found matching the selected filters.
                   </td>
                 </tr>
               ) : (
-                filtered.map((order) => {
+                sorted.map((order) => {
                   const shortfall = order.status !== "Delivered" && hasShortfall(order, menuInventory);
                   return (
                     <tr key={order.id} className="hover:bg-gray-50/50 transition-colors group">
@@ -181,8 +208,8 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
         </div>
         </div>
 
-        {/* Tablet/mobile (<1024px container): stacked card list with accordion + bottom sheet. */}
-        <OrderCardList orders={filtered} menuInventory={menuInventory} getClientName={clientName} onView={onView} />
+        {/* Tablet/mobile (<1042px container): stacked card list with accordion + bottom sheet. */}
+        <OrderCardList orders={sorted} menuInventory={menuInventory} getClientName={clientName} onView={onView} />
       </div>
     </div>
   );

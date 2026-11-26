@@ -51,7 +51,7 @@ export default function FinishedGoodsTable({ menuInventory, onRestock }: Finishe
         <div className="px-4 md:px-6 py-4 border-b border-[#F3B978] bg-[#F3B978]/20">
           <h2 id={headingId} className="text-base md:text-lg font-bold text-[#562D07]">📦 Finished Goods Stock</h2>
         </div>
-        <div className="overflow-x-auto w-full">
+        <div className="overflow-x-auto w-full" tabIndex={0} role="region" aria-label="Finished goods stock">
           <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[600px]">
             <thead>
               <tr className="bg-[#FDF9F3] border-b border-[#F3B978] text-sm text-[#562D07]/80">

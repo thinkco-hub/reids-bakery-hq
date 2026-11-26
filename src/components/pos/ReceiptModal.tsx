@@ -34,7 +34,7 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
       labelledBy={headingId}
       onClose={onClose}
       overlayClassName="z-[100] bg-black/50 backdrop-blur-sm p-4 print:bg-white print:static"
-      className="print-receipt bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto overscroll-contain animate-fadeIn print:shadow-none print:rounded-none"
+      className="print-receipt bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm max-h-[90dvh] overflow-y-auto overscroll-contain animate-fadeIn print:shadow-none print:rounded-none"
     >
         <div className="text-center mb-6">
           <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import SelectField from "../common/SelectField";
 import OrderStatusBadge from "./OrderStatusBadge";
 import PaymentStatusBadge from "./PaymentStatusBadge";
 import { formatMoney } from "../../utils/money";
@@ -14,8 +13,6 @@ export function formatDueDate(iso: string): string {
   return `${months[month - 1]} ${String(day).padStart(2, "0")}`;
 }
 
-type SortKey = "created" | "date" | "total";
-
 interface OrderCardListProps {
   orders: Order[];
   menuInventory: MenuItemStock[];
@@ -24,47 +21,22 @@ interface OrderCardListProps {
 }
 
 /**
- * Tablet/mobile (< 1024px container width) representation of the orders table:
+ * Tablet/mobile (< 1042px container width) representation of the orders table:
  * two-line cards with a fixed tabular value slot and an accordion reveal.
  * Rendered inside the parent @container.
  */
 export default function OrderCardList({ orders, menuInventory, getClientName, onView }: OrderCardListProps) {
-  const [mobileSort, setMobileSort] = useState<SortKey>("created");
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
-
-  const sorted = [...orders].sort((a, b) => {
-    if (mobileSort === "total") return computeOrderTotal(b) - computeOrderTotal(a);
-    if (mobileSort === "date") return b.requestedDate.localeCompare(a.requestedDate);
-    return b.createdAt.localeCompare(a.createdAt);
-  });
 
   return (
     <>
-      {/* Standalone sort control — replaces desktop column-header sort triggers.
-          Arbitrary container widths: Tailwind v4's @lg container size is 512px, not 1024px. */}
-      <div className="@max-[1024px]:flex @max-[1024px]:items-center @max-[1024px]:justify-between @max-[1024px]:gap-2 @max-[1024px]:mb-3 @min-[1024px]:hidden">
-        <label htmlFor="orders-mobile-sort" className="text-sm font-medium text-gray-500 whitespace-nowrap">
-          Sort by
-        </label>
-        <SelectField
-          id="orders-mobile-sort"
-          value={mobileSort}
-          onChange={(e) => setMobileSort(e.target.value as SortKey)}
-          className="pl-3 py-2 border border-gray-200 rounded-lg bg-white text-sm font-medium text-gray-700 focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
-        >
-          <option value="created">Newest first</option>
-          <option value="date">Requested date</option>
-          <option value="total">Total amount</option>
-        </SelectField>
-      </div>
-
-      <div className="hidden @max-[1024px]:grid gap-3">
-        {sorted.length === 0 ? (
+      <div className="hidden @max-[1042px]:grid gap-3">
+        {orders.length === 0 ? (
           <p className="px-4 py-8 text-center text-gray-500 bg-white rounded-lg border border-gray-200">
             No orders found matching the selected filters.
           </p>
         ) : (
-          sorted.map((order) => (
+          orders.map((order) => (
             <OrderCard
               key={order.id}
               order={order}

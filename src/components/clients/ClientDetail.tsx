@@ -71,7 +71,7 @@ export default function ClientDetail({ client, orders, onBack }: ClientDetailPro
         <div className="p-5 border-b border-gray-100">
           <h3 id={ordersHeadingId} className="text-lg font-bold text-[#121212]">Order History</h3>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Order history">
           <table aria-labelledby={ordersHeadingId} className="w-full text-left border-collapse min-w-[600px]">
             <thead>
               <tr className="bg-gray-50/50 text-xs font-semibold text-gray-500 uppercase tracking-wider">

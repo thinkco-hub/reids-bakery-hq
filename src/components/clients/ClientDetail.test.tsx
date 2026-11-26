@@ -35,6 +35,8 @@ describe("ClientDetail", () => {
     await user.tab();
     const link = screen.getByRole("link", { name: "#1042" });
     expect(link).toHaveAttribute("href", "/orders/%231042");
+    // The signed scroll region is its own tab stop between the back button and the row link.
+    await user.tab();
     await user.tab();
     expect(link).toHaveFocus();
     await user.keyboard("{Enter}");

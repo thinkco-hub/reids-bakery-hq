@@ -71,7 +71,7 @@ function IngredientFormModal({
     <Modal
       labelledBy={headingId}
       onClose={onClose}
-      overlayClassName="z-[100] bg-black/50 backdrop-blur-sm px-4"
+      overlayClassName="z-[100] bg-black/50 backdrop-blur-sm p-4"
       className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md max-h-[85dvh] overflow-y-auto overscroll-contain animate-fadeIn"
     >
       <form onSubmit={handleSubmit}>
@@ -257,7 +257,7 @@ export default function RawMaterialsTable({ ingredients, onRestock, onAdd, onUpd
         <div className="px-4 md:px-6 py-4 border-b border-[#F3B978] bg-[#F3B978]/20">
           <h2 id={headingId} className="text-base md:text-lg font-bold text-[#562D07]">🛒 Raw Materials Stock</h2>
         </div>
-        <div className="overflow-x-auto w-full">
+        <div className="overflow-x-auto w-full" tabIndex={0} role="region" aria-label="Raw materials stock">
           <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[860px]">
             <thead>
               <tr className="bg-[#FDF9F3] border-b border-[#F3B978] text-sm text-[#562D07]/80">
