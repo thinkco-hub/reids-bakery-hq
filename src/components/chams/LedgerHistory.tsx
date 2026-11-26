@@ -16,13 +16,13 @@ function TrendBars({ rows }: { rows: LedgerRow[] }) {
         const height = Math.max(2, (r.remainingCalculated / max) * 120);
         return (
           <div key={r.month} className="flex-1 flex flex-col items-center justify-end h-full min-w-0">
-            <span className="text-[10px] font-semibold text-gray-500 mb-1">{r.remainingCalculated}</span>
+            <span className="text-[0.625rem] font-semibold text-gray-500 mb-1">{r.remainingCalculated}</span>
             <div
               className={`w-full max-w-[32px] rounded-t-[4px] ${r.flagged ? "bg-red-400" : "bg-chams-blue"}`}
               style={{ height }}
               title={`${r.branchName} — ${r.productName} — ${formatMonthLabel(r.month)}`}
             />
-            <span className="text-[10px] text-gray-500 mt-1 whitespace-nowrap">
+            <span className="text-[0.625rem] text-gray-500 mt-1 whitespace-nowrap">
               {formatMonthLabel(r.month).split(" ")[0].slice(0, 3)}
             </span>
           </div>
@@ -106,13 +106,13 @@ export default function LedgerHistory({ branches, products, beginnings, movement
             <tbody className="divide-y divide-gray-200 text-sm">
               {rows.map((r) => (
                 <tr key={r.month} className={`hover:bg-gray-50/50 transition-colors ${r.flagged ? "bg-red-50/40" : ""}`}>
-                  <th scope="row" className="px-5 py-4 text-left font-medium text-gray-900">{formatMonthLabel(r.month)}</th>
+                  <th scope="row" className="px-5 py-4 text-left font-medium text-ink">{formatMonthLabel(r.month)}</th>
                   <td className="px-5 py-4 text-right text-gray-600 tabular-nums">{r.beginning}</td>
                   <td className="px-5 py-4 text-right text-gray-600 tabular-nums">{r.restocked}</td>
                   <td className="px-5 py-4 text-right text-gray-600 tabular-nums">{r.spoilage}</td>
                   <td className="px-5 py-4 text-right text-gray-600 tabular-nums">{r.sold}</td>
                   <td className="px-5 py-4 text-right text-green-700 font-medium tabular-nums">{formatMoney(r.revenue)}</td>
-                  <td className="px-5 py-4 text-right font-semibold text-gray-900 tabular-nums">{r.remainingCalculated}</td>
+                  <td className="px-5 py-4 text-right font-semibold text-ink tabular-nums">{r.remainingCalculated}</td>
                   <td className="px-5 py-4 text-right text-gray-600">
                     {r.countSubmitted ? r.remainingReported : <span className="text-gray-500">—</span>}
                   </td>

@@ -1,6 +1,11 @@
 /** The currency mark every DOM money render shares. */
 export const MONEY_SYMBOL = "₱";
 
+/** Cents, so computed totals land exactly on the 2dp grid the display shows. */
+export function roundMoney(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
 /** Peso amounts in the DOM: two decimals, no thousands grouping. */
 export function formatMoney(value: number): string {
   return `${MONEY_SYMBOL}${value.toFixed(2)}`;

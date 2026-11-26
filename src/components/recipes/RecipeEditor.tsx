@@ -13,7 +13,13 @@ import type {
   RecipeInput,
 } from "../../types/domain";
 
-const emptyLine = () => ({ ingredientId: "", qty: "", unit: "" });
+let nextRowKey = 1;
+const emptyLine = () => ({
+  key: `line-${nextRowKey++}`,
+  ingredientId: "",
+  qty: "",
+  unit: "",
+});
 
 const clampMargin = (value: number) => Math.min(Math.max(value, 0), 95);
 
@@ -37,7 +43,7 @@ type RecipeEditorForm = Omit<RecipeInput, "yieldQty" | "ingredients" | "price" |
   price: string | number;
   qty: string | number;
   target: string | number;
-  ingredients: Array<{ ingredientId: string; qty: string | number; unit: string }>;
+  ingredients: Array<{ key: string; ingredientId: string; qty: string | number; unit: string }>;
 };
 
 export default function RecipeEditor({
@@ -59,7 +65,15 @@ export default function RecipeEditor({
   const yieldUnitFieldId = useId();
   const [form, setForm] = useState<RecipeEditorForm>(() =>
     recipe
-      ? { ...recipe, yieldQty: recipe.yieldQty ?? "", yieldUnit: recipe.yieldUnit ?? "pcs" }
+      ? {
+          ...recipe,
+          ingredients: recipe.ingredients.map((line) => ({
+            ...line,
+            key: `line-${nextRowKey++}`,
+          })),
+          yieldQty: recipe.yieldQty ?? "",
+          yieldUnit: recipe.yieldUnit ?? "pcs",
+        }
       : {
           id: null,
           name: "",
@@ -121,7 +135,11 @@ export default function RecipeEditor({
     yieldQty: parseFloat(String(form.yieldQty)) || 0,
     ingredients: form.ingredients
       .filter((l) => l.ingredientId)
-      .map((l) => ({ ...l, qty: parseFloat(String(l.qty)) || 0 })),
+      .map((l) => ({
+        ingredientId: l.ingredientId,
+        qty: parseFloat(String(l.qty)) || 0,
+        unit: l.unit,
+      })),
   } as Recipe;
   const { totalCost, costPerUnit } = computeRecipeCost(normalizedForCalc, ingredients);
 
@@ -132,7 +150,11 @@ export default function RecipeEditor({
     e.preventDefault();
     const cleanIngredients = form.ingredients
       .filter((l) => l.ingredientId && l.qty !== "")
-      .map((l) => ({ ...l, qty: parseFloat(String(l.qty)) || 0 }));
+      .map((l) => ({
+        ingredientId: l.ingredientId,
+        qty: parseFloat(String(l.qty)) || 0,
+        unit: l.unit,
+      }));
     const missing: Array<{ key: string; label: string }> = [];
     if (!form.name) missing.push({ key: "name", label: "a recipe name" });
     if (form.price === "") missing.push({ key: "price", label: "a price" });
@@ -175,7 +197,7 @@ export default function RecipeEditor({
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <nav aria-label="Breadcrumb" className="mb-6">
-        <ol className="flex items-center text-[15px] text-gray-500 font-medium tracking-wide">
+        <ol className="flex items-center text-[0.9375rem] text-gray-500 font-medium tracking-wide">
           <li>
             <button
               onClick={onCancel}
@@ -346,7 +368,7 @@ export default function RecipeEditor({
                 {form.ingredients.map((line, idx) => {
                   const ingredient = ingredients.find((i) => i.id === line.ingredientId);
                   return (
-                    <div key={idx} className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                    <div key={line.key} className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
                       <SelectField
                         value={line.ingredientId}
                         onChange={(e) => {
@@ -402,11 +424,11 @@ export default function RecipeEditor({
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between text-gray-600 font-medium">
                     <span>Total Batch Cost</span>
-                    <span className="text-gray-900">{formatMoney(totalCost)}</span>
+                    <span className="text-ink">{formatMoney(totalCost)}</span>
                   </div>
                   <div className="flex justify-between text-gray-600 font-medium border-b border-gray-200 pb-3">
                     <span>Cost per Unit</span>
-                    <span className="text-gray-900">{formatMoney(costPerUnit)}</span>
+                    <span className="text-ink">{formatMoney(costPerUnit)}</span>
                   </div>
                 </div>
 

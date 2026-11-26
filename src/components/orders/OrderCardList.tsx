@@ -99,10 +99,12 @@ function OrderCard({ order, clientName, menuInventory, expanded, onToggle, onVie
         {/* Line 1: Identity (left) · Primary Value (right, fixed tabular slot). */}
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="font-semibold text-gray-900 truncate">{clientName}</p>
+            <p className="font-semibold text-ink truncate" title={clientName}>
+              {clientName}
+            </p>
             <p className="text-xs text-gray-500 font-mono mt-0.5">{order.id}</p>
           </div>
-          <p className="text-lg font-bold text-gray-900 whitespace-nowrap tabular-nums">
+          <p className="text-lg font-bold text-ink whitespace-nowrap tabular-nums">
             {formatMoney(computeOrderTotal(order))}
           </p>
         </div>
@@ -130,6 +132,10 @@ function OrderCard({ order, clientName, menuInventory, expanded, onToggle, onVie
         <div className="px-4 pb-4 pt-1 border-t border-gray-100 bg-gray-50/50">
           <dl className="text-sm divide-y divide-gray-100">
             <div className="flex justify-between gap-4 py-2">
+              <dt className="text-gray-500">Client</dt>
+              <dd className="text-gray-800 font-medium text-right break-words">{clientName}</dd>
+            </div>
+            <div className="flex justify-between gap-4 py-2">
               <dt className="text-gray-500">Items</dt>
               <dd className="text-gray-800 font-medium text-right">{order.items.length} item(s)</dd>
             </div>
@@ -138,7 +144,7 @@ function OrderCard({ order, clientName, menuInventory, expanded, onToggle, onVie
                 item.name || menuInventory.find((m) => m.id === item.menuItemId)?.name || item.menuItemId;
               return (
                 <div key={`${item.menuItemId}-${i}`} className="flex justify-between gap-4 py-2 pl-4">
-                  <dt className="text-gray-500 truncate">{name}</dt>
+                  <dt className="text-gray-500 truncate" title={name}>{name}</dt>
                   <dd className="text-gray-800 tabular-nums whitespace-nowrap">
                     {item.qty} × {formatMoney(item.unitPrice)}
                   </dd>

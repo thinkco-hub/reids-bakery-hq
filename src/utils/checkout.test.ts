@@ -81,6 +81,19 @@ describe("computeSaleTotals", () => {
   it("is zero for no lines", () => {
     expect(computeSaleTotals([])).toEqual({ subtotal: 0, tax: 0, total: 0 });
   });
+
+  it("rounds every computed amount to whole cents", () => {
+    const line = (id: string, price: number, qty: number): CartItem => ({
+      id,
+      name: id,
+      price,
+      category: "Pastries",
+      color: "#F17D0C",
+      qty,
+    });
+    expect(computeSaleTotals([line("a", 0.1, 1)])).toEqual({ subtotal: 0.1, tax: 0.01, total: 0.11 });
+    expect(computeSaleTotals([line("b", 0.1, 3)])).toEqual({ subtotal: 0.3, tax: 0.02, total: 0.32 });
+  });
 });
 
 describe("buildSale", () => {

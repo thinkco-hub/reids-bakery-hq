@@ -1,4 +1,4 @@
-import type { IngredientStock, Quantity, Recipe, RecipeCost } from "../types/domain";
+import type { IngredientStock, Recipe, RecipeCost } from "../types/domain";
 
 export function computeRecipeCost(
   recipe: Recipe,

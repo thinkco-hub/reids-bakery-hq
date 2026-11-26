@@ -36,8 +36,8 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
     <Modal
       labelledBy={headingId}
       onClose={onClose}
-      overlayClassName="z-[100] bg-black/50 backdrop-blur-sm p-4 print:bg-white print:static"
-      className="print-receipt bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm max-h-[90dvh] overflow-y-auto overscroll-contain animate-fadeIn print:shadow-none print:rounded-none"
+      overlayClassName="z-[100] bg-black/50 backdrop-blur-sm p-4 print:static print:bg-white print:backdrop-blur-none print:p-0"
+      className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm max-h-[90dvh] overflow-y-auto overscroll-contain animate-fadeIn print:max-h-none print:max-w-none print:overflow-visible print:p-8 print:shadow-none print:rounded-none"
     >
         <div className="text-center mb-6">
           <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -90,7 +90,7 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
                 <span className="text-gray-500 mr-2">{item.qty}x</span>
                 {item.name}
               </span>
-              <span className="font-semibold text-gray-900 tabular-nums">
+              <span className="font-semibold text-ink tabular-nums">
                 {formatMoney(item.price * item.qty)}
               </span>
             </li>

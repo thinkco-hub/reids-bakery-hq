@@ -1,4 +1,4 @@
-import type { StockItem, StockStatus, StockStatusGroup } from "../types/domain";
+import type { StockItem, StockStatus } from "../types/domain";
 
 export function getStockStatus(item: StockItem): StockStatus {
   if (item.qty <= 0) return "out";

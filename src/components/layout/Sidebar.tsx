@@ -32,7 +32,7 @@ interface SidebarProps {
 
 /** A top-level item; `extra` carries the group headers' justify-between. */
 function itemCls(active: boolean, extra = "") {
-  return `w-full flex items-center ${extra} p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
+  return `w-full flex items-center ${extra} p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-espresso ${
     active
       ? "bg-caramel/20 text-white shadow-md border-l-4 border-brand"
       : "text-cream/60 hover:bg-caramel/10 hover:text-white border-l-4 border-transparent"
@@ -41,7 +41,7 @@ function itemCls(active: boolean, extra = "") {
 
 function subItemCls(active: boolean) {
   // block: these are router links now, and an inline anchor ignores w-full/py.
-  return `w-full block text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
+  return `w-full block text-left pl-14 py-2.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-espresso ${
     active
       ? "text-brand bg-espresso-deep border-l-2 border-brand"
       : "text-cream/70 hover:text-white hover:bg-espresso-deep border-l-2 border-transparent"
@@ -198,7 +198,7 @@ function Sidebar({
               <span className="text-espresso font-bold text-xs text-center leading-tight">
                 RBC
                 <br />
-                <span className="text-[6px]">BAKERY</span>
+                <span className="text-[0.375rem]">BAKERY</span>
               </span>
             </div>
             <span

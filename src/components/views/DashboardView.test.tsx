@@ -56,18 +56,19 @@ describe("dashboard revenue card", () => {
     ]);
     expect(screen.getByText("₱150.00")).toBeInTheDocument();
     expect(screen.getByText("+50.0%")).toBeInTheDocument();
+    expect(screen.getByText("vs yesterday")).toBeInTheDocument();
   });
 
   it("shows revenue without a percentage when yesterday had no sales", () => {
     renderDashboard([saleOn(todayKey, 80)]);
     expect(screen.getByText("₱80.00")).toBeInTheDocument();
-    expect(screen.queryByTitle("Versus yesterday")).toBeNull();
+    expect(screen.queryByText("vs yesterday")).toBeNull();
   });
 
   it("starts at zero before the first sale", () => {
     renderDashboard([]);
     expect(screen.getByText("₱0.00")).toBeInTheDocument();
-    expect(screen.queryByTitle("Versus yesterday")).toBeNull();
+    expect(screen.queryByText("vs yesterday")).toBeNull();
   });
 });
 

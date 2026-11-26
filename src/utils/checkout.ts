@@ -1,5 +1,6 @@
 import { todayISO } from "./dates";
 import { buildEditHistoryEntry, diffField, diffLines } from "./editHistory";
+import { roundMoney } from "./money";
 import { isValidCustomerContact } from "./orders";
 import type {
   CartItem,
@@ -27,9 +28,9 @@ let nextSaleSeq = 1;
 const nextSaleId = (): SaleId => `SALE-${String(nextSaleSeq++).padStart(4, "0")}`;
 
 export function computeSaleTotals(lines: CartItem[]): SaleTotals {
-  const subtotal = lines.reduce((sum, line) => sum + line.price * line.qty, 0);
-  const tax = subtotal * SALES_TAX_RATE;
-  return { subtotal, tax, total: subtotal + tax };
+  const subtotal = roundMoney(lines.reduce((sum, line) => sum + line.price * line.qty, 0));
+  const tax = roundMoney(subtotal * SALES_TAX_RATE);
+  return { subtotal, tax, total: roundMoney(subtotal + tax) };
 }
 
 /**

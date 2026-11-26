@@ -110,7 +110,7 @@ export default function OrderConfirmationModal({
                   <span className="text-gray-500 mr-2">{item.qty}x</span>{" "}
                   {item.name}
                 </span>
-                <span className="font-bold text-gray-900 tabular-nums">
+                <span className="font-bold text-ink tabular-nums">
                   {formatMoney(item.price * item.qty)}
                 </span>
               </li>

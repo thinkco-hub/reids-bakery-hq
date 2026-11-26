@@ -115,6 +115,11 @@ export default function ReconciliationReview({
         </Button>
       </div>
 
+      <p className="text-xs text-gray-500 mb-4">
+        Apply overwrites system stock with the counted quantity; Dismiss keeps system stock and
+        closes the count.
+      </p>
+
       <Table label="Inventory counts" labelledBy={headingId} minWidth="min-w-[760px]">
         <TableHead>
           <th scope="col" className="px-6 py-4">Date</th>
@@ -144,7 +149,7 @@ export default function ReconciliationReview({
             sorted.map((c) => (
               <tr key={c.id} className="hover:bg-gray-50/50 transition-colors">
                 <td className="px-6 py-4 text-gray-600">{c.date}</td>
-                <th scope="row" className="px-6 py-4 text-left font-medium text-gray-900">{itemName(c)}</th>
+                <th scope="row" className="px-6 py-4 text-left font-medium text-ink">{itemName(c)}</th>
                 <td className="px-6 py-4 text-gray-500 text-xs font-semibold uppercase">
                   {c.itemType === "ingredient" ? "Raw Material" : "Menu Item"}
                 </td>
@@ -175,7 +180,6 @@ export default function ReconciliationReview({
                         size="sm"
                         variant="ghostBrand"
                         onClick={() => onResolve(c.id, "apply")}
-                        title="Adjust system stock to match the counted quantity"
                         aria-label={`Apply counted quantity for ${itemName(c)}`}
                       >
                         Apply
@@ -184,7 +188,6 @@ export default function ReconciliationReview({
                         size="sm"
                         variant="ghost"
                         onClick={() => onResolve(c.id, "dismiss")}
-                        title="Keep system stock as-is, discard this count"
                         aria-label={`Dismiss count for ${itemName(c)}`}
                       >
                         Dismiss

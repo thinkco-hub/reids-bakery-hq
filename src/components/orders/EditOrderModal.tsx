@@ -10,11 +10,15 @@ import { isValidCustomerContact, toContactDigits } from "../../utils/orders";
 import type { Client, EditOrderInput, MenuItemStock, Order, OrderItem } from "../../types/domain";
 
 interface Line {
+  key: string;
   menuItemId: string;
   name: string;
   qty: string;
   unitPrice: number;
 }
+
+let nextRowKey = 1;
+const makeLine = (line: Omit<Line, "key">): Line => ({ key: `line-${nextRowKey++}`, ...line });
 
 const lineName = (line: OrderItem | Line, menuInventory: MenuItemStock[]) =>
   menuInventory.find((m) => m.id === line.menuItemId)?.name || line.name || line.menuItemId;
@@ -35,12 +39,14 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
   const [customerName, setCustomerName] = useState(order.customerName || "");
   const [customerContact, setCustomerContact] = useState(order.customerContact || "");
   const [lines, setLines] = useState<Line[]>(
-    order.items.map((item) => ({
-      menuItemId: item.menuItemId,
-      name: item.name || "",
-      qty: String(item.qty),
-      unitPrice: item.unitPrice,
-    }))
+    order.items.map((item) =>
+      makeLine({
+        menuItemId: item.menuItemId,
+        name: item.name || "",
+        qty: String(item.qty),
+        unitPrice: item.unitPrice,
+      })
+    )
   );
 
   const updateLine = (idx: number, patch: Partial<Line>) =>
@@ -53,7 +59,8 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
       unitPrice: menuItem ? menuItem.price : 0,
     });
   };
-  const addLine = () => setLines((prev) => [...prev, { menuItemId: "", name: "", qty: "", unitPrice: 0 }]);
+  const addLine = () =>
+    setLines((prev) => [...prev, makeLine({ menuItemId: "", name: "", qty: "", unitPrice: 0 })]);
   const removeLine = (idx: number) => setLines((prev) => prev.filter((_, i) => i !== idx));
 
   const cleanLines = lines.filter((l) => l.menuItemId && (parseFloat(l.qty) || 0) >= 1);
@@ -137,7 +144,7 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
             </div>
             <div className="space-y-2">
               {lines.map((line, idx) => (
-                <div key={idx} className="flex gap-2 items-center">
+                <div key={line.key} className="flex gap-2 items-center">
                   <SelectField
                     value={line.menuItemId}
                     onChange={(e) => changeItem(idx, e.target.value)}

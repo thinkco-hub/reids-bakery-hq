@@ -166,7 +166,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
                   const shortfall = order.status !== "Delivered" && hasShortfall(order, menuInventory);
                   return (
                     <tr key={order.id} className="hover:bg-gray-50/50 transition-colors group">
-                      <th scope="row" className="px-6 py-4 text-left font-medium text-gray-900">{order.id}</th>
+                      <th scope="row" className="px-6 py-4 text-left font-medium text-ink">{order.id}</th>
                       <td className="px-6 py-4 text-gray-800">{clientName(order)}</td>
                       <td className="px-6 py-4 text-gray-600">{order.items.length} item(s)</td>
                       <td className="px-6 py-4 text-gray-800 font-medium">{order.requestedDate}</td>
@@ -183,7 +183,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
                       <td className="px-6 py-4">
                         <PaymentStatusBadge status={getPaymentStatus(order)} />
                       </td>
-                      <td className="px-6 py-4 text-right font-medium text-gray-900 tabular-nums">
+                      <td className="px-6 py-4 text-right font-medium text-ink tabular-nums">
                         {formatMoney(computeOrderTotal(order))}
                       </td>
                       <td className="px-4 py-4 text-center">

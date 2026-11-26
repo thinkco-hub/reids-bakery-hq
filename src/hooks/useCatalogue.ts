@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { initialCatalogue } from "../data/initialCatalogue";
 import {
   initialIngredients,
@@ -36,16 +36,6 @@ const EMPTY_RESTOCK_MODAL: RestockModalState = {
   amountToAdd: "",
 };
 
-// Monotonic ID counters, seeded past the highest seeded record so new IDs keep
-// the display formats (ING-xx, RR-xxx) and never collide — even after deletes.
-let nextIngredientSeq = initialIngredients.length + 1;
-const nextIngredientId = (): IngredientId =>
-  `ING-${String(nextIngredientSeq++).padStart(2, "0")}`;
-
-let nextReminderSeq = initialRestockReminders.length + 1;
-const nextReminderId = (): RestockReminderId =>
-  `RR-${String(nextReminderSeq++).padStart(3, "0")}`;
-
 interface UseCatalogueOptions {
   currentUser: User | null;
   /** Seeded collections; a test fixture replaces the values from src/data. */
@@ -79,6 +69,18 @@ export function useCatalogue({
     seededRestockReminders ?? initialRestockReminders
   );
   const [restockModal, setRestockModal] = useState<RestockModalState>(EMPTY_RESTOCK_MODAL);
+
+  // Monotonic ID counters per provider instance, seeded past the highest seeded
+  // record so new IDs keep the display formats (ING-xx, RR-xxx) and never
+  // collide — even after deletes.
+  const idSeq = useRef({
+    ingredient: (seededIngredients ?? initialIngredients).length + 1,
+    reminder: (seededRestockReminders ?? initialRestockReminders).length + 1,
+  });
+  const nextIngredientId = (): IngredientId =>
+    `ING-${String(idSeq.current.ingredient++).padStart(2, "0")}`;
+  const nextReminderId = (): RestockReminderId =>
+    `RR-${String(idSeq.current.reminder++).padStart(3, "0")}`;
 
   // One memoized slice object. The derived arrays are built here too, so two
   // renders with unchanged state hand consumers the same identities.

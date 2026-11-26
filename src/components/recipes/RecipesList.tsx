@@ -132,13 +132,13 @@ export default function RecipesList({
               const delta = actualPrice - price;
               return (
                 <tr key={recipe.id} className="hover:bg-gray-50/50 transition-colors">
-                  <th scope="row" className="px-6 py-4 text-left font-medium text-gray-900">{recipe.name}</th>
+                  <th scope="row" className="px-6 py-4 text-left font-medium text-ink">{recipe.name}</th>
                   <td className="px-6 py-4 text-gray-600">
                     {recipe.yieldQty} {recipe.yieldUnit}
                   </td>
                   {canViewIngredientCosts && (
                     <>
-                      <td className="px-6 py-4 text-right font-medium text-gray-900 tabular-nums">
+                      <td className="px-6 py-4 text-right font-medium text-ink tabular-nums">
                         {formatMoney(costPerUnit)}
                       </td>
                       <td className="px-6 py-4 text-right font-bold text-brand-strong tabular-nums">
@@ -148,7 +148,7 @@ export default function RecipesList({
                   )}
                   <td className="px-6 py-4 text-right">
                     <div>
-                      <span className="font-bold text-gray-900 tabular-nums">{formatMoney(actualPrice)}</span>
+                      <span className="font-bold text-ink tabular-nums">{formatMoney(actualPrice)}</span>
                       {canViewIngredientCosts && (
                         <Badge
                           family="micro"

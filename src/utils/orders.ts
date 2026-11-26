@@ -1,3 +1,4 @@
+import { roundMoney } from "./money";
 import type {
   MenuItemStock,
   Order,
@@ -8,7 +9,7 @@ import type {
 } from "../types/domain";
 
 export function computeOrderTotal(order: Order): number {
-  return order.items.reduce((sum, line) => sum + line.qty * line.unitPrice, 0);
+  return roundMoney(order.items.reduce((sum, line) => sum + line.qty * line.unitPrice, 0));
 }
 
 export function computeOrderItemUnits(order: Order): number {

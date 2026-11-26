@@ -105,7 +105,7 @@ export default function BakeryCommandCenter() {
           <div
             className={`flex flex-col ${
               navigation.canUseSidebarRail ? "md:flex-row" : ""
-            } h-screen bg-cream font-sans text-ink overflow-hidden relative`}
+            } h-screen bg-cream font-sans text-ink overflow-hidden relative print:hidden`}
           >
             <Routes>
               <Route path="/" element={<LayoutRoute />}>

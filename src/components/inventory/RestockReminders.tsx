@@ -101,7 +101,7 @@ export default function RestockReminders({ ingredients, reminders, onAdd, onTogg
                 {pending.map((r) => (
                   <li key={r.id} className="p-5 flex items-start justify-between gap-4 hover:bg-gray-50">
                     <div>
-                      <p className="font-bold text-gray-900 text-sm">{ingredientName(r.ingredientId)}</p>
+                      <p className="font-bold text-ink text-sm">{ingredientName(r.ingredientId)}</p>
                       {r.note && <p className="text-sm text-gray-500 mt-0.5">{r.note}</p>}
                       <p className="text-xs text-gray-500 mt-1">Due {r.dueDate}</p>
                     </div>
@@ -128,9 +128,9 @@ export default function RestockReminders({ ingredients, reminders, onAdd, onTogg
               </div>
               <ul className="divide-y divide-gray-100">
                 {done.map((r) => (
-                  <li key={r.id} className="p-5 flex items-start justify-between gap-4 opacity-60">
+                  <li key={r.id} className="p-5 flex items-start justify-between gap-4">
                     <div>
-                      <p className="font-bold text-gray-900 text-sm line-through">
+                      <p className="font-bold text-gray-600 text-sm line-through">
                         {ingredientName(r.ingredientId)}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">Due {r.dueDate}</p>

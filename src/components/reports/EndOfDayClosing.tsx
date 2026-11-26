@@ -199,7 +199,7 @@ export default function EndOfDayClosing({
               <li key={exp.id} className="py-3 flex justify-between items-center text-sm">
                 <span className="text-gray-700">{exp.description}</span>
                 <div className="flex items-center gap-3">
-                  <span className="font-semibold text-gray-900 tabular-nums">{formatMoney(Number(exp.amount))}</span>
+                  <span className="font-semibold text-ink tabular-nums">{formatMoney(Number(exp.amount))}</span>
                   {!alreadyClosed && (
                     <button
                       onClick={() => setPendingExpense(exp)}
@@ -219,7 +219,10 @@ export default function EndOfDayClosing({
 
       {!alreadyClosed && (
         <Button variant="cta" size="lg" className="w-full shadow-lg" onClick={() => setConfirmingClose(true)}>
-          Close {date} — Lock In Net Profit of {formatMoney(closing.netProfit)}
+          {/* The shared Button never wraps labels; this one must at 320px. */}
+          <span className="whitespace-normal">
+            Close {date} — Lock In Net Profit of {formatMoney(closing.netProfit)}
+          </span>
         </Button>
       )}
 
@@ -247,7 +250,7 @@ export default function EndOfDayClosing({
                 .sort((a, b) => (a.date < b.date ? 1 : -1))
                 .map((c) => (
                   <tr key={c.id} className="hover:bg-gray-50/50">
-                    <th scope="row" className="px-6 py-3 text-left font-medium text-gray-900">{c.date}</th>
+                    <th scope="row" className="px-6 py-3 text-left font-medium text-ink">{c.date}</th>
                     <td className="px-6 py-3 text-right text-gray-700 tabular-nums">{formatMoney(c.grossSales)}</td>
                     <td className="px-6 py-3 text-right text-red-700 tabular-nums">{formatMoney(c.totalExpenses)}</td>
                     <td className={`px-6 py-3 text-right font-semibold tabular-nums ${c.netProfit >= 0 ? "text-green-700" : "text-red-700"}`}>

@@ -23,7 +23,7 @@ export default function TicketLineItem({
     <li className={`group hover:bg-gray-50 ${className}`}>
       <div className="flex justify-between items-start mb-[0.8em]">
         <span className="font-bold text-gray-800">{item.name}</span>
-        <span className="font-bold text-gray-900 tabular-nums">
+        <span className="font-bold text-ink tabular-nums">
           {formatMoney(item.price * item.qty)}
         </span>
       </div>
