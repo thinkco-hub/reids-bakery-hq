@@ -54,8 +54,10 @@ export default function LoginPage({ onLogin, getLockedUntil }: LoginPageProps) {
   const lockedUntil = getLockedUntil(email);
   const secondsLeft = lockedUntil ? Math.max(0, Math.ceil((lockedUntil - now) / 1000)) : 0;
   const isLocked = secondsLeft > 0;
+  // The alert text stays still while locked; the seconds tick in their own
+  // timer region, so assistive tech is not interrupted once per second.
   const errorMessage = isLocked
-    ? `Too many failed attempts. Try again in ${secondsLeft}s.`
+    ? "Too many failed attempts. Please wait for the lockout to expire."
     : error;
 
   const handleSubmit = async (e: FormEvent) => {
@@ -111,6 +113,11 @@ export default function LoginPage({ onLogin, getLockedUntil }: LoginPageProps) {
         {errorMessage && (
           <p id="login-error" role="alert" className="mt-4 text-sm font-semibold text-red-700">
             {errorMessage}
+          </p>
+        )}
+        {isLocked && (
+          <p role="timer" aria-live="off" className="mt-1 text-sm font-medium text-red-700 tabular-nums">
+            Try again in {secondsLeft}s.
           </p>
         )}
 

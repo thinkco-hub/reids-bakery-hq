@@ -12,12 +12,14 @@ interface DeleteConfirmDialogProps {
 /** Destructive-action confirmation dialog, replacing window.confirm. */
 export default function DeleteConfirmDialog({ title, message, confirmLabel, onConfirm, onCancel }: DeleteConfirmDialogProps) {
   const headingId = useId();
+  const messageId = useId();
   const cancelRef = useRef<HTMLButtonElement>(null);
   // z-[110] keeps this above a z-[100] detail card when delete is opened from inside it.
   return (
     <Modal
       role="alertdialog"
       labelledBy={headingId}
+      describedBy={messageId}
       onClose={onCancel}
       initialFocusRef={cancelRef}
       overlayClassName="z-[110] bg-black/50 backdrop-blur-sm p-4"
@@ -34,7 +36,7 @@ export default function DeleteConfirmDialog({ title, message, confirmLabel, onCo
         </span>
         <div className="min-w-0">
           <h2 id={headingId} className="text-xl font-bold text-[#121212]">{title}</h2>
-          <p className="mt-2 text-sm leading-relaxed text-gray-500">{message}</p>
+          <p id={messageId} className="mt-2 text-sm leading-relaxed text-gray-500">{message}</p>
         </div>
       </div>
       <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
