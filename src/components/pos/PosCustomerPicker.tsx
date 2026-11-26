@@ -150,6 +150,7 @@ function ClientRow({
     <li>
       <button
         onClick={() => onAttach({ name: client.name, contact: client.contact })}
+        aria-pressed={attached}
         className={`w-full flex items-center gap-3 min-h-[4rem] px-4 py-3 text-left transition-colors ${
           attached ? "bg-orange-50" : "hover:bg-gray-50 active:bg-orange-50"
         }`}

@@ -210,6 +210,7 @@ export default function ReportsDashboard({
           <button
             key={p.id}
             onClick={() => setPreset(p.id)}
+            aria-pressed={preset === p.id}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
               preset === p.id
                 ? "bg-[#562D07] text-white"

@@ -67,6 +67,7 @@ export default function InventoryStatsBar({ items, activeFilter, onFilterChange 
             key={key}
             type="button"
             onClick={() => onFilterChange(key)}
+            aria-pressed={isActive}
             className={`text-left bg-white p-4 md:p-5 rounded-2xl border shadow-sm transition-all ${
               isActive
                 ? "border-[var(--color-brand-text)] ring-2 ring-[var(--color-brand-text)]/30"

@@ -58,6 +58,7 @@ export default function InventoryView({
           <div className="self-center sm:self-auto inline-flex rounded-xl bg-[#4a2605] p-1 shadow-inner">
             <button
               onClick={() => setStockView("menu")}
+              aria-pressed={stockView === "menu"}
               className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${
                 stockView === "menu"
                   ? "bg-[var(--color-brand-strong)] text-white shadow-md"
@@ -68,6 +69,7 @@ export default function InventoryView({
             </button>
             <button
               onClick={() => setStockView("raw")}
+              aria-pressed={stockView === "raw"}
               className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${
                 stockView === "raw"
                   ? "bg-[var(--color-brand-strong)] text-white shadow-md"

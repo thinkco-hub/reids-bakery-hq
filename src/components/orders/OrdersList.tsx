@@ -83,6 +83,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
             <button
               key={tab}
               onClick={() => setStatusFilter(tab)}
+              aria-pressed={statusFilter === tab}
               className={`px-4 py-1.5 rounded border text-sm font-medium whitespace-nowrap transition-colors ${
                 statusFilter === tab
                   ? "bg-blue-50 border-blue-200 text-blue-700 shadow-sm"

@@ -98,6 +98,7 @@ export default function ReconciliationReview({
             <button
               key={f.key}
               onClick={() => setFilter(f.key)}
+              aria-pressed={filter === f.key}
               className={`px-4 py-1.5 rounded border text-sm font-medium transition-colors ${
                 filter === f.key
                   ? "bg-blue-50 border-blue-200 text-blue-700 shadow-sm"

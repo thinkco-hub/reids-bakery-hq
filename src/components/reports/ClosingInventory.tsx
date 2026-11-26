@@ -248,13 +248,13 @@ export default function ClosingInventory({ menuInventory, ingredients, inventory
 
       {/* View toggle + period navigation */}
       <div className="bg-white border border-gray-200 rounded-lg p-3 mb-6 flex flex-wrap items-center gap-2">
-        <button onClick={() => setView("day")} className={pillCls(view === "day")}>
+        <button onClick={() => setView("day")} aria-pressed={view === "day"} className={pillCls(view === "day")}>
           Daily
         </button>
-        <button onClick={() => setView("week")} className={pillCls(view === "week")}>
+        <button onClick={() => setView("week")} aria-pressed={view === "week"} className={pillCls(view === "week")}>
           Weekly
         </button>
-        <button onClick={() => setView("month")} className={pillCls(view === "month")}>
+        <button onClick={() => setView("month")} aria-pressed={view === "month"} className={pillCls(view === "month")}>
           Monthly
         </button>
         <div className="w-px h-6 bg-gray-200 mx-1 hidden sm:block" />

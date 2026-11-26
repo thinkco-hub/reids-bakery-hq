@@ -173,6 +173,7 @@ export default function ProductionRunsList({
               key={card.key}
               type="button"
               onClick={() => setStatusFilter(card.key)}
+              aria-pressed={isActive}
               className={`text-left bg-white p-4 md:p-5 rounded-2xl border shadow-sm transition-all ${
                 isActive ? "border-[var(--color-brand-text)] ring-2 ring-[var(--color-brand-text)]/30" : "border-gray-100 hover:border-gray-300"
               }`}
