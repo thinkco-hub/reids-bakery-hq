@@ -53,7 +53,7 @@ export default function PosCustomerPicker({
       onClose={onClose}
       initialFocusRef={searchRef}
       dismissOnBackdrop={false}
-      overlayClassName="z-[100] bg-[#FDF9F3] p-0!"
+      overlayClassName="z-[100] bg-[#FDF9F3]"
       className="w-full h-full flex flex-col animate-fadeIn"
     >
       {isFormOpen && (
