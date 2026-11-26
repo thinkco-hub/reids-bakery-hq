@@ -36,6 +36,12 @@ export default function LoginPage({ onLogin, getLockedUntil }: LoginPageProps) {
     return () => clearInterval(timer);
   }, []);
 
+  // Signing out lands here from a titled view; the sign-in screen is the
+  // document's default, not whichever view the last user left.
+  useEffect(() => {
+    document.title = "Reid's Bakery HQ";
+  }, []);
+
   useEffect(() => {
     try {
       if (email) localStorage.setItem(LAST_EMAIL_KEY, email);
@@ -62,7 +68,7 @@ export default function LoginPage({ onLogin, getLockedUntil }: LoginPageProps) {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-[#FDF9F3] px-4">
+    <main className="fixed inset-0 flex items-center justify-center bg-[#FDF9F3] px-4">
       <form
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm animate-fadeIn"
@@ -116,6 +122,6 @@ export default function LoginPage({ onLogin, getLockedUntil }: LoginPageProps) {
           {isLocked ? "Locked" : submitting ? "Signing in..." : "Log In"}
         </button>
       </form>
-    </div>
+    </main>
   );
 }

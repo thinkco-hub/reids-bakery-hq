@@ -17,7 +17,7 @@ export default function CrashFallback() {
     error instanceof Error ? error.message : typeof error === "string" ? error : "";
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-[#FDF9F3] px-4">
+    <main className="fixed inset-0 flex items-center justify-center bg-[#FDF9F3] px-4">
       <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm animate-fadeIn">
         <h1 className="text-2xl font-bold text-[#121212] mb-1">Something went wrong</h1>
         <p className="text-gray-500 text-sm mb-6">
@@ -36,6 +36,6 @@ export default function CrashFallback() {
           <p className="text-xs text-gray-500 font-mono mt-4 break-words">{detail}</p>
         )}
       </div>
-    </div>
+    </main>
   );
 }
