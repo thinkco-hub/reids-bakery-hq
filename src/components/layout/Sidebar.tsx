@@ -212,7 +212,8 @@ export default function Sidebar({
               ref={closeRef}
               onClick={() => setIsSidebarOpen(false)}
               aria-label="Close navigation"
-              className="p-1 text-[#FDF9F3]/60 hover:text-white"
+              // 44px target; the negative margins keep the 24px icon where it was.
+              className="p-2.5 -my-0.5 -mr-1.5 text-[#FDF9F3]/60 hover:text-white"
             >
               <svg
                 className="w-6 h-6"
@@ -320,11 +321,21 @@ export default function Sidebar({
 
           {canAccessTab(role, "inventory") && (
             <div className="flex flex-col">
-              <div className={itemCls(isInventoryActive)}>
+              {/* The link carries the row padding so the whole row is one 48px
+                  target; the row itself keeps the chrome and the chevron. */}
+              <div
+                className={`flex items-center rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
+                  isInventoryActive
+                    ? "bg-[#F3B978]/20 text-white shadow-md"
+                    : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white"
+                }`}
+              >
                 <NavLink
                   to={PATH_BY_TAB.inventory}
                   onClick={onNavSelect}
-                  className="flex items-center min-w-0 flex-1"
+                  className={`flex items-center min-w-0 flex-1 p-3 border-l-4 ${
+                    isInventoryActive ? "border-[#F17D0C]" : "border-transparent"
+                  }`}
                 >
                   <div className="flex items-center justify-center w-8 flex-shrink-0">
                     <svg
@@ -346,8 +357,9 @@ export default function Sidebar({
                     aria-label="Toggle inventory submenu"
                     aria-expanded={isInventoryExpanded}
                     aria-controls={inventorySubmenuId}
-                    // Negative margins keep the chevron in place; the target is 40px.
-                    className="-my-3 -mr-3 ml-2 p-3 flex-shrink-0"
+                    // 44px target inside the 48px row; pl-4/pr-3 keeps the icon
+                    // 12px from the row edge, where the old 40px padding put it.
+                    className="ml-2 py-3.5 pl-4 pr-3 flex-shrink-0"
                   >
                     <svg
                       className={`w-4 h-4 transition-transform duration-200 ${
