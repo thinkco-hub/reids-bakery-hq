@@ -99,11 +99,11 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
         })}
       </div>
 
-      {/* Container-query breakpoint: below 1024px the table swaps to a card list. */}
+      {/* Container-query breakpoint: below the 1040px table floor (+2px card border) the table swaps to a card list. */}
       <div className="@container">
-        {/* Desktop table — original structure and styling preserved; hidden only at <1024px container width. */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden @max-[1024px]:hidden">
-        <div className="overflow-x-auto w-full">
+        {/* Desktop table — original structure and styling preserved; hidden only when the table cannot fit the container. */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden @max-[1042px]:hidden">
+        <div className="overflow-x-auto w-full" tabIndex={0} role="region" aria-label="Orders list">
           <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[1040px]">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">

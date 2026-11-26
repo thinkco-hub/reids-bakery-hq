@@ -24,7 +24,7 @@ interface OrderCardListProps {
 }
 
 /**
- * Tablet/mobile (< 1024px container width) representation of the orders table:
+ * Tablet/mobile (< 1042px container width) representation of the orders table:
  * two-line cards with a fixed tabular value slot and an accordion reveal.
  * Rendered inside the parent @container.
  */
@@ -42,7 +42,7 @@ export default function OrderCardList({ orders, menuInventory, getClientName, on
     <>
       {/* Standalone sort control — replaces desktop column-header sort triggers.
           Arbitrary container widths: Tailwind v4's @lg container size is 512px, not 1024px. */}
-      <div className="@max-[1024px]:flex @max-[1024px]:items-center @max-[1024px]:justify-between @max-[1024px]:gap-2 @max-[1024px]:mb-3 @min-[1024px]:hidden">
+      <div className="@max-[1042px]:flex @max-[1042px]:items-center @max-[1042px]:justify-between @max-[1042px]:gap-2 @max-[1042px]:mb-3 @min-[1042px]:hidden">
         <label htmlFor="orders-mobile-sort" className="text-sm font-medium text-gray-500 whitespace-nowrap">
           Sort by
         </label>
@@ -58,7 +58,7 @@ export default function OrderCardList({ orders, menuInventory, getClientName, on
         </SelectField>
       </div>
 
-      <div className="hidden @max-[1024px]:grid gap-3">
+      <div className="hidden @max-[1042px]:grid gap-3">
         {sorted.length === 0 ? (
           <p className="px-4 py-8 text-center text-gray-500 bg-white rounded-lg border border-gray-200">
             No orders found matching the selected filters.
