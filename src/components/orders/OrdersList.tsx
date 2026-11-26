@@ -56,7 +56,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
               type="date"
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
-              className="w-full px-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-600 focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none cursor-pointer"
+              className="w-full px-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-600 focus:border-[var(--color-brand-text)] outline-none cursor-pointer"
             />
           </div>
           {dateFilter && (

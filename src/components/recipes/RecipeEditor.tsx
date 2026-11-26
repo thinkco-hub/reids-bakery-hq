@@ -131,14 +131,13 @@ export default function RecipeEditor({
     const cleanIngredients = form.ingredients
       .filter((l) => l.ingredientId && l.qty !== "")
       .map((l) => ({ ...l, qty: parseFloat(String(l.qty)) || 0 }));
-    const hasBomLines = cleanIngredients.length > 0;
     const missing: Array<{ key: string; label: string }> = [];
     if (!form.name) missing.push({ key: "name", label: "a recipe name" });
     if (form.price === "") missing.push({ key: "price", label: "a price" });
     if (form.qty === "") missing.push({ key: "qty", label: "an initial quantity" });
     if (form.target === "") missing.push({ key: "target", label: "a target stock" });
     if (!form.shelfLife) missing.push({ key: "shelfLife", label: "a shelf life" });
-    if (hasBomLines) {
+    if (hasBom) {
       if (!form.yieldQty || Number(form.yieldQty) <= 0)
         missing.push({ key: "yieldQty", label: "a yield quantity" });
       if (!form.yieldUnit) missing.push({ key: "yieldUnit", label: "a yield unit" });

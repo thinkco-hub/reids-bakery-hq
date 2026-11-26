@@ -116,7 +116,7 @@ export default function LoginPage({ onLogin, getLockedUntil }: LoginPageProps) {
           </p>
         )}
         {isLocked && (
-          <p role="timer" aria-live="off" className="mt-1 text-sm font-medium text-red-700 tabular-nums">
+          <p role="timer" className="mt-1 text-sm font-medium text-red-700 tabular-nums">
             Try again in {secondsLeft}s.
           </p>
         )}
