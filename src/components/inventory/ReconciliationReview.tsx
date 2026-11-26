@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
 import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
 import { discrepancyLabel } from "../../utils/counts";
 import {
@@ -39,6 +39,7 @@ export default function ReconciliationReview({
   const [filter, setFilter] = useState<ReconciliationFilter>("flagged");
   const [confirmingApplyAll, setConfirmingApplyAll] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const headingId = useId();
   // Apply All disables itself once nothing is pending, so the dialog cannot return focus to it.
   const focusHeadingOnConfirm = useRef(false);
 
@@ -71,7 +72,7 @@ export default function ReconciliationReview({
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8">
-        <h2 ref={headingRef} tabIndex={-1} className="text-2xl md:text-3xl font-bold text-[#562D07]">Inventory Reconciliation</h2>
+        <h2 ref={headingRef} id={headingId} tabIndex={-1} className="text-2xl md:text-3xl font-bold text-[#562D07]">Inventory Reconciliation</h2>
         <p className="text-[#562D07]/70 mt-1 font-medium text-sm md:text-base">
           Review discrepancies between counted and system stock
         </p>
@@ -125,17 +126,17 @@ export default function ReconciliationReview({
           role="region"
           aria-label="Inventory counts"
         >
-          <table className="w-full text-left border-collapse min-w-[760px]">
+          <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[760px]">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-                <th className="px-6 py-4">Date</th>
-                <th className="px-6 py-4">Item</th>
-                <th className="px-6 py-4">Type</th>
-                <th className="px-6 py-4 text-right">System Qty</th>
-                <th className="px-6 py-4 text-right">Counted Qty</th>
-                <th className="px-6 py-4 text-right">Discrepancy</th>
-                <th className="px-6 py-4">Resolution</th>
-                <th className="px-4 py-4 text-center">Action</th>
+                <th scope="col" className="px-6 py-4">Date</th>
+                <th scope="col" className="px-6 py-4">Item</th>
+                <th scope="col" className="px-6 py-4">Type</th>
+                <th scope="col" className="px-6 py-4 text-right">System Qty</th>
+                <th scope="col" className="px-6 py-4 text-right">Counted Qty</th>
+                <th scope="col" className="px-6 py-4 text-right">Discrepancy</th>
+                <th scope="col" className="px-6 py-4">Resolution</th>
+                <th scope="col" className="px-4 py-4 text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 text-sm">
@@ -149,7 +150,7 @@ export default function ReconciliationReview({
                 sorted.map((c) => (
                   <tr key={c.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-4 text-gray-600">{c.date}</td>
-                    <td className="px-6 py-4 font-medium text-gray-900">{itemName(c)}</td>
+                    <th scope="row" className="px-6 py-4 text-left font-medium text-gray-900">{itemName(c)}</th>
                     <td className="px-6 py-4 text-gray-500 text-xs font-semibold uppercase">
                       {c.itemType === "ingredient" ? "Raw Material" : "Menu Item"}
                     </td>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
 import ScheduleRunModal from "./ScheduleRunModal";
 import RunDetailModal from "./RunDetailModal";
 import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
@@ -48,6 +48,7 @@ export default function ProductionRunsList({
   const [selectedRunId, setSelectedRunId] = useState<ProductionRunId | null>(null);
   const [pendingDelete, setPendingDelete] = useState<ProductionRun | null>(null);
   const announce = useAnnounce();
+  const tableHeadingBase = useId();
 
   const withStatus = productionRuns.map((run) => {
     const recipe = catalogue.find((r) => r.id === run.recipeId) || null;
@@ -200,13 +201,15 @@ export default function ProductionRunsList({
         </div>
       ) : (
         <div className="space-y-6">
-          {groupedByDate.map((group) => (
+          {groupedByDate.map((group, groupIndex) => {
+            const groupHeadingId = `${tableHeadingBase}-${groupIndex}`;
+            return (
             <div key={group.date} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               <div className="px-5 py-3 border-b border-gray-100 bg-gray-50/50">
-                <h3 className="text-sm font-bold text-gray-700">{group.date}</h3>
+                <h3 id={groupHeadingId} className="text-sm font-bold text-gray-700">{group.date}</h3>
               </div>
               <div className="overflow-x-auto w-full">
-                <table className="w-full text-left border-collapse min-w-[720px]">
+                <table aria-labelledby={groupHeadingId} className="w-full text-left border-collapse min-w-[720px]">
                   <tbody className="divide-y divide-gray-100 text-sm">
                     {group.entries.map(({ run, recipe, status }) => (
                       <tr key={run.id} className="hover:bg-gray-50/50 transition-colors">
@@ -224,7 +227,7 @@ export default function ProductionRunsList({
                         <td className="px-5 py-4 text-right whitespace-nowrap">
                           <button
                             onClick={() => setSelectedRunId(run.id)}
-                            aria-label={`${status === "completed" ? "View" : "View or complete"} ${recipe ? recipe.name : "run"} for ${run.plannedDate}`}
+                            aria-label={`${status === "completed" ? "View" : "View / Complete"} ${recipe ? recipe.name : "run"} for ${run.plannedDate}`}
                             className="text-gray-500 hover:text-[var(--color-brand-text)] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
                           >
                             {status === "completed" ? "View" : "View / Complete"}
@@ -245,7 +248,8 @@ export default function ProductionRunsList({
                 </table>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

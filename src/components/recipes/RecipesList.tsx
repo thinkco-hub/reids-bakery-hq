@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
 import { formatMoney } from "../../utils/money";
 import { computeRecipeCost, suggestedPrice } from "../../utils/pricing";
 import SearchField from "../common/SearchField";
@@ -29,6 +29,7 @@ export default function RecipesList({
   onEdit,
   onCreate,
 }: RecipesListProps) {
+  const headingId = useId();
   const [search, setSearch] = useState("");
   const columnCount = canViewIngredientCosts ? 6 : 4;
 
@@ -40,7 +41,7 @@ export default function RecipesList({
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-[#121212]">Recipes / BOM</h2>
+          <h2 id={headingId} className="text-3xl font-bold text-[#121212]">Recipes / BOM</h2>
           <p className="text-gray-500 mt-1">
             {canViewIngredientCosts
               ? "One recipe per menu item, with live cost and suggested pricing."
@@ -85,7 +86,7 @@ export default function RecipesList({
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto w-full">
-          <table className="w-full text-left border-collapse min-w-[760px]">
+          <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[760px]">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
                 <th scope="col" className="px-6 py-4">Recipe</th>

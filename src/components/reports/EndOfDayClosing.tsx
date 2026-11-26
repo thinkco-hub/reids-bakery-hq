@@ -31,6 +31,7 @@ export default function EndOfDayClosing({
   const [expenseError, setExpenseError] = useState<string | null>(null);
   const expenseErrorId = useId();
   const [pendingExpense, setPendingExpense] = useState<Expense | null>(null);
+  const closingHistoryHeadingId = useId();
   const [confirmingClose, setConfirmingClose] = useState(false);
   const expensesHeadingRef = useRef<HTMLHeadingElement>(null);
   // Confirming either action destroys its own trigger, so the dialog has nothing to return focus to.
@@ -229,7 +230,7 @@ export default function EndOfDayClosing({
       {dayClosings.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mt-8">
           <div className="p-5 border-b border-gray-100">
-            <h3 className="text-base font-bold text-[#121212]">Closing History</h3>
+            <h3 id={closingHistoryHeadingId} className="text-base font-bold text-[#121212]">Closing History</h3>
           </div>
           <div
             className="overflow-x-auto w-full"
@@ -237,7 +238,7 @@ export default function EndOfDayClosing({
             role="region"
             aria-label="Closing history"
           >
-            <table className="w-full text-left border-collapse min-w-[560px]">
+            <table aria-labelledby={closingHistoryHeadingId} className="w-full text-left border-collapse min-w-[560px]">
               <thead>
                 <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
                   <th scope="col" className="px-6 py-3">Date</th>

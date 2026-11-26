@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import SearchField from "../common/SearchField";
 import { getAuditLog } from "../../utils/auditLog";
 import { formatTime, toISODate, todayISO } from "../../utils/dates";
@@ -45,6 +45,7 @@ const WARNING_ACTIONS: ReadonlySet<AuditActionType> = new Set([
 ]);
 
 export default function AuditLogsView() {
+  const headingId = useId();
   // Read once on mount: the view is only mounted while its tab is open, so each visit is a fresh read.
   const [entries] = useState<AuditLogEntry[]>(() => getAuditLog());
   const [search, setSearch] = useState("");
@@ -67,7 +68,7 @@ export default function AuditLogsView() {
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8">
-        <h2 className="text-3xl font-bold text-[#121212]">Audit Logs</h2>
+        <h2 id={headingId} className="text-3xl font-bold text-[#121212]">Audit Logs</h2>
         <p className="text-gray-500 mt-1">
           Sign-ins and changes made by users across the system.
         </p>
@@ -114,7 +115,7 @@ export default function AuditLogsView() {
           role="region"
           aria-label="Audit log entries"
         >
-          <table className="w-full text-left border-collapse min-w-[860px]">
+          <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[860px]">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
                 <th scope="col" className="px-6 py-4">Time</th>

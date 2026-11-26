@@ -26,6 +26,7 @@ export default function RunDetailModal({ run, recipe, ingredients, onClose, onCo
   const isCompleted = run.status === "completed";
   const status = getRunStatus(run, recipe, ingredients);
   const headingId = useId();
+  const requiredHeadingId = useId();
 
   return (
     <Modal
@@ -67,20 +68,20 @@ export default function RunDetailModal({ run, recipe, ingredients, onClose, onCo
             <div className="bg-[#fff6ef] rounded-lg p-3 text-sm text-[#562D07] font-medium mb-6">{run.notes}</div>
           )}
 
-          <h3 className="text-sm font-bold text-gray-700 mb-3">Required Ingredients</h3>
+          <h3 id={requiredHeadingId} className="text-sm font-bold text-gray-700 mb-3">Required Ingredients</h3>
           <div className="border border-gray-200 rounded-lg overflow-hidden">
-            <table className="w-full text-left border-collapse text-sm">
+            <table aria-labelledby={requiredHeadingId} className="w-full text-left border-collapse text-sm">
               <thead>
                 <tr className="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  <th className="px-4 py-2.5">Ingredient</th>
-                  <th className="px-4 py-2.5 text-right">Required</th>
-                  <th className="px-4 py-2.5 text-right">In Stock</th>
+                  <th scope="col" className="px-4 py-2.5">Ingredient</th>
+                  <th scope="col" className="px-4 py-2.5 text-right">Required</th>
+                  <th scope="col" className="px-4 py-2.5 text-right">In Stock</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {required.map((line) => (
                   <tr key={line.ingredientId} className={line.shortfall > 0 ? "bg-red-50/50" : ""}>
-                    <td className="px-4 py-2.5 font-medium text-gray-800">{line.name}</td>
+                    <th scope="row" className="px-4 py-2.5 text-left font-medium text-gray-800">{line.name}</th>
                     <td className="px-4 py-2.5 text-right text-gray-700">
                       {line.requiredQty} {line.unit}
                     </td>

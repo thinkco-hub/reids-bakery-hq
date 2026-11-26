@@ -37,6 +37,7 @@ export default function DashboardView({
   readyOrdersCount,
   onNavClick,
 }: DashboardViewProps) {
+  const recentOrdersHeadingId = React.useId();
   const today = new Date();
   const todayLabel = formatDate(today);
   const todayKey = toISODate(today);
@@ -189,7 +190,7 @@ export default function DashboardView({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
           <div className="p-5 border-b border-gray-100 flex justify-between items-center">
-            <h3 className="text-lg font-bold text-[#121212]">
+            <h3 id={recentOrdersHeadingId} className="text-lg font-bold text-[#121212]">
               Recent Orders
             </h3>
             <button
@@ -205,7 +206,7 @@ export default function DashboardView({
             role="region"
             aria-label="Recent orders"
           >
-            <table className="w-full text-left border-collapse min-w-[500px]">
+            <table aria-labelledby={recentOrdersHeadingId} className="w-full text-left border-collapse min-w-[500px]">
               <thead>
                 <tr className="bg-gray-50/50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   <th scope="col" className="px-5 py-3">Order #</th>

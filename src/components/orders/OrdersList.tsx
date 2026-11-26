@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
 import OrderCardList from "./OrderCardList";
 import OrderStatusBadge from "./OrderStatusBadge";
 import PaymentStatusBadge from "./PaymentStatusBadge";
@@ -15,6 +15,7 @@ interface OrdersListProps {
 }
 
 export default function OrdersList({ orders, clients, menuInventory, onView }: OrdersListProps) {
+  const headingId = useId();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "All">("All");
   const [dateFilter, setDateFilter] = useState("");
@@ -35,7 +36,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8">
-        <h2 className="text-3xl font-bold text-[#121212]">Orders</h2>
+        <h2 id={headingId} className="text-3xl font-bold text-[#121212]">Orders</h2>
         <p className="text-gray-500 mt-1">Manage all customer orders and production status.</p>
       </header>
 
@@ -101,17 +102,17 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
         {/* Desktop table — original structure and styling preserved; hidden only at <1024px container width. */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden @max-[1024px]:hidden">
         <div className="overflow-x-auto w-full">
-          <table className="w-full text-left border-collapse min-w-[1040px]">
+          <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[1040px]">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-                <th className="px-6 py-4">Order #</th>
-                <th className="px-6 py-4">Client</th>
-                <th className="px-6 py-4">Items</th>
-                <th className="px-6 py-4">Requested Date</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Payment</th>
-                <th className="px-6 py-4">Total</th>
-                <th className="px-4 py-4 text-center">Action</th>
+                <th scope="col" className="px-6 py-4">Order #</th>
+                <th scope="col" className="px-6 py-4">Client</th>
+                <th scope="col" className="px-6 py-4">Items</th>
+                <th scope="col" className="px-6 py-4">Requested Date</th>
+                <th scope="col" className="px-6 py-4">Status</th>
+                <th scope="col" className="px-6 py-4">Payment</th>
+                <th scope="col" className="px-6 py-4">Total</th>
+                <th scope="col" className="px-4 py-4 text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 text-sm">
@@ -126,7 +127,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
                   const shortfall = order.status !== "Delivered" && hasShortfall(order, menuInventory);
                   return (
                     <tr key={order.id} className="hover:bg-gray-50/50 transition-colors group">
-                      <td className="px-6 py-4 font-medium text-gray-900">{order.id}</td>
+                      <th scope="row" className="px-6 py-4 text-left font-medium text-gray-900">{order.id}</th>
                       <td className="px-6 py-4 text-gray-800">{clientName(order)}</td>
                       <td className="px-6 py-4 text-gray-600">{order.items.length} item(s)</td>
                       <td className="px-6 py-4 text-gray-800 font-medium">{order.requestedDate}</td>

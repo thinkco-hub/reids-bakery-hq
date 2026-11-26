@@ -191,6 +191,7 @@ interface RawMaterialsTableProps {
 }
 
 export default function RawMaterialsTable({ ingredients, onRestock, onAdd, onUpdate }: RawMaterialsTableProps) {
+  const headingId = useId();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | StockStatus>("all");
   const [modalState, setModalState] = useState<{ isOpen: boolean; editing: IngredientStock | null }>({
@@ -254,20 +255,20 @@ export default function RawMaterialsTable({ ingredients, onRestock, onAdd, onUpd
 
       <div className="bg-white rounded-lg shadow-sm border border-[#F3B978] mb-6 md:mb-8 overflow-hidden w-full">
         <div className="px-4 md:px-6 py-4 border-b border-[#F3B978] bg-[#F3B978]/20">
-          <h2 className="text-base md:text-lg font-bold text-[#562D07]">🛒 Raw Materials Stock</h2>
+          <h2 id={headingId} className="text-base md:text-lg font-bold text-[#562D07]">🛒 Raw Materials Stock</h2>
         </div>
         <div className="overflow-x-auto w-full">
-          <table className="w-full text-left border-collapse min-w-[860px]">
+          <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[860px]">
             <thead>
               <tr className="bg-[#FDF9F3] border-b border-[#F3B978] text-sm text-[#562D07]/80">
-                <th className="px-4 md:px-6 py-3 font-semibold">Ingredient Name</th>
-                <th className="px-4 md:px-6 py-3 font-semibold">Item ID</th>
-                <th className="px-4 md:px-6 py-3 font-semibold">Qty in Stock</th>
-                <th className="px-4 md:px-6 py-3 font-semibold">Reorder Threshold</th>
-                <th className="px-4 md:px-6 py-3 font-semibold">Supplier</th>
-                <th className="px-4 md:px-6 py-3 font-semibold">Unit Cost</th>
-                <th className="px-4 md:px-6 py-3 font-semibold">Status</th>
-                <th className="px-4 md:px-6 py-3 font-semibold text-center">Action</th>
+                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Ingredient Name</th>
+                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Item ID</th>
+                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Qty in Stock</th>
+                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Reorder Threshold</th>
+                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Supplier</th>
+                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Unit Cost</th>
+                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Status</th>
+                <th scope="col" className="px-4 md:px-6 py-3 font-semibold text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F3B978]/50">
@@ -292,7 +293,7 @@ export default function RawMaterialsTable({ ingredients, onRestock, onAdd, onUpd
                     )}
                     {group.items.map((item) => (
                       <tr key={item.id} className="hover:bg-[#FDF9F3]/50 transition-colors">
-                        <td className="px-4 md:px-6 py-4 font-semibold text-[#121212]">{item.name}</td>
+                        <th scope="row" className="px-4 md:px-6 py-4 text-left font-semibold text-[#121212]">{item.name}</th>
                         <td className="px-4 md:px-6 py-4 text-sm text-[#562D07]/70 font-medium">{item.id}</td>
                         <td className="px-4 md:px-6 py-4 font-bold text-[#121212] text-lg tabular-nums">
                           {item.qty} <span className="text-xs font-medium text-gray-500">{item.unit}</span>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
 import { useAnnounce } from "../common/Announcer";
 import { todayISO } from "../../utils/dates";
 import type { FormEvent } from "react";
@@ -25,24 +25,25 @@ function CountSection({
   counts: CountMap;
   onUpdate: (id: string, value: string) => void;
 }) {
+  const headingId = useId();
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
-      <h3 className="text-base font-bold text-[#121212] mb-4">
+      <h3 id={headingId} className="text-base font-bold text-[#121212] mb-4">
         {icon} {title}
       </h3>
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[420px]">
+        <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[420px]">
           <thead>
             <tr className="bg-gray-50/50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              <th className="px-4 py-3">Item</th>
-              <th className="px-4 py-3">Unit</th>
-              <th className="px-4 py-3 text-right">Counted Qty</th>
+              <th scope="col" className="px-4 py-3">Item</th>
+              <th scope="col" className="px-4 py-3">Unit</th>
+              <th scope="col" className="px-4 py-3 text-right">Counted Qty</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 text-sm">
             {items.map((item) => (
               <tr key={item.id}>
-                <td className="px-4 py-3 font-medium text-gray-900">{item.name}</td>
+                <th scope="row" className="px-4 py-3 text-left font-medium text-gray-900">{item.name}</th>
                 <td className="px-4 py-3 text-gray-500">{("unit" in item && item.unit) || "pcs"}</td>
                 <td className="px-4 py-3 text-right">
                   <input

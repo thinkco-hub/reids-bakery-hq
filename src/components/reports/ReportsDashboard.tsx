@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useId, useMemo, useState } from "react";
 import RevenueByDayChart from "./RevenueByDayChart";
 import SellerBarList from "./SellerBarList";
 import EditSaleModal from "./EditSaleModal";
@@ -131,6 +131,7 @@ export default function ReportsDashboard({
   const [customEnd, setCustomEnd] = useState("");
   const [logSearch, setLogSearch] = useState("");
   const [editingSale, setEditingSale] = useState<Sale | null>(null);
+  const salesLogHeadingId = useId();
 
   const range = useMemo(() => {
     if (preset === "custom") return { start: customStart, end: customEnd };
@@ -290,7 +291,7 @@ export default function ReportsDashboard({
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <h3 className="text-lg font-bold text-[#121212]">Sales Log</h3>
+          <h3 id={salesLogHeadingId} className="text-lg font-bold text-[#121212]">Sales Log</h3>
           <div className="relative sm:w-72">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <SearchIcon className="h-5 w-5 text-gray-500" />
@@ -311,17 +312,17 @@ export default function ReportsDashboard({
           role="region"
           aria-label="Sales log"
         >
-          <table className="w-full text-left border-collapse min-w-[760px]">
+          <table aria-labelledby={salesLogHeadingId} className="w-full text-left border-collapse min-w-[760px]">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-                <th className="px-6 py-3">Sale</th>
-                <th className="px-6 py-3">Date</th>
-                <th className="px-6 py-3">Type</th>
-                <th className="px-6 py-3">Customer</th>
-                <th className="px-6 py-3">Payment</th>
-                <th className="px-6 py-3 text-right">Total</th>
-                <th className="px-6 py-3 text-right">Edit</th>
-                <th className="px-6 py-3 text-right">Receipt</th>
+                <th scope="col" className="px-6 py-3">Sale</th>
+                <th scope="col" className="px-6 py-3">Date</th>
+                <th scope="col" className="px-6 py-3">Type</th>
+                <th scope="col" className="px-6 py-3">Customer</th>
+                <th scope="col" className="px-6 py-3">Payment</th>
+                <th scope="col" className="px-6 py-3 text-right">Total</th>
+                <th scope="col" className="px-6 py-3 text-right">Edit</th>
+                <th scope="col" className="px-6 py-3 text-right">Receipt</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 text-sm">
@@ -334,7 +335,7 @@ export default function ReportsDashboard({
               ) : (
                 logRows.map((sale) => (
                   <tr key={sale.id} className="hover:bg-gray-50/50">
-                    <td className="px-6 py-3 font-medium text-gray-900">
+                    <th scope="row" className="px-6 py-3 text-left font-medium text-gray-900">
                       {sale.id}
                       {!!sale.editHistory?.length && (
                         <span
@@ -344,7 +345,7 @@ export default function ReportsDashboard({
                           Edited
                         </span>
                       )}
-                    </td>
+                    </th>
                     <td className="px-6 py-3 text-gray-600">{formatDateTime(sale.createdAt)}</td>
                     <td className="px-6 py-3 text-gray-600">{sale.type}</td>
                     <td className="px-6 py-3 text-gray-800">{sale.customerName}</td>

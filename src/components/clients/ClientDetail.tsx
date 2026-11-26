@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 import { Link } from "react-router";
 import OrderStatusBadge from "../orders/OrderStatusBadge";
 import { formatMoney } from "../../utils/money";
@@ -13,6 +13,7 @@ interface ClientDetailProps {
 }
 
 export default function ClientDetail({ client, orders, onBack }: ClientDetailProps) {
+  const ordersHeadingId = useId();
   const clientOrders = [...orders]
     .filter((o) => o.clientId === client.id)
     .sort((a, b) => b.requestedDate.localeCompare(a.requestedDate));
@@ -61,16 +62,16 @@ export default function ClientDetail({ client, orders, onBack }: ClientDetailPro
 
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="p-5 border-b border-gray-100">
-          <h3 className="text-lg font-bold text-[#121212]">Order History</h3>
+          <h3 id={ordersHeadingId} className="text-lg font-bold text-[#121212]">Order History</h3>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[600px]">
+          <table aria-labelledby={ordersHeadingId} className="w-full text-left border-collapse min-w-[600px]">
             <thead>
               <tr className="bg-gray-50/50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                <th className="px-5 py-3">Order #</th>
-                <th className="px-5 py-3">Requested Date</th>
-                <th className="px-5 py-3">Status</th>
-                <th className="px-5 py-3 text-right">Total</th>
+                <th scope="col" className="px-5 py-3">Order #</th>
+                <th scope="col" className="px-5 py-3">Requested Date</th>
+                <th scope="col" className="px-5 py-3">Status</th>
+                <th scope="col" className="px-5 py-3 text-right">Total</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-sm">
@@ -86,14 +87,14 @@ export default function ClientDetail({ client, orders, onBack }: ClientDetailPro
                     key={order.id}
                     className="hover:bg-gray-50/50 transition-colors"
                   >
-                    <td className="px-5 py-4 font-medium text-gray-900">
+                    <th scope="row" className="px-5 py-4 text-left font-medium text-gray-900">
                       <Link
                         to={orderPath(order.id)}
                         className="rounded hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-text)]"
                       >
                         {order.id}
                       </Link>
-                    </td>
+                    </th>
                     <td className="px-5 py-4 text-gray-600">{order.requestedDate}</td>
                     <td className="px-5 py-4">
                       <OrderStatusBadge status={order.status} />
