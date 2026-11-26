@@ -202,7 +202,7 @@ export default function EndOfDayClosing({
                   {!alreadyClosed && (
                     <button
                       onClick={() => setPendingExpense(exp)}
-                      className="text-gray-500 hover:text-red-500 transition-colors"
+                      className="flex items-center justify-center min-h-[2.75rem] min-w-[2.75rem] rounded-lg text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"
                       title="Remove expense"
                       aria-label={`Remove expense ${exp.description}`}
                     >
