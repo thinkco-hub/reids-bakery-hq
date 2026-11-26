@@ -1,7 +1,7 @@
-import React from "react";
-import { Route, Routes, useNavigate } from "react-router";
+import React, { useEffect, useRef } from "react";
+import { Route, Routes, useLocation, useNavigate } from "react-router";
 import LoginPage from "./components/auth/LoginPage";
-import { AnnouncerProvider } from "./components/common/Announcer";
+import { AnnouncerProvider, useAnnounce } from "./components/common/Announcer";
 import UnknownRoute from "./components/common/UnknownRoute";
 import { useAuth } from "./hooks/useAuth";
 import { useNavigation } from "./hooks/useNavigation";
@@ -29,9 +29,34 @@ import ReportsRoute from "./routes/ReportsRoute";
 import RolesRoute from "./routes/RolesRoute";
 import { ShellProvider } from "./routes/shell";
 import type { ShellContextValue } from "./routes/shell";
-import { CHAMS_PATH, PATH_BY_TAB } from "./routes";
+import { CHAMS_PATH, PATH_BY_TAB, viewNameFromPath } from "./routes";
 import { DEFAULT_TAB, canAccessTab } from "./utils/permissions";
 import { canUseSidebarRail } from "./utils/responsive";
+
+/**
+ * A route change has to retitle the tab, move focus into the new view and say
+ * its name out loud. The first mount is the landing screen, not a navigation:
+ * it keeps index.html's title and whatever focus the browser started with.
+ */
+function ViewAnnouncement() {
+  const { pathname } = useLocation();
+  const announce = useAnnounce();
+  const isFirstMount = useRef(true);
+
+  useEffect(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
+    const viewName = viewNameFromPath(pathname);
+    document.title = `${viewName} — Reid's Bakery HQ`;
+    // Main carries tabIndex=-1 and is the landmark the skip link targets.
+    document.getElementById("main")?.focus();
+    announce(`Navigated to ${viewName}.`);
+  }, [pathname, announce]);
+
+  return null;
+}
 
 /**
  * The shell: auth, the navigation state, and the route table. Feature state
@@ -70,6 +95,7 @@ export default function BakeryCommandCenter() {
 
   return (
     <AnnouncerProvider>
+      <ViewAnnouncement />
       <ShellProvider value={shell}>
         <BakeryProvider currentUser={currentUser}>
           <div

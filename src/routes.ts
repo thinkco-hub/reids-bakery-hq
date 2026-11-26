@@ -29,6 +29,49 @@ export const PATH_BY_TAB: Record<NavTabId, string> = {
   "user-management": "/roles",
 };
 
+/** The view name a screen reader hears and the browser tab shows — the on-screen title. */
+const VIEW_NAME_BY_TAB: Record<NavTabId, string> = {
+  dashboard: "Dashboard",
+  pos: "Point of Sale",
+  orders: "Orders",
+  clients: "Clients",
+  inventory: "Inventory",
+  "inventory-closing-count": "Closing Inventory Count",
+  "inventory-reconciliation": "Inventory Reconciliation",
+  recipes: "Recipes",
+  "production-runs": "Production Runs",
+  calendar: "Calendar",
+  "reports-dashboard": "Sales Reports",
+  "reports-closing": "End-of-Day Closing",
+  "reports-inventory": "Closing Inventory",
+  "audit-logs": "Audit Logs",
+  "user-management": "Roles",
+};
+
+/**
+ * Record URLs carry no tab, so they are named by pattern. `/recipes/new` has to
+ * be tested before the recipe record pattern, or the editor would announce
+ * itself as an existing recipe.
+ */
+const RECORD_VIEW_NAMES: Array<[RegExp, string]> = [
+  [/^\/recipes\/new$/, "New Recipe"],
+  [/^\/orders\/[^/]+$/, "Order Details"],
+  [/^\/clients\/[^/]+$/, "Client Details"],
+  [/^\/recipes\/[^/]+$/, "Recipe Details"],
+];
+
+/** The human name of the screen at `pathname`, for titles and announcements. */
+export function viewNameFromPath(pathname: string): string {
+  const normalized = normalize(pathname);
+  if (normalized === CHAMS_PATH) return "Chams Ledger";
+  const tab = tabFromPath(normalized);
+  if (tab) return VIEW_NAME_BY_TAB[tab];
+  for (const [pattern, name] of RECORD_VIEW_NAMES) {
+    if (pattern.test(normalized)) return name;
+  }
+  return "Page not found";
+}
+
 const TAB_BY_PATH: Record<string, NavTabId> = Object.fromEntries(
   Object.entries(PATH_BY_TAB).map(([tab, path]) => [path, tab as NavTabId])
 );
