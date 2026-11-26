@@ -63,7 +63,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
             <button
               onClick={() => setDateFilter("")}
               aria-label="Clear date filter"
-              className="text-gray-500 hover:text-red-500 p-1 transition-colors"
+              className="text-gray-500 hover:text-red-500 p-1 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-text)]"
               title="Clear Date Filter"
             >
               <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,7 +87,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
               key={tab}
               onClick={() => setStatusFilter(tab)}
               aria-pressed={statusFilter === tab}
-              className={`px-4 py-1.5 rounded border text-sm font-medium whitespace-nowrap transition-colors ${
+              className={`px-4 py-1.5 rounded border text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-text)] ${
                 statusFilter === tab
                   ? "bg-blue-50 border-blue-200 text-blue-700 shadow-sm"
                   : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -153,7 +153,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
                         <button
                           onClick={() => onView(order)}
                           aria-label={`View order ${order.id}`}
-                          className="text-gray-500 hover:text-[var(--color-brand-text)] transition-colors p-2 rounded-md hover:bg-orange-50"
+                          className="text-gray-500 hover:text-[var(--color-brand-text)] transition-colors p-2 rounded-md hover:bg-orange-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-text)]"
                           title="View Order Details"
                         >
                           <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
