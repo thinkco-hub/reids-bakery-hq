@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Button from "../common/Button";
 import FinishedGoodsTable from "../inventory/FinishedGoodsTable";
 import RawMaterialsTable from "../inventory/RawMaterialsTable";
 import RestockChoiceModal from "../inventory/RestockChoiceModal";
@@ -55,14 +56,14 @@ export default function InventoryView({
       {/* Header: Menu Items / Raw Materials toggle + Closing Count button */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         {canViewIngredients && (
-          <div className="self-center sm:self-auto inline-flex rounded-xl bg-[#4a2605] p-1 shadow-inner">
+          <div className="self-center sm:self-auto inline-flex rounded-xl bg-espresso-well p-1 shadow-inner">
             <button
               onClick={() => setStockView("menu")}
               aria-pressed={stockView === "menu"}
               className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${
                 stockView === "menu"
-                  ? "bg-[var(--color-brand-strong)] text-white shadow-md"
-                  : "text-[#FDF9F3]/70 hover:text-white"
+                  ? "bg-brand-strong text-white shadow-md"
+                  : "text-cream/70 hover:text-white"
               }`}
             >
               Menu Items
@@ -72,8 +73,8 @@ export default function InventoryView({
               aria-pressed={stockView === "raw"}
               className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${
                 stockView === "raw"
-                  ? "bg-[var(--color-brand-strong)] text-white shadow-md"
-                  : "text-[#FDF9F3]/70 hover:text-white"
+                  ? "bg-brand-strong text-white shadow-md"
+                  : "text-cream/70 hover:text-white"
               }`}
             >
               Raw Materials
@@ -81,12 +82,13 @@ export default function InventoryView({
           </div>
         )}
 
-        <button
+        <Button
+          variant="cta"
+          className="sm:ml-auto"
           onClick={() => onNavClick("inventory-closing-count")}
-          className="sm:ml-auto inline-flex items-center justify-center px-4 py-2 rounded-xl bg-[var(--color-brand-strong)] text-white text-sm font-bold shadow-md hover:bg-[var(--color-brand-strong-hover)] transition-colors"
         >
           Closing Count
-        </button>
+        </Button>
       </div>
 
       {/* Combined stock tables — Menu Items and Raw Materials are toggleable */}

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import SelectField from "../common/SelectField";
 import TicketLineItem from "./TicketLineItem";
-import { SearchIcon } from "../icons";
+import EmptyState from "../common/EmptyState";
+import { ChevronLeftIcon, SearchIcon, XIcon } from "../icons";
 import { POS_CATEGORIES } from "../../data/initialCatalogue";
 import { formatMoney } from "../../utils/money";
 import type {
@@ -71,18 +72,9 @@ export default function PosMobile({
         <>
           <button
             onClick={closeTicketView}
-            className="flex-shrink-0 flex items-center gap-2 min-h-[3rem] px-4 text-left font-bold text-[#562D07] hover:bg-gray-200 active:bg-gray-300 transition-colors"
+            className="flex-shrink-0 flex items-center gap-2 min-h-[3rem] px-4 text-left font-bold text-espresso hover:bg-gray-200 active:bg-gray-300 transition-colors"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2.5}
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
+            <ChevronLeftIcon className="w-5 h-5" />
             Back to items
           </button>
 
@@ -99,16 +91,7 @@ export default function PosMobile({
                 aria-label={`Remove ${customer.name} from the ticket`}
                 className="flex-shrink-0 min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center rounded-lg text-gray-500 hover:text-red-500 hover:bg-gray-100 transition-colors"
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <XIcon className="w-5 h-5" />
               </button>
             </div>
           )}
@@ -130,15 +113,15 @@ export default function PosMobile({
             <div className="space-y-1 mb-4">
               <div className="flex justify-between text-gray-500 text-[0.95rem] font-medium">
                 <span>Subtotal</span>
-                <span>{formatMoney(cartSubtotal)}</span>
+                <span className="tabular-nums">{formatMoney(cartSubtotal)}</span>
               </div>
               <div className="flex justify-between text-gray-500 text-[0.95rem] font-medium border-b border-gray-200 pb-1.5">
                 <span>Tax (5%)</span>
-                <span>{formatMoney(cartTax)}</span>
+                <span className="tabular-nums">{formatMoney(cartTax)}</span>
               </div>
-              <div className="flex justify-between text-[#121212] text-[1.05rem] font-bold pt-1">
+              <div className="flex justify-between text-ink text-[1.05rem] font-bold pt-1">
                 <span>Total</span>
-                <span>{formatMoney(cartTotal)}</span>
+                <span className="tabular-nums">{formatMoney(cartTotal)}</span>
               </div>
             </div>
             <TicketButton
@@ -168,7 +151,7 @@ export default function PosMobile({
               }
               aria-label="Filter items by category"
               wrapperClassName="flex-1 min-w-0"
-              className="min-h-[2.75rem] w-full pl-3 pr-10 bg-gray-100 border border-gray-200 rounded-lg text-sm font-bold text-gray-800 focus:ring-2 focus:ring-[var(--color-brand-text)] outline-none"
+              className="min-h-[2.75rem] w-full pl-3 pr-10 bg-gray-100 border border-gray-200 rounded-lg text-sm font-bold text-gray-800 focus:ring-2 focus:ring-brand-strong outline-none"
             >
               {POS_CATEGORIES.map((cat) => (
                 <option key={cat} value={cat}>
@@ -182,21 +165,12 @@ export default function PosMobile({
               aria-label={isSearchOpen ? "Close item search" : "Search items"}
               className={`flex-shrink-0 min-h-[2.75rem] min-w-[2.75rem] px-3 rounded-lg border transition-colors flex items-center justify-center ${
                 isSearchOpen
-                  ? "bg-[#562D07] border-[#562D07] text-white"
+                  ? "bg-espresso border-espresso text-white"
                   : "bg-gray-100 border-gray-200 text-gray-600 hover:bg-gray-200"
               }`}
             >
               {isSearchOpen ? (
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <XIcon className="w-5 h-5" />
               ) : (
                 <SearchIcon className="w-5 h-5" />
               )}
@@ -212,16 +186,17 @@ export default function PosMobile({
                 onChange={(e) => setPosSearch(e.target.value)}
                 placeholder="Search items..."
                 aria-label="Search items"
-                className="w-full min-h-[2.75rem] px-3 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-[var(--color-brand-text)] outline-none"
+                className="w-full min-h-[2.75rem] px-3 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-brand-strong outline-none"
               />
             </div>
           )}
 
           <div className="flex-1 min-h-0 overflow-y-auto bg-white">
             {filteredPosProducts.length === 0 ? (
-              <p className="p-6 text-center text-gray-500">
-                No items match. Try a different category or search.
-              </p>
+              <EmptyState
+                title="No items match."
+                hint="Try a different category or search."
+              />
             ) : (
               <ul className="divide-y divide-gray-100">
                 {filteredPosProducts.map((product) => {
@@ -238,7 +213,7 @@ export default function PosMobile({
                             className={`block h-12 w-12 rounded-lg ${product.color}`}
                           />
                           {qty > 0 && (
-                            <span className="absolute -right-1.5 -bottom-1.5 min-w-[1.4rem] h-[1.4rem] px-1 rounded-full bg-[var(--color-brand-strong)] text-white text-xs font-bold flex items-center justify-center shadow">
+                            <span className="absolute -right-1.5 -bottom-1.5 min-w-[1.4rem] h-[1.4rem] px-1 rounded-full bg-brand-strong text-white text-xs font-bold flex items-center justify-center shadow">
                               {qty}
                             </span>
                           )}
@@ -246,7 +221,7 @@ export default function PosMobile({
                         <span className="flex-1 min-w-0 font-bold text-gray-800 leading-tight">
                           {product.name}
                         </span>
-                        <span className="flex-shrink-0 font-bold text-[#121212]">
+                        <span className="flex-shrink-0 font-bold text-ink tabular-nums">
                           {formatMoney(product.price)}
                         </span>
                       </button>
@@ -283,7 +258,7 @@ function TicketButton({
       className={`w-full min-h-[3.25rem] py-2.5 rounded-xl font-bold shadow-lg transition-all transform active:scale-[0.98] flex flex-col items-center justify-center leading-tight ${
         disabled
           ? "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
-          : "bg-[var(--color-brand-strong)] hover:bg-[var(--color-brand-strong-hover)] text-white"
+          : "bg-brand-strong hover:bg-brand-strong-hover text-white"
       }`}
     >
       <span className="text-[1.05rem]">{label}</span>

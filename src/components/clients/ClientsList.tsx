@@ -1,6 +1,9 @@
 import React, { useId, useState } from "react";
 import ClientFormModal from "./ClientFormModal";
 import SearchField from "../common/SearchField";
+import Table, { TableHead } from "../common/Table";
+import EmptyState from "../common/EmptyState";
+import Button from "../common/Button";
 import type { Client, ClientFormData, ClientId, Order } from "../../types/domain";
 
 interface ClientsListProps {
@@ -40,15 +43,12 @@ export default function ClientsList({ clients, orders, onAdd, onUpdate, onView }
 
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
-          <h2 id={headingId} className="text-3xl font-bold text-[#121212]">Clients</h2>
+          <h2 id={headingId} className="text-3xl font-bold text-ink">Clients</h2>
           <p className="text-gray-500 mt-1">Client records and standing order preferences.</p>
         </div>
-        <button
-          onClick={() => setModalState({ isOpen: true, editing: null })}
-          className="px-4 py-2.5 rounded-lg bg-[#562D07] hover:bg-[#3a1d04] text-white font-bold text-sm shadow-sm transition-colors whitespace-nowrap"
-        >
+        <Button onClick={() => setModalState({ isOpen: true, editing: null })}>
           + Add Client
-        </button>
+        </Button>
       </header>
 
       <div className="bg-white border border-gray-200 rounded-lg p-2 mb-4 shadow-sm flex">
@@ -60,58 +60,68 @@ export default function ClientsList({ clients, orders, onAdd, onUpdate, onView }
         />
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto w-full" tabIndex={0} role="region" aria-label="Clients list">
-          <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[720px]">
-            <thead>
-              <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-                <th scope="col" className="px-6 py-4">Client</th>
-                <th scope="col" className="px-6 py-4">Contact</th>
-                <th scope="col" className="px-6 py-4">Standing Order</th>
-                <th scope="col" className="px-6 py-4 text-right">Orders</th>
-                <th scope="col" className="px-4 py-4 text-center">Action</th>
+      <Table label="Clients list" labelledBy={headingId} minWidth="min-w-[720px]">
+        <TableHead>
+          <th scope="col" className="px-6 py-4">Client</th>
+          <th scope="col" className="px-6 py-4">Contact</th>
+          <th scope="col" className="px-6 py-4">Standing Order</th>
+          <th scope="col" className="px-6 py-4 text-right">Orders</th>
+          <th scope="col" className="px-4 py-4 text-center">Action</th>
+        </TableHead>
+        <tbody className="divide-y divide-gray-200 text-sm">
+          {filtered.length === 0 ? (
+            <tr>
+              <td colSpan={5}>
+                <EmptyState
+                  title={search ? "No clients match your search." : "No clients yet."}
+                  hint={search ? undefined : "Add a client to keep their orders and standing preferences together."}
+                  action={
+                    search ? (
+                      <Button size="sm" variant="ghostBrand" onClick={() => setSearch("")}>
+                        Clear search
+                      </Button>
+                    ) : (
+                      <Button size="sm" onClick={() => setModalState({ isOpen: true, editing: null })}>
+                        + Add Client
+                      </Button>
+                    )
+                  }
+                />
+              </td>
+            </tr>
+          ) : (
+            filtered.map((client) => (
+              <tr key={client.id} className="hover:bg-gray-50/50 transition-colors">
+                <th scope="row" className="px-6 py-4 text-left font-medium text-gray-900">{client.name}</th>
+                <td className="px-6 py-4 text-gray-600">
+                  <div>{client.contact || "—"}</div>
+                  {client.email && <div className="text-xs text-gray-500">{client.email}</div>}
+                </td>
+                <td className="px-6 py-4 text-gray-600 max-w-xs truncate">{client.standingOrder || "—"}</td>
+                <td className="px-6 py-4 text-right text-gray-600 tabular-nums">{orderCount(client.id)}</td>
+                <td className="px-4 py-4 text-center whitespace-nowrap">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setModalState({ isOpen: true, editing: client })}
+                    aria-label={`Edit ${client.name}`}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghostBrand"
+                    onClick={() => onView(client)}
+                    aria-label={`View ${client.name}`}
+                  >
+                    View
+                  </Button>
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 text-sm">
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                    No clients found.
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((client) => (
-                  <tr key={client.id} className="hover:bg-gray-50/50 transition-colors">
-                    <th scope="row" className="px-6 py-4 text-left font-medium text-gray-900">{client.name}</th>
-                    <td className="px-6 py-4 text-gray-600">
-                      <div>{client.contact || "—"}</div>
-                      {client.email && <div className="text-xs text-gray-500">{client.email}</div>}
-                    </td>
-                    <td className="px-6 py-4 text-gray-600 max-w-xs truncate">{client.standingOrder || "—"}</td>
-                    <td className="px-6 py-4 text-right text-gray-600">{orderCount(client.id)}</td>
-                    <td className="px-4 py-4 text-center whitespace-nowrap">
-                      <button
-                        onClick={() => setModalState({ isOpen: true, editing: client })}
-                        aria-label={`Edit ${client.name}`}
-                        className="text-gray-500 hover:bg-gray-100 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => onView(client)}
-                        aria-label={`View ${client.name}`}
-                        className="text-[var(--color-brand-text)] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
-                      >
-                        View
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            ))
+          )}
+        </tbody>
+      </Table>
     </div>
   );
 }

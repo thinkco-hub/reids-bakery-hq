@@ -1,5 +1,8 @@
 import React, { useId, useState } from "react";
 import Modal from "../common/Modal";
+import Button from "../common/Button";
+import Badge from "../common/Badge";
+import { CheckIcon } from "../icons";
 import { formatDateTime } from "../../utils/dates";
 import { formatMoney } from "../../utils/money";
 import type { Sale } from "../../types/domain";
@@ -38,15 +41,15 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
     >
         <div className="text-center mb-6">
           <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+            <CheckIcon className="w-6 h-6 text-green-700" />
           </div>
-          <h2 id={headingId} className="text-xl font-bold text-[#121212]">Sale Complete</h2>
+          <h2 id={headingId} className="text-xl font-bold text-ink">Sale Complete</h2>
           <p className="text-gray-500 text-sm mt-1">{receipt.id}</p>
           {receipt.type === "Order" && (
-            <p className="text-xs font-semibold text-[var(--color-brand-text)] mt-2 bg-orange-50 rounded-full px-3 py-1 inline-block">
-              Added to Orders — tracked through production &amp; delivery
+            <p className="mt-2">
+              <Badge family="stock" tone="attention">
+                Added to Orders — tracked through production &amp; delivery
+              </Badge>
             </p>
           )}
         </div>
@@ -87,7 +90,7 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
                 <span className="text-gray-500 mr-2">{item.qty}x</span>
                 {item.name}
               </span>
-              <span className="font-semibold text-gray-900">
+              <span className="font-semibold text-gray-900 tabular-nums">
                 {formatMoney(item.price * item.qty)}
               </span>
             </li>
@@ -97,19 +100,19 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
         <div className="space-y-1 mb-6 border-t border-dashed border-gray-300 pt-3">
           <div className="flex justify-between text-gray-500 text-sm">
             <span>Subtotal</span>
-            <span>{formatMoney(receipt.subtotal)}</span>
+            <span className="tabular-nums">{formatMoney(receipt.subtotal)}</span>
           </div>
           <div className="flex justify-between text-gray-500 text-sm">
             <span>Tax (5%)</span>
-            <span>{formatMoney(receipt.tax)}</span>
+            <span className="tabular-nums">{formatMoney(receipt.tax)}</span>
           </div>
           <div
-            className={`flex justify-between text-lg font-bold text-[#121212] pt-1 ${
+            className={`flex justify-between text-lg font-bold text-ink pt-1 ${
               receipt.notes ? "pb-3 border-b border-dashed border-gray-300" : ""
             }`}
           >
             <span>Total</span>
-            <span className="text-[var(--color-brand-text)]">{formatMoney(receipt.total)}</span>
+            <span className="text-brand-strong tabular-nums">{formatMoney(receipt.total)}</span>
           </div>
           {receipt.notes && (
             <div className="flex justify-between text-sm pt-1">
@@ -123,20 +126,19 @@ export default function ReceiptModal({ receipt, onClose }: ReceiptModalProps) {
 
         <div className="print:hidden">
           <div className="flex gap-3">
-            <button
-              onClick={onClose}
-              className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-colors"
-            >
+            <Button variant="secondary" size="lg" className="flex-1" onClick={onClose}>
               Exit
-            </button>
+            </Button>
             {/* aria-disabled rather than disabled: disabling the focused button drops focus to body. */}
-            <button
+            <Button
+              variant="cta"
+              size="lg"
+              className="flex-1 aria-disabled:bg-gray-200 aria-disabled:text-gray-400 aria-disabled:cursor-not-allowed"
               onClick={handleDownload}
               aria-disabled={exporting}
-              className="flex-1 py-3 rounded-xl text-white font-bold bg-[var(--color-brand-strong)] hover:bg-[var(--color-brand-strong-hover)] aria-disabled:bg-gray-300 aria-disabled:text-gray-600 aria-disabled:cursor-not-allowed transition-colors"
             >
               {exporting ? "Preparing…" : "Download Receipt"}
-            </button>
+            </Button>
           </div>
           {/* Mounted empty: a live region inserted with its text is often skipped by screen readers. */}
           <p role="status" className="sr-only">

@@ -3,6 +3,10 @@ import Modal from "../common/Modal";
 import InventoryStatsBar from "./InventoryStatsBar";
 import StockStatusBadge from "./StockStatusBadge";
 import SearchField from "../common/SearchField";
+import Table, { TableHead } from "../common/Table";
+import EmptyState from "../common/EmptyState";
+import Button from "../common/Button";
+import { ShoppingCartIcon } from "../icons";
 import { formatMoney } from "../../utils/money";
 import { STOCK_STATUS_LABELS } from "../../utils/status";
 import { groupByStatus, getStockStatus } from "../../utils/stock";
@@ -75,7 +79,7 @@ function IngredientFormModal({
       className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md max-h-[85dvh] overflow-y-auto overscroll-contain animate-fadeIn"
     >
       <form onSubmit={handleSubmit}>
-        <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-6">
+        <h2 id={headingId} className="text-2xl font-bold text-ink mb-6">
           {initial ? "Edit Ingredient" : "Add Ingredient"}
         </h2>
 
@@ -87,7 +91,7 @@ function IngredientFormModal({
               type="text"
               value={form.name}
               onChange={(e) => update("name", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
               required
             />
           </div>
@@ -103,7 +107,7 @@ function IngredientFormModal({
                 step="any"
                 value={form.qty}
                 onChange={(e) => update("qty", e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                 required
               />
             </div>
@@ -115,7 +119,7 @@ function IngredientFormModal({
                 placeholder="kg, Liters..."
                 value={form.unit}
                 onChange={(e) => update("unit", e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                 required
               />
             </div>
@@ -132,7 +136,7 @@ function IngredientFormModal({
                 step="any"
                 value={form.target}
                 onChange={(e) => update("target", e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                 required
               />
             </div>
@@ -147,7 +151,7 @@ function IngredientFormModal({
                 step="any"
                 value={form.unitCost}
                 onChange={(e) => update("unitCost", e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
               />
             </div>
           </div>
@@ -158,25 +162,18 @@ function IngredientFormModal({
               type="text"
               value={form.supplier}
               onChange={(e) => update("supplier", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
             />
           </div>
         </div>
 
         <div className="flex gap-3 mt-8">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-colors"
-          >
+          <Button type="button" variant="secondary" size="lg" className="flex-1" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            className="flex-1 py-3 rounded-xl text-white font-bold bg-[#562D07] hover:bg-[#3a1d04] transition-colors"
-          >
+          </Button>
+          <Button type="submit" size="lg" className="flex-1">
             Save Ingredient
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>
@@ -227,19 +224,16 @@ export default function RawMaterialsTable({ ingredients, onRestock, onAdd, onUpd
 
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-[#562D07]">
+          <h2 className="text-2xl md:text-3xl font-bold text-espresso">
             Inventory: Raw Materials
           </h2>
-          <p className="text-[#562D07]/70 mt-1 font-medium text-sm md:text-base">
+          <p className="text-espresso/70 mt-1 font-medium text-sm md:text-base">
             Monitor raw materials required for production
           </p>
         </div>
-        <button
-          onClick={() => setModalState({ isOpen: true, editing: null })}
-          className="px-4 py-2.5 rounded-lg bg-[#562D07] hover:bg-[#3a1d04] text-white font-bold text-sm shadow-sm transition-colors whitespace-nowrap"
-        >
+        <Button onClick={() => setModalState({ isOpen: true, editing: null })}>
           + Add Ingredient
-        </button>
+        </Button>
       </header>
 
       <InventoryStatsBar items={ingredients} activeFilter={statusFilter} onFilterChange={setStatusFilter} />
@@ -253,85 +247,106 @@ export default function RawMaterialsTable({ ingredients, onRestock, onAdd, onUpd
         />
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-[#F3B978] mb-6 md:mb-8 overflow-hidden w-full">
-        <div className="px-4 md:px-6 py-4 border-b border-[#F3B978] bg-[#F3B978]/20">
-          <h2 id={headingId} className="text-base md:text-lg font-bold text-[#562D07]">🛒 Raw Materials Stock</h2>
-        </div>
-        <div className="overflow-x-auto w-full" tabIndex={0} role="region" aria-label="Raw materials stock">
-          <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[860px]">
-            <thead>
-              <tr className="bg-[#FDF9F3] border-b border-[#F3B978] text-sm text-[#562D07]/80">
-                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Ingredient Name</th>
-                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Item ID</th>
-                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Qty in Stock</th>
-                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Reorder Threshold</th>
-                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Supplier</th>
-                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Unit Cost</th>
-                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Status</th>
-                <th scope="col" className="px-4 md:px-6 py-3 font-semibold text-center">Action</th>
+      <div className="mb-6 md:mb-8">
+        <Table
+          label="Raw materials stock"
+          labelledBy={headingId}
+          minWidth="min-w-[860px]"
+          header={
+            <div className="px-4 md:px-6 py-4 border-b border-gray-200 bg-gray-50/50">
+              <h2 id={headingId} className="text-base md:text-lg font-bold text-ink flex items-center gap-2">
+                <ShoppingCartIcon className="w-5 h-5 text-gray-500" />
+                Raw Materials Stock
+              </h2>
+            </div>
+          }
+        >
+          <TableHead>
+            <th scope="col" className="px-4 md:px-6 py-3">Ingredient Name</th>
+            <th scope="col" className="px-4 md:px-6 py-3">Item ID</th>
+            <th scope="col" className="px-4 md:px-6 py-3">Qty in Stock</th>
+            <th scope="col" className="px-4 md:px-6 py-3">Reorder Threshold</th>
+            <th scope="col" className="px-4 md:px-6 py-3">Supplier</th>
+            <th scope="col" className="px-4 md:px-6 py-3">Unit Cost</th>
+            <th scope="col" className="px-4 md:px-6 py-3">Status</th>
+            <th scope="col" className="px-4 md:px-6 py-3 text-center">Action</th>
+          </TableHead>
+          <tbody className="divide-y divide-gray-200">
+            {filtered.length === 0 ? (
+              <tr>
+                <td colSpan={8}>
+                  <EmptyState
+                    title={search ? "No ingredients match your search." : "No raw materials in this view."}
+                    hint={search ? undefined : "Add an ingredient to track its stock, cost and supplier."}
+                    action={
+                      search ? (
+                        <Button size="sm" variant="ghostBrand" onClick={() => setSearch("")}>
+                          Clear search
+                        </Button>
+                      ) : (
+                        <Button size="sm" onClick={() => setModalState({ isOpen: true, editing: null })}>
+                          + Add Ingredient
+                        </Button>
+                      )
+                    }
+                  />
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-[#F3B978]/50">
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="text-center py-6 text-gray-500">
-                    No ingredients match your search.
-                  </td>
-                </tr>
-              ) : (
-                groups.map((group) => (
-                  <React.Fragment key={group.status}>
-                    {statusFilter === "all" && (
-                      <tr>
-                        <td
-                          colSpan={8}
-                          className="px-4 md:px-6 py-2 bg-[#FDF9F3] text-xs font-bold uppercase tracking-wider text-[#562D07]/70"
+            ) : (
+              groups.map((group) => (
+                <React.Fragment key={group.status}>
+                  {statusFilter === "all" && (
+                    <tr>
+                      <td
+                        colSpan={8}
+                        className="px-4 md:px-6 py-2 bg-gray-50 text-xs font-bold uppercase tracking-wider text-gray-700"
+                      >
+                        {STOCK_STATUS_LABELS[group.status]} ({group.items.length})
+                      </td>
+                    </tr>
+                  )}
+                  {group.items.map((item) => (
+                    <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
+                      <th scope="row" className="px-4 md:px-6 py-4 text-left font-semibold text-ink">{item.name}</th>
+                      <td className="px-4 md:px-6 py-4 text-sm text-gray-600 font-medium">{item.id}</td>
+                      <td className="px-4 md:px-6 py-4 font-bold text-ink text-lg tabular-nums">
+                        {item.qty} <span className="text-xs font-medium text-gray-500">{item.unit}</span>
+                      </td>
+                      <td className="px-4 md:px-6 py-4 text-sm text-gray-600 font-medium tabular-nums">
+                        {item.target} {item.unit}
+                      </td>
+                      <td className="px-4 md:px-6 py-4 text-sm text-gray-600">{item.supplier || "—"}</td>
+                      <td className="px-4 md:px-6 py-4 text-sm text-gray-800 font-medium tabular-nums">
+                        {formatMoney(Number(item.unitCost || 0))}
+                      </td>
+                      <td className="px-4 md:px-6 py-4">
+                        <StockStatusBadge item={item} />
+                      </td>
+                      <td className="px-4 md:px-6 py-4 text-center whitespace-nowrap">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setModalState({ isOpen: true, editing: item })}
+                          aria-label={`Edit ${item.name}`}
                         >
-                          {STOCK_STATUS_LABELS[group.status]} ({group.items.length})
-                        </td>
-                      </tr>
-                    )}
-                    {group.items.map((item) => (
-                      <tr key={item.id} className="hover:bg-[#FDF9F3]/50 transition-colors">
-                        <th scope="row" className="px-4 md:px-6 py-4 text-left font-semibold text-[#121212]">{item.name}</th>
-                        <td className="px-4 md:px-6 py-4 text-sm text-[#562D07]/70 font-medium">{item.id}</td>
-                        <td className="px-4 md:px-6 py-4 font-bold text-[#121212] text-lg tabular-nums">
-                          {item.qty} <span className="text-xs font-medium text-gray-500">{item.unit}</span>
-                        </td>
-                        <td className="px-4 md:px-6 py-4 text-sm text-[#562D07]/70 font-medium tabular-nums">
-                          {item.target} {item.unit}
-                        </td>
-                        <td className="px-4 md:px-6 py-4 text-sm text-gray-600">{item.supplier || "—"}</td>
-                        <td className="px-4 md:px-6 py-4 text-sm text-gray-800 font-medium tabular-nums">
-                          {formatMoney(Number(item.unitCost || 0))}
-                        </td>
-                        <td className="px-4 md:px-6 py-4">
-                          <StockStatusBadge item={item} />
-                        </td>
-                        <td className="px-4 md:px-6 py-4 text-center whitespace-nowrap">
-                          <button
-                            onClick={() => setModalState({ isOpen: true, editing: item })}
-                            aria-label={`Edit ${item.name}`}
-                            className="text-gray-500 hover:bg-gray-100 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => onRestock(item.id)}
-                            aria-label={`Restock ${item.name}`}
-                            className="text-[var(--color-brand-text)] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
-                          >
-                            + Restock
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </React.Fragment>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghostBrand"
+                          onClick={() => onRestock(item.id)}
+                          aria-label={`Restock ${item.name}`}
+                        >
+                          + Restock
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </React.Fragment>
+              ))
+            )}
+          </tbody>
+        </Table>
       </div>
     </div>
   );

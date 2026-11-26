@@ -1,5 +1,7 @@
 import React, { useId, useState } from "react";
 import SelectField from "../common/SelectField";
+import Button from "../common/Button";
+import { XIcon } from "../icons";
 import { formatMoney } from "../../utils/money";
 import { computeRecipeCost, suggestedPrice } from "../../utils/pricing";
 import type { FormEvent } from "react";
@@ -177,13 +179,13 @@ export default function RecipeEditor({
           <li>
             <button
               onClick={onCancel}
-              className="-my-2 py-2 hover:text-[var(--color-brand-text)] transition-colors"
+              className="-my-2 py-2 hover:text-brand-strong transition-colors"
             >
               Recipes
             </button>
           </li>
           <li aria-hidden="true" className="mx-2 text-gray-500">&gt;</li>
-          <li aria-current="page" className="text-[#121212] font-bold">{isNew ? "New Recipe" : "Edit Recipe"}</li>
+          <li aria-current="page" className="text-ink font-bold">{isNew ? "New Recipe" : "Edit Recipe"}</li>
         </ol>
       </nav>
 
@@ -200,7 +202,7 @@ export default function RecipeEditor({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-              <h2 className="text-lg font-bold text-[#121212] mb-4">Recipe Details</h2>
+              <h2 className="text-lg font-bold text-ink mb-4">Recipe Details</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
                   <label htmlFor={nameFieldId} className="block text-sm font-semibold text-gray-700 mb-1">Recipe Name</label>
@@ -211,7 +213,7 @@ export default function RecipeEditor({
                     onChange={(e) => updateField("name", e.target.value)}
                     aria-invalid={invalidField("name")}
                     aria-describedby={describedBy}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                     required
                   />
                 </div>
@@ -221,7 +223,7 @@ export default function RecipeEditor({
                     id={categoryFieldId}
                     value={form.category}
                     onChange={(e) => updateCategory(e.target.value as PosItemCategory)}
-                    className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                    className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                   >
                     {CATEGORY_OPTIONS.map((cat) => (
                       <option key={cat} value={cat}>
@@ -241,7 +243,7 @@ export default function RecipeEditor({
                     onChange={(e) => updateField("price", e.target.value)}
                     aria-invalid={invalidField("price")}
                     aria-describedby={describedBy}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                     required
                   />
                 </div>
@@ -256,7 +258,7 @@ export default function RecipeEditor({
                     onChange={(e) => updateField("qty", e.target.value)}
                     aria-invalid={invalidField("qty")}
                     aria-describedby={describedBy}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                     required
                   />
                 </div>
@@ -271,7 +273,7 @@ export default function RecipeEditor({
                     onChange={(e) => updateField("target", e.target.value)}
                     aria-invalid={invalidField("target")}
                     aria-describedby={describedBy}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                     required
                   />
                 </div>
@@ -285,7 +287,7 @@ export default function RecipeEditor({
                     onChange={(e) => updateField("shelfLife", e.target.value)}
                     aria-invalid={invalidField("shelfLife")}
                     aria-describedby={describedBy}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                     required
                   />
                 </div>
@@ -304,7 +306,7 @@ export default function RecipeEditor({
                       aria-invalid={invalidField("yieldQty")}
                       aria-describedby={describedBy}
                       required={hasBom}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                     />
                   </div>
                   <div>
@@ -317,7 +319,7 @@ export default function RecipeEditor({
                       aria-invalid={invalidField("yieldUnit")}
                       aria-describedby={describedBy}
                       required={hasBom}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                     />
                   </div>
                 </div>
@@ -327,7 +329,7 @@ export default function RecipeEditor({
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  <h3 className="text-lg font-bold text-[#121212]">Ingredients (per batch)</h3>
+                  <h3 className="text-lg font-bold text-ink">Ingredients (per batch)</h3>
                   <p className="text-xs text-gray-500 font-medium mt-0.5">
                     Optional — leave empty for simple items with no BOM.
                   </p>
@@ -335,7 +337,7 @@ export default function RecipeEditor({
                 <button
                   type="button"
                   onClick={addLine}
-                  className="-my-2 py-2 text-sm font-bold text-[var(--color-brand-text)] hover:underline"
+                  className="-my-2 py-2 text-sm font-bold text-brand-strong hover:underline"
                 >
                   + Add Ingredient
                 </button>
@@ -354,7 +356,7 @@ export default function RecipeEditor({
                         }}
                         aria-label={`Ingredient ${idx + 1}`}
                         wrapperClassName="flex-1 w-full"
-                        className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                        className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                       >
                         <option value="">Select ingredient...</option>
                         {ingredients.map((i) => (
@@ -371,7 +373,7 @@ export default function RecipeEditor({
                         aria-label={`Quantity for ingredient ${idx + 1}`}
                         value={line.qty}
                         onChange={(e) => updateLine(idx, "qty", e.target.value)}
-                        className="w-full sm:w-28 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                        className="w-full sm:w-28 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                       />
                       <span className="w-16 text-sm text-gray-500 font-medium">
                         {ingredient?.unit || line.unit || ""}
@@ -383,14 +385,7 @@ export default function RecipeEditor({
                         title="Remove"
                         aria-label={`Remove ingredient ${idx + 1}`}
                       >
-                        <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
+                        <XIcon className="w-5 h-5" />
                       </button>
                     </div>
                   );
@@ -403,7 +398,7 @@ export default function RecipeEditor({
             {/* Both figures in this card come from ingredient unit costs. */}
             {canViewIngredientCosts && (
               <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 lg:min-h-0 lg:overflow-y-auto">
-                <h3 className="text-lg font-bold text-[#121212] mb-4">Live Cost Summary</h3>
+                <h3 className="text-lg font-bold text-ink mb-4">Live Cost Summary</h3>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between text-gray-600 font-medium">
                     <span>Total Batch Cost</span>
@@ -416,7 +411,7 @@ export default function RecipeEditor({
                 </div>
 
                 <div className="mt-5 pt-5 border-t border-gray-200">
-                  <h4 className="text-sm font-bold text-[#121212] mb-3">
+                  <h4 className="text-sm font-bold text-ink mb-3">
                     Suggested Prices <span className="text-gray-500 font-normal">(customizable margin)</span>
                   </h4>
                   <div className="space-y-3">
@@ -425,10 +420,10 @@ export default function RecipeEditor({
                       return (
                         <div
                           key={idx}
-                          className="flex items-center justify-between gap-3 bg-[#FDF9F3] border border-[#F3B978]/60 rounded-lg px-3 py-2.5"
+                          className="flex items-center justify-between gap-3 bg-cream border border-caramel/60 rounded-lg px-3 py-2.5"
                         >
                           <div>
-                            <p className="text-xs font-bold text-[#562D07]/70 uppercase tracking-wide">
+                            <p className="text-xs font-bold text-espresso/70 uppercase tracking-wide">
                               {TIER_LABELS[idx]}
                             </p>
                             <div className="flex items-center gap-1 mt-1">
@@ -439,12 +434,12 @@ export default function RecipeEditor({
                                 aria-label={`${TIER_LABELS[idx]} margin percent`}
                                 value={margin}
                                 onChange={(e) => updateMarginTier(idx, e.target.value)}
-                                className="w-14 px-1.5 py-1 border border-gray-300 rounded text-xs font-bold text-gray-800 text-right focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
+                                className="w-14 px-1.5 py-1 border border-gray-300 rounded text-xs font-bold text-gray-800 text-right focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none"
                               />
                               <span className="text-xs text-gray-500 font-medium">% margin</span>
                             </div>
                           </div>
-                          <span className="text-lg font-bold text-[var(--color-brand-text)]">{formatMoney(tierPrice)}</span>
+                          <span className="text-lg font-bold text-brand-strong">{formatMoney(tierPrice)}</span>
                         </div>
                       );
                     })}
@@ -454,19 +449,12 @@ export default function RecipeEditor({
             )}
 
             <div className="flex gap-3 lg:shrink-0">
-              <button
-                type="button"
-                onClick={onCancel}
-                className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-colors"
-              >
+              <Button type="button" variant="secondary" size="lg" className="flex-1" onClick={onCancel}>
                 Cancel
-              </button>
-              <button
-                type="submit"
-                className="flex-1 py-3 rounded-xl text-white font-bold bg-[#562D07] hover:bg-[#3a1d04] transition-colors"
-              >
+              </Button>
+              <Button type="submit" size="lg" className="flex-1">
                 Save Recipe
-              </button>
+              </Button>
             </div>
           </div>
         </div>

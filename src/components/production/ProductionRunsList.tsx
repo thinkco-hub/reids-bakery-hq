@@ -4,10 +4,15 @@ import RunDetailModal from "./RunDetailModal";
 import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
 import { useAnnounce } from "../common/Announcer";
 import SearchField from "../common/SearchField";
+import Table, { TableHead } from "../common/Table";
+import EmptyState from "../common/EmptyState";
+import StatCard from "../common/StatCard";
+import Badge from "../common/Badge";
+import Button from "../common/Button";
 import { getRunStatus } from "../../utils/production";
 import {
-  RUN_STATUS_BADGE_CLASSES,
   RUN_STATUS_LABELS,
+  RUN_STATUS_TONES,
 } from "../../utils/status";
 import type {
   CatalogueItem,
@@ -18,11 +23,11 @@ import type {
   ScheduleRunData,
 } from "../../types/domain";
 
-const STAT_CARDS: Array<{ key: "all" | ProductionRunDisposition; label: string; iconBg: string }> = [
-  { key: "all", label: "Total Runs", iconBg: "bg-gray-100 text-gray-500" },
-  { key: "scheduled", label: RUN_STATUS_LABELS.scheduled, iconBg: "bg-blue-50 text-blue-500" },
-  { key: "insufficient", label: RUN_STATUS_LABELS.insufficient, iconBg: "bg-red-50 text-red-500" },
-  { key: "completed", label: RUN_STATUS_LABELS.completed, iconBg: "bg-green-50 text-green-500" },
+const STAT_CARDS: Array<{ key: "all" | ProductionRunDisposition; label: string }> = [
+  { key: "all", label: "Total Runs" },
+  { key: "scheduled", label: RUN_STATUS_LABELS.scheduled },
+  { key: "insufficient", label: RUN_STATUS_LABELS.insufficient },
+  { key: "completed", label: RUN_STATUS_LABELS.completed },
 ];
 
 interface ProductionRunsListProps {
@@ -148,42 +153,33 @@ export default function ProductionRunsList({
 
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-[#121212]">Production Runs</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-ink">Production Runs</h2>
           <p className="text-gray-500 mt-1">Schedule batches and track them against ingredient stock.</p>
         </div>
-        <button
-          onClick={() => setIsScheduling(true)}
-          disabled={catalogue.length === 0}
-          className="px-4 py-2.5 rounded-lg bg-[#562D07] hover:bg-[#3a1d04] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold text-sm shadow-sm transition-colors whitespace-nowrap"
-        >
+        <Button onClick={() => setIsScheduling(true)} disabled={catalogue.length === 0}>
           + Schedule Production Run
-        </button>
+        </Button>
       </header>
 
       {catalogue.length === 0 && (
-        <p className="text-sm text-gray-500 bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
-          No recipes yet — create one under Recipes before scheduling a production run.
-        </p>
+        <div className="bg-white border border-gray-200 rounded-lg mb-6">
+          <EmptyState
+            title="No recipes yet."
+            hint="Create one under Recipes before scheduling a production run."
+          />
+        </div>
       )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
-        {STAT_CARDS.map((card) => {
-          const isActive = statusFilter === card.key;
-          return (
-            <button
-              key={card.key}
-              type="button"
-              onClick={() => setStatusFilter(card.key)}
-              aria-pressed={isActive}
-              className={`text-left bg-white p-4 md:p-5 rounded-2xl border shadow-sm transition-all ${
-                isActive ? "border-[var(--color-brand-text)] ring-2 ring-[var(--color-brand-text)]/30" : "border-gray-100 hover:border-gray-300"
-              }`}
-            >
-              <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">{card.label}</p>
-              <p className="text-xl md:text-2xl font-bold text-[#121212]">{counts[card.key]}</p>
-            </button>
-          );
-        })}
+        {STAT_CARDS.map((card) => (
+          <StatCard
+            key={card.key}
+            label={card.label}
+            value={counts[card.key]}
+            active={statusFilter === card.key}
+            onSelect={() => setStatusFilter(card.key)}
+          />
+        ))}
       </div>
 
       <div className="bg-white border border-gray-200 rounded-lg p-2 mb-6 flex shadow-sm">
@@ -196,66 +192,90 @@ export default function ProductionRunsList({
       </div>
 
       {groupedByDate.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center text-gray-500">
-          No production runs in this view.
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <EmptyState
+            title={search || statusFilter !== "all" ? "No production runs in this view." : "No production runs yet."}
+            hint={
+              search || statusFilter !== "all"
+                ? "Try another recipe name or status."
+                : "Schedule a run to plan a batch against ingredient stock."
+            }
+            action={
+              search || statusFilter !== "all" ? (
+                <Button
+                  size="sm"
+                  variant="ghostBrand"
+                  onClick={() => {
+                    setSearch("");
+                    setStatusFilter("all");
+                  }}
+                >
+                  Clear filters
+                </Button>
+              ) : catalogue.length > 0 ? (
+                <Button size="sm" onClick={() => setIsScheduling(true)}>
+                  + Schedule Production Run
+                </Button>
+              ) : undefined
+            }
+          />
         </div>
       ) : (
         <div className="space-y-6">
           {groupedByDate.map((group, groupIndex) => {
             const groupHeadingId = `${tableHeadingBase}-${groupIndex}`;
             return (
-            <div key={group.date} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="px-5 py-3 border-b border-gray-100 bg-gray-50/50">
-                <h3 id={groupHeadingId} className="text-sm font-bold text-gray-700">{group.date}</h3>
-              </div>
-              <div className="overflow-x-auto w-full" tabIndex={0} role="region" aria-label={`Production runs for ${group.date}`}>
-                <table aria-labelledby={groupHeadingId} className="w-full text-left border-collapse min-w-[720px]">
-                  <thead>
-                    <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-                      <th scope="col" className="px-5 py-4">Recipe</th>
-                      <th scope="col" className="px-5 py-4">Qty</th>
-                      <th scope="col" className="px-5 py-4">Status</th>
-                      <th scope="col" className="px-5 py-4 text-right">Actions</th>
+              <Table
+                key={group.date}
+                label={`Production runs for ${group.date}`}
+                labelledBy={groupHeadingId}
+                minWidth="min-w-[720px]"
+                header={
+                  <div className="px-5 py-3 border-b border-gray-100 bg-gray-50/50">
+                    <h3 id={groupHeadingId} className="text-sm font-bold text-gray-700">{group.date}</h3>
+                  </div>
+                }
+              >
+                <TableHead>
+                  <th scope="col" className="px-5 py-4">Recipe</th>
+                  <th scope="col" className="px-5 py-4">Qty</th>
+                  <th scope="col" className="px-5 py-4">Status</th>
+                  <th scope="col" className="px-5 py-4 text-right">Actions</th>
+                </TableHead>
+                <tbody className="divide-y divide-gray-100 text-sm">
+                  {group.entries.map(({ run, recipe, status }) => (
+                    <tr key={run.id} className="hover:bg-gray-50/50 transition-colors">
+                      <td className="px-5 py-4 font-medium text-gray-900">{recipe ? recipe.name : "—"}</td>
+                      <td className="px-5 py-4 text-gray-600 tabular-nums">
+                        {run.plannedQty} {recipe ? recipe.yieldUnit : ""}
+                      </td>
+                      <td className="px-5 py-4">
+                        <Badge tone={RUN_STATUS_TONES[status]}>{RUN_STATUS_LABELS[status]}</Badge>
+                      </td>
+                      <td className="px-5 py-4 text-right whitespace-nowrap">
+                        <Button
+                          size="sm"
+                          variant="ghostBrand"
+                          onClick={() => setSelectedRunId(run.id)}
+                          aria-label={`${status === "completed" ? "View" : "View / Complete"} ${recipe ? recipe.name : "run"} for ${run.plannedDate}`}
+                        >
+                          {status === "completed" ? "View" : "View / Complete"}
+                        </Button>
+                        {status !== "completed" && (
+                          <Button
+                            size="sm"
+                            variant="ghostDanger"
+                            onClick={() => setPendingDelete(run)}
+                            aria-label={`Delete ${recipe ? recipe.name : "run"} for ${run.plannedDate}`}
+                          >
+                            Delete
+                          </Button>
+                        )}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 text-sm">
-                    {group.entries.map(({ run, recipe, status }) => (
-                      <tr key={run.id} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="px-5 py-4 font-medium text-gray-900">{recipe ? recipe.name : "—"}</td>
-                        <td className="px-5 py-4 text-gray-600">
-                          {run.plannedQty} {recipe ? recipe.yieldUnit : ""}
-                        </td>
-                        <td className="px-5 py-4">
-                          <span
-                            className={`px-3 py-1 rounded-full border text-xs font-bold whitespace-nowrap ${RUN_STATUS_BADGE_CLASSES[status]}`}
-                          >
-                            {RUN_STATUS_LABELS[status]}
-                          </span>
-                        </td>
-                        <td className="px-5 py-4 text-right whitespace-nowrap">
-                          <button
-                            onClick={() => setSelectedRunId(run.id)}
-                            aria-label={`${status === "completed" ? "View" : "View / Complete"} ${recipe ? recipe.name : "run"} for ${run.plannedDate}`}
-                            className="text-gray-500 hover:text-[var(--color-brand-text)] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
-                          >
-                            {status === "completed" ? "View" : "View / Complete"}
-                          </button>
-                          {status !== "completed" && (
-                            <button
-                              onClick={() => setPendingDelete(run)}
-                              aria-label={`Delete ${recipe ? recipe.name : "run"} for ${run.plannedDate}`}
-                              className="text-gray-500 hover:text-red-500 hover:bg-red-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
-                            >
-                              Delete
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+                  ))}
+                </tbody>
+              </Table>
             );
           })}
         </div>

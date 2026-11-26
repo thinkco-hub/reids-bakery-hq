@@ -1,4 +1,5 @@
 import React from "react";
+import { MinusIcon, PlusIcon } from "../icons";
 import { formatMoney } from "../../utils/money";
 import type { CartItem } from "../../types/domain";
 
@@ -22,7 +23,7 @@ export default function TicketLineItem({
     <li className={`group hover:bg-gray-50 ${className}`}>
       <div className="flex justify-between items-start mb-[0.8em]">
         <span className="font-bold text-gray-800">{item.name}</span>
-        <span className="font-bold text-gray-900">
+        <span className="font-bold text-gray-900 tabular-nums">
           {formatMoney(item.price * item.qty)}
         </span>
       </div>
@@ -33,17 +34,9 @@ export default function TicketLineItem({
             aria-label={`Remove one ${item.name}`}
             className="w-[2.9em] h-[2.9em] min-h-[2.75rem] flex items-center justify-center bg-gray-50 hover:bg-gray-200 text-gray-600 transition-colors"
           >
-            <svg
-              className="w-[1.5em] h-[1.5em]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth="2.5"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
-            </svg>
+            <MinusIcon className="w-[1.5em] h-[1.5em]" />
           </button>
-          <span className="w-[2.2em] text-center font-bold text-[#121212]">
+          <span className="w-[2.2em] text-center font-bold text-ink tabular-nums">
             {item.qty}
           </span>
           <button
@@ -51,22 +44,10 @@ export default function TicketLineItem({
             aria-label={`Add one ${item.name}`}
             className="w-[2.9em] h-[2.9em] min-h-[2.75rem] flex items-center justify-center bg-gray-50 hover:bg-gray-200 text-gray-600 transition-colors"
           >
-            <svg
-              className="w-[1.5em] h-[1.5em]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth="2.5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
+            <PlusIcon className="w-[1.5em] h-[1.5em]" />
           </button>
         </div>
-        <span>x {formatMoney(item.price)}</span>
+        <span className="tabular-nums">x {formatMoney(item.price)}</span>
       </div>
     </li>
   );

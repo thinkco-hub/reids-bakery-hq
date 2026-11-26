@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import SelectField from "../common/SelectField";
+import Button from "../common/Button";
 import { useAnnounce } from "../common/Announcer";
 import { formatMonthLabel, monthKey } from "../../utils/dates";
 import type { FormEvent } from "react";
@@ -66,8 +67,8 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
   return (
     <div className="max-w-2xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-[#1B2A4A]">Spoilage / Sold Logging</h2>
-        <p className="text-[#1B2A4A]/70 mt-1 font-medium text-sm md:text-base">
+        <h2 className="text-2xl md:text-3xl font-bold text-chams-navy">Spoilage / Sold Logging</h2>
+        <p className="text-chams-navy/70 mt-1 font-medium text-sm md:text-base">
           Supplier/admin entry — restocked, spoilage and sold quantities per branch, siopao type, and month.
           Restocked here is stock newly delivered this month; last month's remaining is added on top automatically.
         </p>
@@ -87,7 +88,7 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
               id="movement-branch"
               value={branchId}
               onChange={(e) => setBranchId(e.target.value)}
-              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
+              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chams-blue focus:border-chams-blue outline-none text-gray-800"
             >
               {branches.map((b) => (
                 <option key={b.id} value={b.id}>
@@ -102,7 +103,7 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
               id="movement-product"
               value={productId}
               onChange={(e) => setProductId(e.target.value)}
-              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
+              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chams-blue focus:border-chams-blue outline-none text-gray-800"
             >
               {products.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -117,7 +118,7 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
               id="movement-month"
               value={month}
               onChange={(e) => setMonth(e.target.value)}
-              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
+              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chams-blue focus:border-chams-blue outline-none text-gray-800"
             >
               {MONTH_OPTIONS.map((m) => (
                 <option key={m} value={m}>
@@ -139,7 +140,7 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
               step="any"
               defaultValue={existing ? String(existing.restocked) : ""}
               placeholder="0"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chams-blue focus:border-chams-blue outline-none text-gray-800"
             />
           </div>
           <div>
@@ -152,7 +153,7 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
               step="any"
               defaultValue={existing ? String(existing.spoilage) : ""}
               placeholder="0"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chams-blue focus:border-chams-blue outline-none text-gray-800"
             />
           </div>
           <div>
@@ -165,17 +166,14 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
               step="any"
               defaultValue={existing ? String(existing.sold) : ""}
               placeholder="0"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chams-blue focus:border-chams-blue outline-none text-gray-800"
             />
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="w-full sm:w-auto px-6 py-3 rounded-xl text-white font-bold bg-[#1B2A4A] hover:bg-[#12203a] transition-colors"
-        >
+        <Button type="submit" variant="chams" size="lg" className="w-full sm:w-auto">
           Save Movement
-        </button>
+        </Button>
       </form>
     </div>
   );

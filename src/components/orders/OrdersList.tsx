@@ -4,6 +4,11 @@ import OrderStatusBadge from "./OrderStatusBadge";
 import PaymentStatusBadge from "./PaymentStatusBadge";
 import SearchField from "../common/SearchField";
 import SelectField from "../common/SelectField";
+import Table, { TableHead } from "../common/Table";
+import EmptyState from "../common/EmptyState";
+import Button from "../common/Button";
+import Badge from "../common/Badge";
+import { EyeIcon, XIcon } from "../icons";
 import { formatMoney } from "../../utils/money";
 import { computeOrderTotal, getPaymentStatus, hasShortfall, ORDER_STATUSES } from "../../utils/orders";
 import type { Client, MenuItemStock, Order, OrderStatus } from "../../types/domain";
@@ -43,10 +48,28 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
     return b.createdAt.localeCompare(a.createdAt);
   });
 
+  const hasFilters = !!search || statusFilter !== "All" || !!dateFilter;
+  const clearFilters = () => {
+    setSearch("");
+    setStatusFilter("All");
+    setDateFilter("");
+  };
+  const emptyState = (
+    <EmptyState
+      title="No orders match these filters."
+      hint="Try another client, status or date."
+      action={
+        <Button size="sm" variant="ghostBrand" onClick={clearFilters}>
+          Clear filters
+        </Button>
+      }
+    />
+  );
+
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8">
-        <h2 id={headingId} className="text-3xl font-bold text-[#121212]">Orders</h2>
+        <h2 id={headingId} className="text-3xl font-bold text-ink">Orders</h2>
         <p className="text-gray-500 mt-1">Manage all customer orders and production status.</p>
       </header>
 
@@ -60,30 +83,23 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
         <div className="w-full h-px md:w-px md:h-8 bg-gray-200 my-2 md:my-0 block"></div>
         <div className="flex items-center gap-2 w-full md:w-auto px-2">
           <label htmlFor="orders-date-filter" className="text-sm text-gray-500 font-medium whitespace-nowrap">Filter Date:</label>
-          <div className="flex-1 md:flex-none rounded-md focus-within:ring-2 focus-within:ring-[var(--color-brand-text)]">
+          <div className="flex-1 md:flex-none rounded-md focus-within:ring-2 focus-within:ring-brand-strong">
             <input
               id="orders-date-filter"
               type="date"
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
-              className="w-full px-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-600 focus:border-[var(--color-brand-text)] outline-none cursor-pointer"
+              className="w-full px-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-600 focus:border-brand-strong outline-none cursor-pointer"
             />
           </div>
           {dateFilter && (
             <button
               onClick={() => setDateFilter("")}
               aria-label="Clear date filter"
-              className="text-gray-500 hover:text-red-500 p-1 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-text)]"
+              className="text-gray-500 hover:text-red-700 p-1 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-strong"
               title="Clear Date Filter"
             >
-              <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              <XIcon className="w-4 h-4" />
             </button>
           )}
         </div>
@@ -97,7 +113,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
               key={tab}
               onClick={() => setStatusFilter(tab)}
               aria-pressed={statusFilter === tab}
-              className={`px-4 py-1.5 min-h-[2.75rem] rounded border text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-text)] ${
+              className={`px-4 py-1.5 min-h-[2.75rem] rounded border text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-strong ${
                 statusFilter === tab
                   ? "bg-blue-50 border-blue-200 text-blue-700 shadow-sm"
                   : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -120,7 +136,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
             id="orders-sort"
             value={sortKey}
             onChange={(e) => setSortKey(e.target.value as SortKey)}
-            className="pl-3 py-2 border border-gray-200 rounded-lg bg-white text-sm font-medium text-gray-700 focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
+            className="pl-3 py-2 border border-gray-200 rounded-lg bg-white text-sm font-medium text-gray-700 focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none"
           >
             <option value="created">Newest first</option>
             <option value="date">Requested date</option>
@@ -128,28 +144,22 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
           </SelectField>
         </div>
 
-        {/* Desktop table — original structure and styling preserved; hidden only when the table cannot fit the container. */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden @max-[1042px]:hidden">
-        <div className="overflow-x-auto w-full" tabIndex={0} role="region" aria-label="Orders list">
-          <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[1040px]">
-            <thead>
-              <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-                <th scope="col" className="px-6 py-4">Order #</th>
-                <th scope="col" className="px-6 py-4">Client</th>
-                <th scope="col" className="px-6 py-4">Items</th>
-                <th scope="col" className="px-6 py-4">Requested Date</th>
-                <th scope="col" className="px-6 py-4">Status</th>
-                <th scope="col" className="px-6 py-4">Payment</th>
-                <th scope="col" className="px-6 py-4">Total</th>
-                <th scope="col" className="px-4 py-4 text-center">Action</th>
-              </tr>
-            </thead>
+        <div className="@max-[1042px]:hidden">
+          <Table label="Orders list" labelledBy={headingId} minWidth="min-w-[1040px]">
+            <TableHead>
+              <th scope="col" className="px-6 py-4">Order #</th>
+              <th scope="col" className="px-6 py-4">Client</th>
+              <th scope="col" className="px-6 py-4">Items</th>
+              <th scope="col" className="px-6 py-4">Requested Date</th>
+              <th scope="col" className="px-6 py-4">Status</th>
+              <th scope="col" className="px-6 py-4">Payment</th>
+              <th scope="col" className="px-6 py-4 text-right">Total</th>
+              <th scope="col" className="px-4 py-4 text-center">Action</th>
+            </TableHead>
             <tbody className="divide-y divide-gray-200 text-sm">
               {sorted.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
-                    No orders found matching the selected filters.
-                  </td>
+                  <td colSpan={8}>{emptyState}</td>
                 </tr>
               ) : (
                 sorted.map((order) => {
@@ -164,39 +174,26 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
                         <div className="flex items-center gap-2">
                           <OrderStatusBadge status={order.status} />
                           {shortfall && (
-                            <span className="px-2 py-0.5 rounded-full bg-red-50 text-red-700 text-[10px] font-bold whitespace-nowrap">
+                            <Badge family="micro" size="xs" tone="danger">
                               Shortfall
-                            </span>
+                            </Badge>
                           )}
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <PaymentStatusBadge status={getPaymentStatus(order)} />
                       </td>
-                      <td className="px-6 py-4 font-medium text-gray-900">
+                      <td className="px-6 py-4 text-right font-medium text-gray-900 tabular-nums">
                         {formatMoney(computeOrderTotal(order))}
                       </td>
                       <td className="px-4 py-4 text-center">
                         <button
                           onClick={() => onView(order)}
                           aria-label={`View order ${order.id}`}
-                          className="text-gray-500 hover:text-[var(--color-brand-text)] transition-colors p-2 rounded-md hover:bg-orange-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-text)]"
+                          className="text-gray-500 hover:text-brand-strong transition-colors p-2 rounded-md hover:bg-orange-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-strong"
                           title="View Order Details"
                         >
-                          <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                            />
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                            />
-                          </svg>
+                          <EyeIcon className="w-5 h-5" />
                         </button>
                       </td>
                     </tr>
@@ -204,12 +201,18 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
                 })
               )}
             </tbody>
-          </table>
-        </div>
+          </Table>
         </div>
 
         {/* Tablet/mobile (<1042px container): stacked card list with accordion + bottom sheet. */}
-        <OrderCardList orders={sorted} menuInventory={menuInventory} getClientName={clientName} onView={onView} />
+        <OrderCardList
+          orders={sorted}
+          menuInventory={menuInventory}
+          getClientName={clientName}
+          onView={onView}
+          hasFilters={hasFilters}
+          onClearFilters={clearFilters}
+        />
       </div>
     </div>
   );

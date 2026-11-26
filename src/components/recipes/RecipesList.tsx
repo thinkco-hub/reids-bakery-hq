@@ -2,6 +2,10 @@ import React, { useId, useState } from "react";
 import { formatMoney } from "../../utils/money";
 import { computeRecipeCost, suggestedPrice } from "../../utils/pricing";
 import SearchField from "../common/SearchField";
+import Table, { TableHead } from "../common/Table";
+import EmptyState from "../common/EmptyState";
+import Badge from "../common/Badge";
+import Button from "../common/Button";
 import type {
   IngredientStock,
   PricingRuleInput,
@@ -41,24 +45,19 @@ export default function RecipesList({
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
-          <h2 id={headingId} className="text-3xl font-bold text-[#121212]">Recipes / BOM</h2>
+          <h2 id={headingId} className="text-3xl font-bold text-ink">Recipes / BOM</h2>
           <p className="text-gray-500 mt-1">
             {canViewIngredientCosts
               ? "One recipe per menu item, with live cost and suggested pricing."
               : "One recipe per menu item."}
           </p>
         </div>
-        <button
-          onClick={onCreate}
-          className="px-4 py-2.5 rounded-lg bg-[#562D07] hover:bg-[#3a1d04] text-white font-bold text-sm shadow-sm transition-colors whitespace-nowrap"
-        >
-          + New Recipe
-        </button>
+        <Button onClick={onCreate}>+ New Recipe</Button>
       </header>
 
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 mb-6 flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
         <div>
-          <h3 className="font-bold text-[#121212]">Pricing Rule</h3>
+          <h3 className="font-bold text-ink">Pricing Rule</h3>
           <p className="text-sm text-gray-500">Target margin used to compute suggested prices.</p>
         </div>
         <div className="flex items-center gap-2">
@@ -69,7 +68,7 @@ export default function RecipesList({
             aria-label="Target margin percent"
             value={pricingRules.targetMarginPercent}
             onChange={(e) => onEditRule({ targetMarginPercent: e.target.value })}
-            className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 text-right font-bold"
+            className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800 text-right font-bold"
           />
           <span className="text-gray-500 font-medium">% target margin</span>
         </div>
@@ -84,96 +83,101 @@ export default function RecipesList({
         />
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto w-full" tabIndex={0} role="region" aria-label="Recipes list">
-          <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[760px]">
-            <thead>
-              <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-                <th scope="col" className="px-6 py-4">Recipe</th>
-                <th scope="col" className="px-6 py-4">Yield</th>
-                {canViewIngredientCosts && (
-                  <>
-                    <th scope="col" className="px-6 py-4 text-right">COGS / Unit</th>
-                    <th scope="col" className="px-6 py-4 text-right">Suggested Price</th>
-                  </>
-                )}
-                <th scope="col" className="px-6 py-4 text-right">Actual Price</th>
-                <th scope="col" className="px-4 py-4 text-center">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 text-sm">
-              {recipes.length === 0 ? (
-                <tr>
-                  <td colSpan={columnCount} className="px-6 py-8 text-center text-gray-500">
-                    No recipes yet. Create one to see live COGS and pricing.
+      <Table label="Recipes list" labelledBy={headingId} minWidth="min-w-[760px]">
+        <TableHead>
+          <th scope="col" className="px-6 py-4">Recipe</th>
+          <th scope="col" className="px-6 py-4">Yield</th>
+          {canViewIngredientCosts && (
+            <>
+              <th scope="col" className="px-6 py-4 text-right">COGS / Unit</th>
+              <th scope="col" className="px-6 py-4 text-right">Suggested Price</th>
+            </>
+          )}
+          <th scope="col" className="px-6 py-4 text-right">Actual Price</th>
+          <th scope="col" className="px-4 py-4 text-center">Action</th>
+        </TableHead>
+        <tbody className="divide-y divide-gray-200 text-sm">
+          {recipes.length === 0 ? (
+            <tr>
+              <td colSpan={columnCount}>
+                <EmptyState
+                  title="No recipes yet."
+                  hint="Create one to see live COGS and pricing."
+                  action={<Button size="sm" onClick={onCreate}>+ New Recipe</Button>}
+                />
+              </td>
+            </tr>
+          ) : filtered.length === 0 ? (
+            <tr>
+              <td colSpan={columnCount}>
+                <EmptyState
+                  title="No recipes match your search."
+                  action={
+                    <Button size="sm" variant="ghostBrand" onClick={() => setSearch("")}>
+                      Clear search
+                    </Button>
+                  }
+                />
+              </td>
+            </tr>
+          ) : (
+            filtered.map((recipe) => {
+              const actualPrice = recipe.price;
+              const costPerUnit = canViewIngredientCosts
+                ? computeRecipeCost(recipe, ingredients).costPerUnit
+                : 0;
+              const price = canViewIngredientCosts
+                ? suggestedPrice(costPerUnit, pricingRules.targetMarginPercent)
+                : 0;
+              const delta = actualPrice - price;
+              return (
+                <tr key={recipe.id} className="hover:bg-gray-50/50 transition-colors">
+                  <th scope="row" className="px-6 py-4 text-left font-medium text-gray-900">{recipe.name}</th>
+                  <td className="px-6 py-4 text-gray-600">
+                    {recipe.yieldQty} {recipe.yieldUnit}
                   </td>
-                </tr>
-              ) : filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={columnCount} className="px-6 py-8 text-center text-gray-500">
-                    No recipes match your search.
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((recipe) => {
-                  const actualPrice = recipe.price;
-                  const costPerUnit = canViewIngredientCosts
-                    ? computeRecipeCost(recipe, ingredients).costPerUnit
-                    : 0;
-                  const price = canViewIngredientCosts
-                    ? suggestedPrice(costPerUnit, pricingRules.targetMarginPercent)
-                    : 0;
-                  const delta = actualPrice - price;
-                  return (
-                    <tr key={recipe.id} className="hover:bg-gray-50/50 transition-colors">
-                      <th scope="row" className="px-6 py-4 text-left font-medium text-gray-900">{recipe.name}</th>
-                      <td className="px-6 py-4 text-gray-600">
-                        {recipe.yieldQty} {recipe.yieldUnit}
+                  {canViewIngredientCosts && (
+                    <>
+                      <td className="px-6 py-4 text-right font-medium text-gray-900 tabular-nums">
+                        {formatMoney(costPerUnit)}
                       </td>
+                      <td className="px-6 py-4 text-right font-bold text-brand-strong tabular-nums">
+                        {formatMoney(price)}
+                      </td>
+                    </>
+                  )}
+                  <td className="px-6 py-4 text-right">
+                    <div>
+                      <span className="font-bold text-gray-900 tabular-nums">{formatMoney(actualPrice)}</span>
                       {canViewIngredientCosts && (
-                        <>
-                          <td className="px-6 py-4 text-right font-medium text-gray-900">
-                            {formatMoney(costPerUnit)}
-                          </td>
-                          <td className="px-6 py-4 text-right font-bold text-[var(--color-brand-text)]">
-                            {formatMoney(price)}
-                          </td>
-                        </>
-                      )}
-                      <td className="px-6 py-4 text-right">
-                        <div>
-                          <span className="font-bold text-gray-900">{formatMoney(actualPrice)}</span>
-                          {canViewIngredientCosts && (
-                            <span
-                              className={`ml-2 text-xs font-bold px-1.5 py-0.5 rounded ${
-                                delta >= 0
-                                  ? "bg-green-50 text-green-700"
-                                  : "bg-red-50 text-red-700"
-                              }`}
-                            >
-                              {delta >= 0 ? "+" : ""}
-                              {formatMoney(delta)}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 text-center">
-                        <button
-                          onClick={() => onEdit(recipe)}
-                          aria-label={`Edit ${recipe.name}`}
-                          className="text-gray-500 hover:text-[var(--color-brand-text)] hover:bg-orange-50 font-semibold px-3 py-1.5 rounded-md transition-colors text-sm"
+                        <Badge
+                          family="micro"
+                          tone={delta >= 0 ? "success" : "danger"}
+                          size="xs"
+                          className="ml-2"
                         >
-                          Edit
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                          {delta >= 0 ? "+" : ""}
+                          {formatMoney(delta)}
+                        </Badge>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    <Button
+                      size="sm"
+                      variant="ghostBrand"
+                      onClick={() => onEdit(recipe)}
+                      aria-label={`Edit ${recipe.name}`}
+                    >
+                      Edit
+                    </Button>
+                  </td>
+                </tr>
+              );
+            })
+          )}
+        </tbody>
+      </Table>
     </div>
   );
 }

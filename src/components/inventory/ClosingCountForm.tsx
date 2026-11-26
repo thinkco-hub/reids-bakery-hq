@@ -1,6 +1,9 @@
 import React, { useEffect, useId, useRef, useState } from "react";
 import { useAnnounce } from "../common/Announcer";
+import Button from "../common/Button";
+import { ArrowLeftIcon, BoxIcon, ShoppingCartIcon } from "../icons";
 import { todayISO } from "../../utils/dates";
+import type { ReactNode } from "react";
 import type { FormEvent } from "react";
 import type {
   ClosingCountEntry,
@@ -20,7 +23,7 @@ function CountSection({
   onUpdate,
 }: {
   title: string;
-  icon: string;
+  icon: ReactNode;
   items: (MenuItemStock | IngredientStock)[];
   counts: CountMap;
   onUpdate: (id: string, value: string) => void;
@@ -29,10 +32,10 @@ function CountSection({
   // Phone inputs would sit off-screen inside the 420px table, so phones get a
   // stacked row per item and the table only ships from md up.
   const inputCls =
-    "px-2 py-1.5 border border-gray-300 rounded-md text-right focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800";
+    "px-2 py-1.5 border border-gray-300 rounded-md text-right focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800";
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
-      <h3 id={headingId} className="text-base font-bold text-[#121212] mb-4">
+      <h3 id={headingId} className="text-base font-bold text-ink mb-4">
         {icon} {title}
       </h3>
       <ul className="md:hidden space-y-4">
@@ -157,17 +160,15 @@ export default function ClosingCountForm({ menuInventory, ingredients, onSubmit,
     <div className="max-w-4xl mx-auto animate-fadeIn pb-10 w-full">
       <button
         onClick={onBack}
-        className="inline-flex items-center gap-2 -mt-2 mb-2 py-2 text-sm font-semibold text-[#562D07]/70 hover:text-[#562D07] transition-colors"
+        className="inline-flex items-center gap-2 -mt-2 mb-2 py-2 text-sm font-semibold text-espresso/70 hover:text-espresso transition-colors"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
+        <ArrowLeftIcon className="w-4 h-4" />
         Back to Inventory
       </button>
 
       <header className="mb-6 md:mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-[#562D07]">Closing Inventory Count</h2>
-        <p className="text-[#562D07]/70 mt-1 font-medium text-sm md:text-base">
+        <h2 className="text-2xl md:text-3xl font-bold text-espresso">Closing Inventory Count</h2>
+        <p className="text-espresso/70 mt-1 font-medium text-sm md:text-base">
           End-of-day physical count. Enter what you physically counted;
           system stock is only compared afterward during reconciliation.
         </p>
@@ -188,7 +189,7 @@ export default function ClosingCountForm({ menuInventory, ingredients, onSubmit,
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
               required
             />
           </div>
@@ -196,7 +197,7 @@ export default function ClosingCountForm({ menuInventory, ingredients, onSubmit,
 
         <CountSection
           title="Menu Items"
-          icon="📦"
+          icon={<BoxIcon className="w-5 h-5 text-gray-500" />}
           items={menuInventory}
           counts={menuCounts}
           onUpdate={updateMenuCount}
@@ -206,19 +207,16 @@ export default function ClosingCountForm({ menuInventory, ingredients, onSubmit,
         {ingredients.length > 0 && (
           <CountSection
             title="Raw Materials"
-            icon="🛒"
+            icon={<ShoppingCartIcon className="w-5 h-5 text-gray-500" />}
             items={ingredients}
             counts={ingredientCounts}
             onUpdate={updateIngredientCount}
           />
         )}
 
-        <button
-          type="submit"
-          className="w-full sm:w-auto px-6 py-3 rounded-xl text-white font-bold bg-[#562D07] hover:bg-[#3a1d04] transition-colors"
-        >
+        <Button type="submit" size="lg" className="w-full sm:w-auto">
           Submit Closing Count
-        </button>
+        </Button>
       </form>
     </div>
   );

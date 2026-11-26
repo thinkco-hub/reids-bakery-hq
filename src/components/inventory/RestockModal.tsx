@@ -1,6 +1,7 @@
 import React, { useId } from "react";
 import type { FormEvent } from "react";
 import Modal from "../common/Modal";
+import Button from "../common/Button";
 import SelectField from "../common/SelectField";
 import type { RestockModalState, StockItem } from "../../types/domain";
 
@@ -42,7 +43,7 @@ export default function RestockModal({
       className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm max-h-[90dvh] overflow-y-auto overscroll-contain animate-fadeIn"
     >
       <form onSubmit={handleSubmit}>
-        <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-1">
+        <h2 id={headingId} className="text-2xl font-bold text-ink mb-1">
           Restock{" "}
           {modal.category === "menu" ? "Menu Item" : "Ingredient"}
         </h2>
@@ -57,7 +58,7 @@ export default function RestockModal({
             </label>
             <SelectField
               id={itemFieldId}
-              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
               value={modal.selectedItemId}
               onChange={(e) => onItemChange(e.target.value)}
             >
@@ -80,7 +81,7 @@ export default function RestockModal({
               placeholder="Enter amount..."
               value={modal.amountToAdd}
               onChange={(e) => onAmountChange(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
             />
           </div>
 
@@ -89,14 +90,14 @@ export default function RestockModal({
             <button
               type="button"
               onClick={() => onQuickAdd(5)}
-              className="flex-1 py-2 bg-orange-50 text-[var(--color-brand-text)] font-bold rounded-lg border border-orange-200 hover:bg-orange-100 transition-colors"
+              className="flex-1 py-2 bg-orange-50 text-brand-strong font-bold rounded-lg border border-orange-200 hover:bg-orange-100 transition-colors"
             >
               + 5
             </button>
             <button
               type="button"
               onClick={() => onQuickAdd(10)}
-              className="flex-1 py-2 bg-orange-50 text-[var(--color-brand-text)] font-bold rounded-lg border border-orange-200 hover:bg-orange-100 transition-colors"
+              className="flex-1 py-2 bg-orange-50 text-brand-strong font-bold rounded-lg border border-orange-200 hover:bg-orange-100 transition-colors"
             >
               + 10
             </button>
@@ -104,24 +105,12 @@ export default function RestockModal({
         </div>
 
         <div className="flex gap-3 mt-8">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-colors"
-          >
+          <Button type="button" variant="secondary" size="lg" className="flex-1" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={disabled}
-            className={`flex-1 py-3 rounded-xl text-white font-bold transition-colors ${
-              disabled
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-[#562D07] hover:bg-[#3a1d04]"
-            }`}
-          >
+          </Button>
+          <Button type="submit" size="lg" className="flex-1" disabled={disabled}>
             Confirm Restock
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>

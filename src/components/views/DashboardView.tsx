@@ -1,7 +1,16 @@
 import React from "react";
 import { Link } from "react-router";
 import OrderStatusBadge from "../orders/OrderStatusBadge";
-import { CalendarIcon } from "../icons";
+import StatCard from "../common/StatCard";
+import EmptyState from "../common/EmptyState";
+import {
+  AlertTriangleIcon,
+  CalendarIcon,
+  CheckCircleIcon,
+  CheckIcon,
+  ClockIcon,
+  MoneyIcon,
+} from "../icons";
 import { orderPath } from "../../routes";
 import { addDaysISO, formatDate, toISODate } from "../../utils/dates";
 import { formatMoney } from "../../utils/money";
@@ -55,39 +64,28 @@ export default function DashboardView({
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-[#121212]">Dashboard</h2>
+          <h2 className="text-3xl font-bold text-ink">Dashboard</h2>
           <p className="text-gray-500 mt-1">
             Overview of your bakery operations today.
           </p>
         </div>
         <div className="self-center md:self-auto bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm flex items-center text-sm font-medium text-gray-600">
-          <CalendarIcon className="w-4 h-4 mr-2 text-[var(--color-brand-text)]" />
+          <CalendarIcon className="w-4 h-4 mr-2 text-brand-strong" />
           {todayLabel}
         </div>
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-        <div className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100">
-          <div className="flex justify-between items-start mb-4">
-            <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            {revenueChangePercent !== null && (
+        <StatCard
+          label="Today's Revenue"
+          value={formatMoney(todayRevenue)}
+          icon={<MoneyIcon className="w-6 h-6" />}
+          iconClassName="bg-orange-50 text-brand-strong"
+          flag={
+            revenueChangePercent !== null ? (
               <span
                 title="Versus yesterday"
-                className={`text-xs font-bold px-2 py-1 rounded-full ${
+                className={`text-xs font-bold px-2 py-1 rounded-full tabular-nums ${
                   revenueChangePercent >= 0
                     ? "text-green-700 bg-green-50"
                     : "text-red-700 bg-red-50"
@@ -96,106 +94,45 @@ export default function DashboardView({
                 {revenueChangePercent >= 0 ? "+" : ""}
                 {revenueChangePercent.toFixed(1)}%
               </span>
-            )}
-          </div>
-          <h3 className="text-gray-500 text-sm font-medium mb-1">
-            Today's Revenue
-          </h3>
-          <p className="text-2xl font-bold text-[#121212] tabular-nums">
-            {formatMoney(todayRevenue)}
-          </p>
-        </div>
-        <div className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100">
-          <div className="flex justify-between items-start mb-4">
-            <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-          </div>
-          <h3 className="text-gray-500 text-sm font-medium mb-1">
-            Pending Orders
-          </h3>
-          <p className="text-2xl font-bold text-[#121212] tabular-nums">
-            {pendingOrdersCount}
-          </p>
-        </div>
-        <div className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100">
-          <div className="flex justify-between items-start mb-4">
-            <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-500">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
-            </div>
-            {lowStockAlerts.length > 0 && (
+            ) : undefined
+          }
+        />
+        <StatCard
+          label="Pending Orders"
+          value={pendingOrdersCount}
+          icon={<ClockIcon className="w-6 h-6" />}
+          iconClassName="bg-blue-50 text-blue-700"
+        />
+        <StatCard
+          label="Low Stock Alerts"
+          value={lowStockAlerts.length}
+          icon={<AlertTriangleIcon className="w-6 h-6" />}
+          iconClassName="bg-red-50 text-red-700"
+          flag={
+            lowStockAlerts.length > 0 ? (
               <span className="text-red-700 text-xs font-bold bg-red-50 px-2 py-1 rounded-full">
                 Action Req
               </span>
-            )}
-          </div>
-          <h3 className="text-gray-500 text-sm font-medium mb-1">
-            Low Stock Alerts
-          </h3>
-          <p className="text-2xl font-bold text-[#121212] tabular-nums">
-            {lowStockAlerts.length}
-          </p>
-        </div>
-        <div className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100">
-          <div className="flex justify-between items-start mb-4">
-            <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-500">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </div>
-          </div>
-          <h3 className="text-gray-500 text-sm font-medium mb-1">
-            Ready for Dispatch
-          </h3>
-          <p className="text-2xl font-bold text-[#121212] tabular-nums">
-            {readyOrdersCount}
-          </p>
-        </div>
+            ) : undefined
+          }
+        />
+        <StatCard
+          label="Ready for Dispatch"
+          value={readyOrdersCount}
+          icon={<CheckIcon className="w-6 h-6" />}
+          iconClassName="bg-green-50 text-green-700"
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
           <div className="p-5 border-b border-gray-100 flex justify-between items-center">
-            <h3 id={recentOrdersHeadingId} className="text-lg font-bold text-[#121212]">
+            <h3 id={recentOrdersHeadingId} className="text-lg font-bold text-ink">
               Recent Orders
             </h3>
             <button
               onClick={() => onNavClick("orders")}
-              className="-my-2 py-2 text-sm text-[var(--color-brand-text)] font-medium hover:underline"
+              className="-my-2 py-2 text-sm text-brand-strong font-medium hover:underline"
             >
               View All
             </button>
@@ -208,7 +145,7 @@ export default function DashboardView({
           >
             <table aria-labelledby={recentOrdersHeadingId} className="w-full text-left border-collapse min-w-[500px]">
               <thead>
-                <tr className="bg-gray-50/50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <tr className="bg-gray-50/50 text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   <th scope="col" className="px-5 py-3">Order #</th>
                   <th scope="col" className="px-5 py-3">Client</th>
                   <th scope="col" className="px-5 py-3">Status</th>
@@ -221,7 +158,7 @@ export default function DashboardView({
                     <th scope="row" className="px-5 py-4 text-left font-medium text-gray-900">
                       <Link
                         to={orderPath(order.id)}
-                        className="rounded hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-text)]"
+                        className="rounded hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-strong"
                       >
                         {order.id}
                       </Link>
@@ -244,9 +181,9 @@ export default function DashboardView({
 
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
           <div className="p-5 border-b border-gray-100 flex justify-between items-center">
-            <h3 className="text-lg font-bold text-[#121212] flex items-center">
+            <h3 className="text-lg font-bold text-ink flex items-center">
               Inventory Alerts
-              <span className="ml-2 bg-red-100 text-red-700 py-0.5 px-2 rounded-full text-xs">
+              <span className="ml-2 bg-red-100 text-red-700 py-0.5 px-2 rounded-full text-xs tabular-nums">
                 {lowStockAlerts.length}
               </span>
             </h3>
@@ -258,24 +195,11 @@ export default function DashboardView({
             aria-label="Inventory alerts"
           >
             {lowStockAlerts.length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-10 text-gray-500">
-                <svg
-                  className="w-12 h-12 mb-3 text-green-200"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <p className="font-medium">
-                  All stock levels are optimal.
-                </p>
-              </div>
+              <EmptyState
+                icon={<CheckCircleIcon className="h-6 w-6 text-green-700" />}
+                title="All stock levels are optimal."
+                hint="Items below their reorder threshold will appear here."
+              />
             ) : (
               <ul className="divide-y divide-gray-100">
                 {lowStockAlerts.map((item) => (

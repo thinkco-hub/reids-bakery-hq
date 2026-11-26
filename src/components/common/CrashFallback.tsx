@@ -17,9 +17,9 @@ export default function CrashFallback() {
     error instanceof Error ? error.message : typeof error === "string" ? error : "";
 
   return (
-    <main className="fixed inset-0 flex items-center justify-center bg-[#FDF9F3] px-4">
+    <main className="fixed inset-0 flex items-center justify-center bg-cream px-4">
       <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm animate-fadeIn">
-        <h1 className="text-2xl font-bold text-[#121212] mb-1">Something went wrong</h1>
+        <h1 className="text-2xl font-bold text-ink mb-1">Something went wrong</h1>
         <p className="text-gray-500 text-sm mb-6">
           This screen stopped responding. Sign in again to carry on — nothing from
           this session is kept.
@@ -27,7 +27,7 @@ export default function CrashFallback() {
 
         <Link
           to={PATH_BY_TAB[DEFAULT_TAB]}
-          className="block w-full text-center py-3 rounded-xl text-white font-bold bg-[#562D07] hover:bg-[#3a1d04] transition-colors"
+          className="block w-full text-center py-3 rounded-xl text-white font-bold bg-espresso hover:bg-espresso-deep transition-colors"
         >
           Back to sign in
         </Link>

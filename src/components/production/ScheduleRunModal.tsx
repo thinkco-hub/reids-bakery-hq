@@ -1,5 +1,6 @@
 import React, { useId, useState } from "react";
 import Modal from "../common/Modal";
+import Button from "../common/Button";
 import { todayISO } from "../../utils/dates";
 import { computeBatches } from "../../utils/production";
 import type { FormEvent } from "react";
@@ -7,7 +8,7 @@ import type { Recipe, ScheduleRunData } from "../../types/domain";
 import SelectField from "../common/SelectField";
 
 const SELECT_BASE =
-  "rounded-lg border border-gray-300 py-2.5 text-gray-800 outline-none focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)]";
+  "rounded-lg border border-gray-300 py-2.5 text-gray-800 outline-none focus:ring-2 focus:ring-brand-strong focus:border-brand-strong";
 
 interface ScheduleRunModalProps {
   recipes: Recipe[];
@@ -55,7 +56,7 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
     >
       <form onSubmit={handleSubmit} className="flex-1 min-h-0 flex flex-col">
         <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-6 md:p-8">
-          <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-1">Schedule Production Run</h2>
+          <h2 id={headingId} className="text-2xl font-bold text-ink mb-1">Schedule Production Run</h2>
           <p className="text-gray-500 text-sm mb-6">Plan a batch run for a recipe.</p>
 
           <div className="space-y-4">
@@ -85,7 +86,7 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
                   step={isBatchMode ? "1" : "any"}
                   value={form.qty}
                   onChange={(e) => setForm({ ...form, qty: e.target.value })}
-                  className="min-w-0 flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                  className="min-w-0 flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                   required
                 />
                 <SelectField
@@ -114,7 +115,7 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
                 type="date"
                 value={form.plannedDate}
                 onChange={(e) => setForm({ ...form, plannedDate: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                 required
               />
             </div>
@@ -125,7 +126,7 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
                 rows={2}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                 placeholder="Optional..."
               />
             </div>
@@ -133,20 +134,12 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
         </div>
 
         <div className="shrink-0 flex flex-wrap gap-3 border-t border-gray-100 px-6 md:px-8 py-4 md:py-6">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 min-h-[2.75rem] px-4 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold whitespace-nowrap hover:bg-gray-100 transition-colors"
-          >
+          <Button type="button" variant="secondary" size="lg" className="flex-1" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={recipes.length === 0}
-            className="flex-1 min-h-[2.75rem] px-4 py-3 rounded-xl text-white font-bold whitespace-nowrap bg-[#562D07] hover:bg-[#3a1d04] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-          >
+          </Button>
+          <Button type="submit" size="lg" className="flex-1" disabled={recipes.length === 0}>
             Schedule Run
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>

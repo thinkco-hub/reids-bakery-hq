@@ -127,7 +127,7 @@ export const initialCatalogue: CatalogueItem[] = [
     qty: 0,
     target: 0,
     shelfLife: "",
-    color: "bg-[#562D07]",
+    color: "bg-espresso",
     trackedStock: false,
     ingredients: [],
   },

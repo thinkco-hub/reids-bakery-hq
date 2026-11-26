@@ -1,6 +1,13 @@
 import React, { useId, useMemo, useState } from "react";
+import Table, { TableHead } from "../common/Table";
+import EmptyState from "../common/EmptyState";
+import StatCard from "../common/StatCard";
+import Badge from "../common/Badge";
+import Button from "../common/Button";
+import { DownloadIcon } from "../icons";
 import { downloadCSV } from "../../utils/sales";
 import { discrepancyLabel } from "../../utils/counts";
+import { TONE_TEXT, type StatusTone } from "../../utils/status";
 import {
   todayISO,
   getDayRange,
@@ -26,46 +33,19 @@ import type {
 
 const pillCls = (active: boolean) =>
   `px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-    active ? "bg-[#562D07] text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+    active ? "bg-espresso text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
   }`;
-
-const navBtnCls =
-  "px-3 py-1.5 rounded-md border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors";
-
-function StatCard({
-  label,
-  value,
-  accent,
-  sub,
-}: {
-  label: string;
-  value: string | number;
-  accent?: string;
-  sub?: string;
-}) {
-  return (
-    <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
-      <p className="text-gray-500 text-xs md:text-sm font-medium mb-1">{label}</p>
-      <p className={`text-xl md:text-2xl font-bold tabular-nums ${accent || "text-[#121212]"}`}>{value}</p>
-      {sub && <p className="text-xs text-gray-500 mt-1">{sub}</p>}
-    </div>
-  );
-}
 
 function DiscrepancyBadge({ row }: { row: ClosingInventoryRow }) {
   if (!row.periodCountCount) {
     return <span className="text-gray-500">—</span>;
   }
-  const cls =
-    row.discrepancyQty === 0
-      ? "bg-green-50 text-green-700"
-      : row.discrepancyQty > 0
-      ? "bg-amber-50 text-amber-700"
-      : "bg-red-50 text-red-700";
+  const tone: StatusTone =
+    row.discrepancyQty === 0 ? "success" : row.discrepancyQty > 0 ? "warning" : "danger";
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${cls}`}>
+    <Badge family="stock" tone={tone}>
       {discrepancyLabel(row.discrepancyQty)}
-    </span>
+    </Badge>
   );
 }
 
@@ -80,69 +60,66 @@ function ClosingSection({
 }) {
   const headingId = useId();
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
-      <div className="p-5 border-b border-gray-100">
-        <h3 id={headingId} className="text-base font-bold text-[#121212]">
-          {title}
-        </h3>
-      </div>
-      <div
-        className="overflow-x-auto w-full"
-        tabIndex={0}
-        role="region"
-        aria-label={`${title} closing inventory`}
+    <div className="mb-6">
+      <Table
+        label={`${title} closing inventory`}
+        labelledBy={headingId}
+        minWidth="min-w-[760px]"
+        header={
+          <div className="p-5 border-b border-gray-100">
+            <h3 id={headingId} className="text-base font-bold text-ink">
+              {title}
+            </h3>
+          </div>
+        }
       >
-        <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[760px]">
-          <thead>
-            <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-              <th scope="col" className="px-6 py-3">Item</th>
-              <th scope="col" className="px-6 py-3">Unit</th>
-              <th scope="col" className="px-6 py-3 text-right">System Qty</th>
-              <th scope="col" className="px-6 py-3 text-right">Closing Qty</th>
-              <th scope="col" className="px-6 py-3">Source</th>
-              <th scope="col" className="px-6 py-3 text-right">Unit Value</th>
-              <th scope="col" className="px-6 py-3 text-right">Closing Value</th>
-              <th scope="col" className="px-6 py-3">Count Discrepancy</th>
+        <TableHead>
+          <th scope="col" className="px-6 py-3">Item</th>
+          <th scope="col" className="px-6 py-3">Unit</th>
+          <th scope="col" className="px-6 py-3 text-right">System Qty</th>
+          <th scope="col" className="px-6 py-3 text-right">Closing Qty</th>
+          <th scope="col" className="px-6 py-3">Source</th>
+          <th scope="col" className="px-6 py-3 text-right">Unit Value</th>
+          <th scope="col" className="px-6 py-3 text-right">Closing Value</th>
+          <th scope="col" className="px-6 py-3">Count Discrepancy</th>
+        </TableHead>
+        <tbody className="divide-y divide-gray-200 text-sm">
+          {rows.length === 0 ? (
+            <tr>
+              <td colSpan={8}>
+                <EmptyState title={emptyText} hint="Stock recorded for this period will appear here." />
+              </td>
             </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200 text-sm">
-            {rows.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
-                  {emptyText}
+          ) : (
+            rows.map((row) => (
+              <tr key={row.id} className="hover:bg-gray-50/50">
+                <th scope="row" className="px-6 py-3 text-left font-medium text-gray-900">{row.name}</th>
+                <td className="px-6 py-3 text-gray-500">{row.unit}</td>
+                <td className="px-6 py-3 text-right text-gray-500 tabular-nums">{row.systemQty}</td>
+                <td className="px-6 py-3 text-right font-semibold text-gray-900 tabular-nums">{row.closingQty}</td>
+                <td className="px-6 py-3">
+                  {row.closingSource === "counted" ? (
+                    <Badge family="stock" tone="success" className="whitespace-nowrap">
+                      Counted {row.lastCountDate}
+                    </Badge>
+                  ) : (
+                    <Badge family="stock" tone="neutral">
+                      System
+                    </Badge>
+                  )}
+                </td>
+                <td className="px-6 py-3 text-right text-gray-600 tabular-nums">{formatMoney(row.unitValue)}</td>
+                <td className="px-6 py-3 text-right font-semibold text-gray-900 tabular-nums">
+                  {formatMoney(row.closingValue)}
+                </td>
+                <td className="px-6 py-3">
+                  <DiscrepancyBadge row={row} />
                 </td>
               </tr>
-            ) : (
-              rows.map((row) => (
-                <tr key={row.id} className="hover:bg-gray-50/50">
-                  <th scope="row" className="px-6 py-3 text-left font-medium text-gray-900">{row.name}</th>
-                  <td className="px-6 py-3 text-gray-500">{row.unit}</td>
-                  <td className="px-6 py-3 text-right text-gray-500 tabular-nums">{row.systemQty}</td>
-                  <td className="px-6 py-3 text-right font-semibold text-gray-900 tabular-nums">{row.closingQty}</td>
-                  <td className="px-6 py-3">
-                    {row.closingSource === "counted" ? (
-                      <span className="text-xs font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded-full whitespace-nowrap">
-                        Counted {row.lastCountDate}
-                      </span>
-                    ) : (
-                      <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full">
-                        System
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-3 text-right text-gray-600 tabular-nums">{formatMoney(row.unitValue)}</td>
-                  <td className="px-6 py-3 text-right font-semibold text-gray-900 tabular-nums">
-                    {formatMoney(row.closingValue)}
-                  </td>
-                  <td className="px-6 py-3">
-                    <DiscrepancyBadge row={row} />
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+            ))
+          )}
+        </tbody>
+      </Table>
     </div>
   );
 }
@@ -209,10 +186,10 @@ export default function ClosingInventory({ menuInventory, ingredients, inventory
   const { summary } = result;
   const discrepancyAccent =
     summary.netDiscrepancyQty === 0
-      ? "text-[#121212]"
+      ? "text-ink"
       : summary.netDiscrepancyQty > 0
-      ? "text-amber-600"
-      : "text-red-500";
+      ? TONE_TEXT.warning
+      : TONE_TEXT.danger;
 
   // The count-log summary the Reconciliation screen shows (FR-3.4.7), over the
   // whole log — not scoped to the selected period.
@@ -225,26 +202,19 @@ export default function ClosingInventory({ menuInventory, ingredients, inventory
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-[#121212]">Closing Inventory</h2>
+          <h2 className="text-3xl font-bold text-ink">Closing Inventory</h2>
           <p className="text-gray-500 mt-1">
             Stock on hand and its value as of the close of a day, week or month.
           </p>
         </div>
-        <button
+        <Button
           onClick={handleExport}
           disabled={result.rows.length === 0}
-          className="px-4 py-2.5 rounded-lg bg-[#562D07] hover:bg-[#3a1d04] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold text-sm shadow-sm transition-colors whitespace-nowrap flex items-center gap-2"
+          title={result.rows.length === 0 ? "No stock rows in the selected period" : undefined}
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"
-            />
-          </svg>
+          <DownloadIcon className="w-4 h-4" />
           Export CSV
-        </button>
+        </Button>
       </header>
 
       {/* View toggle + period navigation */}
@@ -259,13 +229,13 @@ export default function ClosingInventory({ menuInventory, ingredients, inventory
           Monthly
         </button>
         <div className="w-px h-6 bg-gray-200 mx-1 hidden sm:block" />
-        <button onClick={goPrev} className={navBtnCls} title="Previous period">
+        <Button variant="secondary" size="sm" onClick={goPrev} title="Previous period">
           ‹ Prev
-        </button>
+        </Button>
         <span className="text-sm font-semibold text-gray-700 px-1 whitespace-nowrap">{periodLabel}</span>
-        <button onClick={goNext} disabled={!canGoNext} className={navBtnCls} title="Next period">
+        <Button variant="secondary" size="sm" onClick={goNext} disabled={!canGoNext} title="Next period">
           Next ›
-        </button>
+        </Button>
       </div>
 
       <div
@@ -276,7 +246,7 @@ export default function ClosingInventory({ menuInventory, ingredients, inventory
         <StatCard
           label="Total Closing Stock Value"
           value={formatMoney(summary.totalValue)}
-          accent="text-[var(--color-brand-text)]"
+          accent="text-brand-strong"
         />
         <StatCard
           label="Menu Items Value"
@@ -302,18 +272,9 @@ export default function ClosingInventory({ menuInventory, ingredients, inventory
 
       {/* The same count-log summary the Reconciliation screen shows (FR-3.4.7). */}
       <div className="grid grid-cols-3 gap-3 md:gap-4 mb-6">
-        <div className="bg-white p-4 md:p-5 rounded-2xl border border-red-100 shadow-sm">
-          <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">Flagged (Pending)</p>
-          <p className="text-xl md:text-2xl font-bold text-red-600 tabular-nums">{flaggedPending.length}</p>
-        </div>
-        <div className="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm">
-          <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">Total Counts Logged</p>
-          <p className="text-xl md:text-2xl font-bold text-[#121212] tabular-nums">{inventoryCounts.length}</p>
-        </div>
-        <div className="bg-white p-4 md:p-5 rounded-2xl border border-green-100 shadow-sm">
-          <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">Resolved</p>
-          <p className="text-xl md:text-2xl font-bold text-green-600 tabular-nums">{resolved.length}</p>
-        </div>
+        <StatCard label="Flagged (Pending)" value={flaggedPending.length} accent={TONE_TEXT.danger} />
+        <StatCard label="Total Counts Logged" value={inventoryCounts.length} />
+        <StatCard label="Resolved" value={resolved.length} accent={TONE_TEXT.success} />
       </div>
 
       <ClosingSection

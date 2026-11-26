@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import SelectField from "../common/SelectField";
+import Button from "../common/Button";
 import { useAnnounce } from "../common/Announcer";
 import { formatMonthLabel, monthKey } from "../../utils/dates";
 import type { FormEvent } from "react";
@@ -58,8 +59,8 @@ export default function BeginningInventoryForm({ branches, products, beginnings,
   return (
     <div className="max-w-2xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-[#1B2A4A]">Beginning Inventory</h2>
-        <p className="text-[#1B2A4A]/70 mt-1 font-medium text-sm md:text-base">
+        <h2 className="text-2xl md:text-3xl font-bold text-chams-navy">Beginning Inventory</h2>
+        <p className="text-chams-navy/70 mt-1 font-medium text-sm md:text-base">
           Set up the opening stock count for a branch, siopao type, and month — used to onboard a new branch/siopao
           type or correct an error. Ongoing months carry stock forward automatically through Restocked.
         </p>
@@ -79,7 +80,7 @@ export default function BeginningInventoryForm({ branches, products, beginnings,
               id="beginning-branch"
               value={branchId}
               onChange={(e) => setBranchId(e.target.value)}
-              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
+              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chams-blue focus:border-chams-blue outline-none text-gray-800"
             >
               {branches.map((b) => (
                 <option key={b.id} value={b.id}>
@@ -94,7 +95,7 @@ export default function BeginningInventoryForm({ branches, products, beginnings,
               id="beginning-product"
               value={productId}
               onChange={(e) => setProductId(e.target.value)}
-              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
+              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chams-blue focus:border-chams-blue outline-none text-gray-800"
             >
               {products.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -109,7 +110,7 @@ export default function BeginningInventoryForm({ branches, products, beginnings,
               id="beginning-month"
               value={month}
               onChange={(e) => setMonth(e.target.value)}
-              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
+              className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chams-blue focus:border-chams-blue outline-none text-gray-800"
             >
               {MONTH_OPTIONS.map((m) => (
                 <option key={m} value={m}>
@@ -130,7 +131,7 @@ export default function BeginningInventoryForm({ branches, products, beginnings,
             min="0"
             step="any"
             defaultValue={existing ? String(existing.openingCount) : "0"}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3B5BA5] focus:border-[#3B5BA5] outline-none text-gray-800"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chams-blue focus:border-chams-blue outline-none text-gray-800"
           />
           <p className="text-xs text-gray-500 mt-1.5">
             {hasExisting
@@ -139,12 +140,9 @@ export default function BeginningInventoryForm({ branches, products, beginnings,
           </p>
         </div>
 
-        <button
-          type="submit"
-          className="w-full sm:w-auto px-6 py-3 rounded-xl text-white font-bold bg-[#1B2A4A] hover:bg-[#12203a] transition-colors"
-        >
+        <Button type="submit" variant="chams" size="lg" className="w-full sm:w-auto">
           Save Beginning Inventory
-        </button>
+        </Button>
       </form>
     </div>
   );

@@ -6,6 +6,7 @@ import RemainingCountForm from "./RemainingCountForm";
 import LedgerHistory from "./LedgerHistory";
 import { useCanUseSidebarRail } from "../../utils/responsive";
 import { useDrawerA11y } from "../../hooks/useDrawerA11y";
+import { ArrowLeftIcon, MenuIcon, XIcon } from "../icons";
 import { monthKey, shiftMonthKey } from "../../utils/dates";
 import type {
   ChamsBeginning,
@@ -252,27 +253,25 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
     <>
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-[#1B2A4A] focus:px-4 focus:py-2 focus:font-bold focus:text-white"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-chams-navy focus:px-4 focus:py-2 focus:font-bold focus:text-white"
       >
         Skip to main content
       </a>
 
       {/* TOP BAR — drawer layouts only (phone and tablet) */}
       {!isDesktopRail && (
-        <div className="bg-[#1B2A4A] text-[#EAF0FB] p-4 flex justify-between items-center shadow-md z-30 w-full">
+        <div className="bg-chams-navy text-chams-blue-wash p-4 flex justify-between items-center shadow-md z-30 w-full">
           <button
             ref={navTriggerRef}
             onClick={() => setIsSidebarOpen(true)}
             aria-label="Open navigation"
-            className="p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2A4A] bg-[#3B5BA5]/20 rounded-md"
+            className="p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-chams-navy bg-chams-blue/20 rounded-md"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            <MenuIcon className="w-6 h-6" />
           </button>
           <button onClick={onSwitchView} className="flex items-center" title="Switch to Reid's Bakery HQ">
             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2 p-1">
-              <span className="text-[#1B2A4A] font-bold text-xs">CH</span>
+              <span className="text-chams-navy font-bold text-xs">CH</span>
             </div>
             <span className="text-lg font-bold">Chams Ledger</span>
           </button>
@@ -334,11 +333,11 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
             ? `absolute ${railExpanded ? "w-72" : "w-20"}`
             : `fixed w-72 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`
         }
-        bg-[#1B2A4A] text-[#EAF0FB]
+        bg-chams-navy text-chams-blue-wash
       `}
       >
         <div
-          className={`p-5 border-b border-[#3B5BA5]/20 flex justify-between items-center whitespace-nowrap ${
+          className={`p-5 border-b border-chams-blue/20 flex justify-between items-center whitespace-nowrap ${
             isDesktopRail ? "h-[76px]" : ""
           }`}
         >
@@ -348,7 +347,7 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
             title="Switch to Reid's Bakery HQ"
           >
             <div className="w-10 h-10 bg-white rounded-full flex flex-shrink-0 items-center justify-center mr-4 p-1 shadow-inner">
-              <span className="text-[#1B2A4A] font-bold text-xs text-center leading-tight">
+              <span className="text-chams-navy font-bold text-xs text-center leading-tight">
                 CH
                 <br />
                 <span className="text-[6px]">CHAMS</span>
@@ -365,11 +364,9 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
               ref={closeRef}
               onClick={() => setIsSidebarOpen(false)}
               aria-label="Close navigation"
-              className="p-1 text-[#EAF0FB]/60 hover:text-white"
+              className="p-1 text-chams-blue-wash/60 hover:text-white"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <XIcon className="w-6 h-6" />
             </button>
           )}
         </div>
@@ -381,8 +378,8 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
               onClick={() => handleNavClick(item.key)}
               className={`w-full flex items-center p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
                 activeChamsTab === item.key
-                  ? "bg-[#3B5BA5]/20 text-white shadow-md border-l-4 border-[#5B84D6]"
-                  : "text-[#EAF0FB]/60 hover:bg-[#3B5BA5]/10 hover:text-white border-l-4 border-transparent"
+                  ? "bg-chams-blue/20 text-white shadow-md border-l-4 border-chams-blue-soft"
+                  : "text-chams-blue-wash/60 hover:bg-chams-blue/10 hover:text-white border-l-4 border-transparent"
               }`}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
@@ -399,15 +396,13 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
           ))}
         </nav>
 
-        <div className="p-3 border-t border-[#3B5BA5]/20">
+        <div className="p-3 border-t border-chams-blue/20">
           <button
             onClick={onSwitchView}
-            className="w-full flex items-center p-3 rounded-lg font-bold text-[#EAF0FB]/60 hover:bg-[#3B5BA5]/10 hover:text-white transition-colors whitespace-nowrap overflow-hidden"
+            className="w-full flex items-center p-3 rounded-lg font-bold text-chams-blue-wash/60 hover:bg-chams-blue/10 hover:text-white transition-colors whitespace-nowrap overflow-hidden"
           >
             <div className="flex items-center justify-center w-8 flex-shrink-0">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
+              <ArrowLeftIcon className="w-6 h-6" />
             </div>
             <span className={`ml-3 truncate ${sidebarLabelCls} transition-opacity duration-300`}>
               Back to Bakery HQ

@@ -1,6 +1,7 @@
 import React, { useId, useState } from "react";
 import type { FormEvent } from "react";
 import Modal from "../common/Modal";
+import Button from "../common/Button";
 import { toContactDigits } from "../../utils/orders";
 import type { Client, ClientFormData } from "../../types/domain";
 
@@ -39,7 +40,7 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
       className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md max-h-[85dvh] overflow-y-auto overscroll-contain animate-fadeIn"
     >
       <form onSubmit={handleSubmit}>
-        <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-6">
+        <h2 id={headingId} className="text-2xl font-bold text-ink mb-6">
           {initial ? "Edit Client" : "Add Client"}
         </h2>
 
@@ -51,7 +52,7 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
               type="text"
               value={form.name}
               onChange={(e) => update("name", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
               required
             />
           </div>
@@ -65,7 +66,7 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
                 placeholder="09XXXXXXXXX"
                 value={form.contact}
                 onChange={(e) => update("contact", toContactDigits(e.target.value))}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
               />
             </div>
             <div>
@@ -75,7 +76,7 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
                 type="email"
                 value={form.email}
                 onChange={(e) => update("email", e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
               />
             </div>
           </div>
@@ -86,7 +87,7 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
               type="text"
               value={form.address}
               onChange={(e) => update("address", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
             />
           </div>
           <div>
@@ -99,25 +100,18 @@ export default function ClientFormModal({ initial, onClose, onSave }: ClientForm
               onChange={(e) => update("standingOrder", e.target.value)}
               rows={3}
               placeholder="e.g. 20 Butter Croissants every Monday"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
             />
           </div>
         </div>
 
         <div className="flex gap-3 mt-8">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-colors"
-          >
+          <Button type="button" variant="secondary" size="lg" className="flex-1" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            className="flex-1 py-3 rounded-xl text-white font-bold bg-[#562D07] hover:bg-[#3a1d04] transition-colors"
-          >
+          </Button>
+          <Button type="submit" size="lg" className="flex-1">
             Save Client
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>

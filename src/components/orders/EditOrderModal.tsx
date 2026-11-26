@@ -2,6 +2,8 @@ import React, { useId, useState } from "react";
 import Modal from "../common/Modal";
 import EditHistoryList from "../common/EditHistoryList";
 import SelectField from "../common/SelectField";
+import Button from "../common/Button";
+import { XIcon } from "../icons";
 import type { FormEvent } from "react";
 import { formatMoney } from "../../utils/money";
 import { isValidCustomerContact, toContactDigits } from "../../utils/orders";
@@ -84,7 +86,7 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
       className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-lg animate-fadeIn max-h-[90dvh] overflow-y-auto overscroll-contain"
     >
       <form onSubmit={handleSubmit}>
-        <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-6">Edit Order {order.id}</h2>
+        <h2 id={headingId} className="text-2xl font-bold text-ink mb-6">Edit Order {order.id}</h2>
 
         <div className="space-y-4">
           {isClientOrder && (
@@ -101,7 +103,7 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
                 value={isClientOrder ? client?.name || "—" : customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 disabled={isClientOrder}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 disabled:bg-gray-100 disabled:text-gray-500"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800 disabled:bg-gray-100 disabled:text-gray-500"
                 required={!isClientOrder}
               />
             </div>
@@ -114,7 +116,7 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
                 onChange={(e) => setCustomerContact(toContactDigits(e.target.value))}
                 disabled={isClientOrder}
                 placeholder="11-digit mobile number"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 disabled:bg-gray-100 disabled:text-gray-500"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800 disabled:bg-gray-100 disabled:text-gray-500"
               />
               {!isClientOrder && customerContact.length > 0 && !contactOk && (
                 <p className="text-xs text-gray-500 mt-1">Enter the full 11-digit number.</p>
@@ -128,7 +130,7 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
               <button
                 type="button"
                 onClick={addLine}
-                className="text-sm font-bold text-[var(--color-brand-text)] hover:underline"
+                className="text-sm font-bold text-brand-strong hover:underline"
               >
                 + Add Item
               </button>
@@ -141,7 +143,7 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
                     onChange={(e) => changeItem(idx, e.target.value)}
                     aria-label={`Item ${idx + 1}`}
                     wrapperClassName="flex-1"
-                    className="w-full pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 text-sm"
+                    className="w-full pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800 text-sm"
                   >
                     <option value="">Select item...</option>
                     {!menuInventory.some((m) => m.id === line.menuItemId) && line.menuItemId && (
@@ -160,7 +162,7 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
                     aria-label={`Quantity for item ${idx + 1}`}
                     value={line.qty}
                     onChange={(e) => updateLine(idx, { qty: e.target.value })}
-                    className="w-20 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 text-sm"
+                    className="w-20 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800 text-sm"
                   />
                   <button
                     type="button"
@@ -168,9 +170,7 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
                     aria-label={`Remove item ${idx + 1}`}
                     className="text-gray-500 hover:text-red-500 p-1.5 transition-colors"
                   >
-                    <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <XIcon className="w-4 h-4" />
                   </button>
                 </div>
               ))}
@@ -186,20 +186,12 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
         </div>
 
         <div className="flex gap-3 mt-8">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-colors"
-          >
+          <Button type="button" variant="secondary" size="lg" className="flex-1" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={!canSave}
-            className="flex-1 py-3 rounded-xl text-white font-bold bg-[#562D07] hover:bg-[#3a1d04] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-          >
+          </Button>
+          <Button type="submit" size="lg" className="flex-1" disabled={!canSave}>
             Save Changes
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>

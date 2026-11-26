@@ -1,6 +1,8 @@
 import React, { useId } from "react";
 import type { FormEvent } from "react";
 import Modal from "../common/Modal";
+import Button from "../common/Button";
+import { ClipboardListIcon } from "../icons";
 import { TicketCustomerFields } from "./TicketCustomerInput";
 import { addDaysISO } from "../../utils/dates";
 import { formatMoney } from "../../utils/money";
@@ -86,22 +88,10 @@ export default function OrderConfirmationModal({
     >
       <form onSubmit={handleSubmit}>
       <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center text-white bg-[var(--color-brand-strong)]">
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-              />
-            </svg>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-white bg-brand-strong">
+            <ClipboardListIcon className="w-5 h-5" />
           </div>
-          <h2 id={headingId} className="text-2xl font-bold text-[#121212]">
+          <h2 id={headingId} className="text-2xl font-bold text-ink">
             Confirm Order
           </h2>
         </div>
@@ -120,7 +110,7 @@ export default function OrderConfirmationModal({
                   <span className="text-gray-500 mr-2">{item.qty}x</span>{" "}
                   {item.name}
                 </span>
-                <span className="font-bold text-gray-900">
+                <span className="font-bold text-gray-900 tabular-nums">
                   {formatMoney(item.price * item.qty)}
                 </span>
               </li>
@@ -128,9 +118,9 @@ export default function OrderConfirmationModal({
           </ul>
         </div>
 
-        <div className="flex justify-between items-center mb-6 text-xl font-bold text-[#121212] px-2">
+        <div className="flex justify-between items-center mb-6 text-xl font-bold text-ink px-2">
           <span>Total to Charge:</span>
-          <span className="text-[var(--color-brand-text)]">{formatMoney(cartTotal)}</span>
+          <span className="text-brand-strong tabular-nums">{formatMoney(cartTotal)}</span>
         </div>
 
         <div className="mb-6">
@@ -155,7 +145,7 @@ export default function OrderConfirmationModal({
                 }
                 className={`py-2.5 rounded-lg border text-sm font-semibold transition-colors ${
                   modal.saleType === type
-                    ? "border-[var(--color-brand-text)] bg-orange-50 text-[var(--color-brand-text)]"
+                    ? "border-brand-strong bg-orange-50 text-brand-strong"
                     : "border-gray-300 text-gray-700 hover:bg-gray-50"
                 }`}
               >
@@ -185,7 +175,7 @@ export default function OrderConfirmationModal({
               min={tomorrowISO}
               value={modal.deliveryDate}
               onChange={(e) => onFieldChange("deliveryDate", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
             />
             {modal.deliveryDate && modal.deliveryDate <= todayISO ? (
               <p role="alert" className="text-xs font-semibold text-red-700 mt-1.5">
@@ -227,7 +217,7 @@ export default function OrderConfirmationModal({
                 }
                 className={`py-2.5 rounded-lg border text-sm font-semibold transition-colors ${
                   modal.paymentMethod === method
-                    ? "border-[var(--color-brand-text)] bg-orange-50 text-[var(--color-brand-text)]"
+                    ? "border-brand-strong bg-orange-50 text-brand-strong"
                     : "border-gray-300 text-gray-700 hover:bg-gray-50"
                 }`}
               >
@@ -247,29 +237,17 @@ export default function OrderConfirmationModal({
             placeholder="Special instructions, allergies, packaging..."
             value={modal.notes}
             onChange={(e) => onFieldChange("notes", e.target.value)}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 resize-none"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800 resize-none"
           />
         </div>
 
         <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-colors"
-          >
+          <Button type="button" variant="secondary" size="lg" className="flex-1" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={disabled}
-            className={`flex-1 py-3 rounded-xl text-white font-bold transition-colors ${
-              disabled
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-[var(--color-brand-strong)] hover:bg-[var(--color-brand-strong-hover)]"
-            }`}
-          >
+          </Button>
+          <Button type="submit" variant="cta" size="lg" className="flex-1" disabled={disabled}>
             Confirm Order
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>

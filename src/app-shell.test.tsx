@@ -485,7 +485,7 @@ describe("order detail routes", () => {
 });
 
 /** The active half of Sidebar's `itemCls`, which NavLink picks per route. */
-const ACTIVE_ITEM = "bg-[#F3B978]/20";
+const ACTIVE_ITEM = "bg-caramel/20";
 
 /** The record panel's own breadcrumb, which sits beside other buttons of its name. */
 const panelBack = (label: string) =>

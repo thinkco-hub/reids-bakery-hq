@@ -1,6 +1,8 @@
 import React, { useId } from "react";
 import { Link } from "react-router";
 import OrderStatusBadge from "../orders/OrderStatusBadge";
+import Table, { TableHead } from "../common/Table";
+import EmptyState from "../common/EmptyState";
 import { formatMoney } from "../../utils/money";
 import { computeOrderTotal } from "../../utils/orders";
 import { orderPath } from "../../routes";
@@ -25,23 +27,23 @@ export default function ClientDetail({ client, orders, onBack }: ClientDetailPro
           <li>
             <button
               onClick={onBack}
-              className="-my-2 py-2 hover:text-[var(--color-brand-text)] transition-colors"
+              className="-my-2 py-2 hover:text-brand-strong transition-colors"
             >
               Clients
             </button>
           </li>
           <li aria-hidden="true" className="mx-2 text-gray-500">&gt;</li>
-          <li aria-current="page" className="text-[#121212] font-bold">{client.name}</li>
+          <li aria-current="page" className="text-ink font-bold">{client.name}</li>
         </ol>
       </nav>
 
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-full bg-[#ffb74d] text-[#562D07] flex items-center justify-center font-bold text-xl flex-shrink-0">
+          <div className="w-14 h-14 rounded-full bg-amber-disc text-espresso flex items-center justify-center font-bold text-xl flex-shrink-0">
             {client.name.charAt(0).toUpperCase()}
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-[#121212]">{client.name}</h2>
+            <h2 className="text-2xl font-bold text-ink">{client.name}</h2>
             <p className="text-gray-500 text-sm">{clientOrders.length} order(s) on record</p>
           </div>
         </div>
@@ -60,7 +62,7 @@ export default function ClientDetail({ client, orders, onBack }: ClientDetailPro
           </div>
         </div>
         {client.standingOrder && (
-          <div className="mt-6 bg-[#fff6ef] rounded-lg p-4 text-sm text-[#562D07] font-medium">
+          <div className="mt-6 bg-orange-50 rounded-lg p-4 text-sm text-espresso font-medium">
             <span className="font-bold">Standing Order: </span>
             {client.standingOrder}
           </div>
@@ -69,52 +71,48 @@ export default function ClientDetail({ client, orders, onBack }: ClientDetailPro
 
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="p-5 border-b border-gray-100">
-          <h3 id={ordersHeadingId} className="text-lg font-bold text-[#121212]">Order History</h3>
+          <h3 id={ordersHeadingId} className="text-lg font-bold text-ink">Order History</h3>
         </div>
-        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Order history">
-          <table aria-labelledby={ordersHeadingId} className="w-full text-left border-collapse min-w-[600px]">
-            <thead>
-              <tr className="bg-gray-50/50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                <th scope="col" className="px-5 py-3">Order #</th>
-                <th scope="col" className="px-5 py-3">Requested Date</th>
-                <th scope="col" className="px-5 py-3">Status</th>
-                <th scope="col" className="px-5 py-3 text-right">Total</th>
+        <Table label="Order history" labelledBy={ordersHeadingId} bare minWidth="min-w-[600px]">
+          <TableHead>
+            <th scope="col" className="px-5 py-3">Order #</th>
+            <th scope="col" className="px-5 py-3">Requested Date</th>
+            <th scope="col" className="px-5 py-3">Status</th>
+            <th scope="col" className="px-5 py-3 text-right">Total</th>
+          </TableHead>
+          <tbody className="divide-y divide-gray-100 text-sm">
+            {clientOrders.length === 0 ? (
+              <tr>
+                <td colSpan={4}>
+                  <EmptyState title="No orders yet." hint="Orders placed for this client will appear here." />
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 text-sm">
-              {clientOrders.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-5 py-8 text-center text-gray-500">
-                    No orders yet.
+            ) : (
+              clientOrders.map((order) => (
+                <tr
+                  key={order.id}
+                  className="hover:bg-gray-50/50 transition-colors"
+                >
+                  <th scope="row" className="px-5 py-4 text-left font-medium text-gray-900">
+                    <Link
+                      to={orderPath(order.id)}
+                      className="rounded hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-strong"
+                    >
+                      {order.id}
+                    </Link>
+                  </th>
+                  <td className="px-5 py-4 text-gray-600">{order.requestedDate}</td>
+                  <td className="px-5 py-4">
+                    <OrderStatusBadge status={order.status} />
+                  </td>
+                  <td className="px-5 py-4 text-right font-medium text-gray-900 tabular-nums">
+                    {formatMoney(computeOrderTotal(order))}
                   </td>
                 </tr>
-              ) : (
-                clientOrders.map((order) => (
-                  <tr
-                    key={order.id}
-                    className="hover:bg-gray-50/50 transition-colors"
-                  >
-                    <th scope="row" className="px-5 py-4 text-left font-medium text-gray-900">
-                      <Link
-                        to={orderPath(order.id)}
-                        className="rounded hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-text)]"
-                      >
-                        {order.id}
-                      </Link>
-                    </th>
-                    <td className="px-5 py-4 text-gray-600">{order.requestedDate}</td>
-                    <td className="px-5 py-4">
-                      <OrderStatusBadge status={order.status} />
-                    </td>
-                    <td className="px-5 py-4 text-right font-medium text-gray-900">
-                      {formatMoney(computeOrderTotal(order))}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+              ))
+            )}
+          </tbody>
+        </Table>
       </div>
     </div>
   );
