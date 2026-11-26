@@ -82,7 +82,7 @@ export default function OrderConfirmationModal({
     <Modal
       labelledBy={headingId}
       onClose={onClose}
-      className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto overscroll-contain animate-fadeIn"
+      className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md max-h-[90dvh] overflow-y-auto overscroll-contain animate-fadeIn"
     >
       <form onSubmit={handleSubmit}>
       <div className="flex items-center gap-3 mb-2">

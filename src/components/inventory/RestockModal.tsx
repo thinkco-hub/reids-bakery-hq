@@ -39,7 +39,7 @@ export default function RestockModal({
     <Modal
       labelledBy={headingId}
       onClose={onClose}
-      className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto overscroll-contain animate-fadeIn"
+      className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm max-h-[90dvh] overflow-y-auto overscroll-contain animate-fadeIn"
     >
       <form onSubmit={handleSubmit}>
         <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-1">

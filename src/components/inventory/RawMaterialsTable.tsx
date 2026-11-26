@@ -71,7 +71,7 @@ function IngredientFormModal({
     <Modal
       labelledBy={headingId}
       onClose={onClose}
-      overlayClassName="z-[100] bg-black/50 backdrop-blur-sm px-4"
+      overlayClassName="z-[100] bg-black/50 backdrop-blur-sm p-4"
       className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md max-h-[85dvh] overflow-y-auto overscroll-contain animate-fadeIn"
     >
       <form onSubmit={handleSubmit}>

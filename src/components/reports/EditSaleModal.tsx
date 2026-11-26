@@ -67,8 +67,8 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
     <Modal
       labelledBy={headingId}
       onClose={onClose}
-      overlayClassName="z-[100] bg-black/50 backdrop-blur-sm px-4"
-      className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-lg animate-fadeIn max-h-[90vh] overflow-y-auto overscroll-contain"
+      overlayClassName="z-[100] bg-black/50 backdrop-blur-sm p-4"
+      className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-lg animate-fadeIn max-h-[90dvh] overflow-y-auto overscroll-contain"
     >
       <form onSubmit={handleSubmit}>
         <h2 id={headingId} className="text-2xl font-bold text-[#121212] mb-1">Edit Sale {sale.id}</h2>
