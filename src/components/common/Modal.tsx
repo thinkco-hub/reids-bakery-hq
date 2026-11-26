@@ -109,7 +109,7 @@ export default function Modal({
 
   return createPortal(
     <div
-      className={`fixed inset-0 flex justify-center overflow-y-auto px-4 py-4 ${overlayClassName}`}
+      className={`fixed inset-0 flex justify-center overflow-y-auto ${overlayClassName}`}
       onClick={(event) => {
         if (dismissOnBackdrop && event.target === event.currentTarget) onClose();
       }}
