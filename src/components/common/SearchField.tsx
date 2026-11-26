@@ -27,7 +27,7 @@ export default function SearchField({ value, onChange, placeholder, ariaLabel }:
         onChange={(e) => onChange(e.target.value)}
         aria-label={ariaLabel}
         placeholder={placeholder}
-        className="block w-full pl-10 pr-3 py-2 rounded-lg text-sm text-gray-900 placeholder-gray-500 bg-transparent outline-none focus:ring-2 focus:ring-[#B45309]"
+        className="block w-full pl-10 pr-3 py-2 rounded-lg text-sm text-gray-900 placeholder-gray-500 bg-transparent outline-none focus:ring-2 focus:ring-brand-strong"
       />
     </div>
   );

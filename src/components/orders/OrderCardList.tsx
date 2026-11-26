@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import OrderStatusBadge from "./OrderStatusBadge";
 import PaymentStatusBadge from "./PaymentStatusBadge";
+import Badge from "../common/Badge";
+import Button from "../common/Button";
+import EmptyState from "../common/EmptyState";
+import { ChevronDownIcon } from "../icons";
 import { formatMoney } from "../../utils/money";
 import { computeOrderTotal, getPaymentStatus, hasShortfall } from "../../utils/orders";
 import type { MenuItemStock, Order } from "../../types/domain";
@@ -18,6 +22,8 @@ interface OrderCardListProps {
   menuInventory: MenuItemStock[];
   getClientName: (order: Order) => string;
   onView: (order: Order) => void;
+  hasFilters: boolean;
+  onClearFilters: () => void;
 }
 
 /**
@@ -25,16 +31,33 @@ interface OrderCardListProps {
  * two-line cards with a fixed tabular value slot and an accordion reveal.
  * Rendered inside the parent @container.
  */
-export default function OrderCardList({ orders, menuInventory, getClientName, onView }: OrderCardListProps) {
+export default function OrderCardList({
+  orders,
+  menuInventory,
+  getClientName,
+  onView,
+  hasFilters,
+  onClearFilters,
+}: OrderCardListProps) {
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
 
   return (
     <>
       <div className="hidden @max-[1042px]:grid gap-3">
         {orders.length === 0 ? (
-          <p className="px-4 py-8 text-center text-gray-500 bg-white rounded-lg border border-gray-200">
-            No orders found matching the selected filters.
-          </p>
+          <div className="bg-white rounded-lg border border-gray-200">
+            <EmptyState
+              title="No orders match these filters."
+              hint={hasFilters ? "Try another client, status or date." : undefined}
+              action={
+                hasFilters ? (
+                  <Button size="sm" variant="ghostBrand" onClick={onClearFilters}>
+                    Clear filters
+                  </Button>
+                ) : undefined
+              }
+            />
+          </div>
         ) : (
           orders.map((order) => (
             <OrderCard
@@ -71,7 +94,7 @@ function OrderCard({ order, clientName, menuInventory, expanded, onToggle, onVie
         type="button"
         onClick={onToggle}
         aria-expanded={expanded}
-        className="w-full text-left px-4 pt-3.5 pb-2 active:bg-gray-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--color-brand-text)]"
+        className="w-full text-left px-4 pt-3.5 pb-2 active:bg-gray-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-strong"
       >
         {/* Line 1: Identity (left) · Primary Value (right, fixed tabular slot). */}
         <div className="flex items-start justify-between gap-3">
@@ -79,7 +102,7 @@ function OrderCard({ order, clientName, menuInventory, expanded, onToggle, onVie
             <p className="font-semibold text-gray-900 truncate">{clientName}</p>
             <p className="text-xs text-gray-500 font-mono mt-0.5">{order.id}</p>
           </div>
-          <p className="text-lg font-bold text-gray-900 whitespace-nowrap tabular-nums [font-feature-settings:'tnum']">
+          <p className="text-lg font-bold text-gray-900 whitespace-nowrap tabular-nums">
             {formatMoney(computeOrderTotal(order))}
           </p>
         </div>
@@ -88,22 +111,17 @@ function OrderCard({ order, clientName, menuInventory, expanded, onToggle, onVie
           <OrderStatusBadge status={order.status} />
           <PaymentStatusBadge status={getPaymentStatus(order)} />
           {shortfall && (
-            <span className="px-2 py-0.5 rounded-full bg-red-50 text-red-700 text-[10px] font-bold whitespace-nowrap">
+            <Badge family="micro" size="xs" tone="danger">
               Shortfall
-            </span>
+            </Badge>
           )}
           {/* Ambiguous bare dates get an explicit label; status pills stay unlabeled. */}
           <span className="text-xs text-gray-600 ml-auto whitespace-nowrap">
             Requested {formatDueDate(order.requestedDate)}
           </span>
-          <svg
+          <ChevronDownIcon
             className={`w-4 h-4 text-gray-500 transition-transform ${expanded ? "rotate-180" : ""}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
+          />
         </div>
       </button>
 
@@ -121,7 +139,7 @@ function OrderCard({ order, clientName, menuInventory, expanded, onToggle, onVie
               return (
                 <div key={`${item.menuItemId}-${i}`} className="flex justify-between gap-4 py-2 pl-4">
                   <dt className="text-gray-500 truncate">{name}</dt>
-                  <dd className="text-gray-800 tabular-nums [font-feature-settings:'tnum'] whitespace-nowrap">
+                  <dd className="text-gray-800 tabular-nums whitespace-nowrap">
                     {item.qty} × {formatMoney(item.unitPrice)}
                   </dd>
                 </div>
@@ -129,7 +147,7 @@ function OrderCard({ order, clientName, menuInventory, expanded, onToggle, onVie
             })}
             <div className="flex justify-between gap-4 py-2">
               <dt className="text-gray-500">Amount paid</dt>
-              <dd className="text-gray-800 tabular-nums [font-feature-settings:'tnum']">
+              <dd className="text-gray-800 tabular-nums">
                 {formatMoney(order.amountPaid || 0)}
               </dd>
             </div>
@@ -152,12 +170,14 @@ function OrderCard({ order, clientName, menuInventory, expanded, onToggle, onVie
               </div>
             )}
           </dl>
-          <button
+          <Button
+            size="md"
+            onChrome
             onClick={() => onView(order)}
-            className="w-full mt-3 px-3 py-2 rounded-lg bg-[#562D07] text-white text-sm font-bold active:bg-[#3a1d04] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#562D07]"
+            className="w-full mt-3"
           >
             Manage order
-          </button>
+          </Button>
         </div>
       )}
     </div>

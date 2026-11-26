@@ -1,4 +1,5 @@
 import { memo, useId, useRef, useState } from "react";
+import { ChevronDownIcon, DocumentIcon, XIcon } from "../icons";
 import { NavLink, useLocation, useNavigate } from "react-router";
 import type { User } from "../../types/domain";
 import type { Dispatch, RefObject, SetStateAction } from "react";
@@ -33,8 +34,8 @@ interface SidebarProps {
 function itemCls(active: boolean, extra = "") {
   return `w-full flex items-center ${extra} p-3 rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
     active
-      ? "bg-[#F3B978]/20 text-white shadow-md border-l-4 border-[#F17D0C]"
-      : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white border-l-4 border-transparent"
+      ? "bg-caramel/20 text-white shadow-md border-l-4 border-brand"
+      : "text-cream/60 hover:bg-caramel/10 hover:text-white border-l-4 border-transparent"
   }`;
 }
 
@@ -42,8 +43,8 @@ function subItemCls(active: boolean) {
   // block: these are router links now, and an inline anchor ignores w-full/py.
   return `w-full block text-left pl-14 py-2.5 text-sm font-medium transition-colors ${
     active
-      ? "text-[#F17D0C] bg-[#3a1d04] border-l-2 border-[#F17D0C]"
-      : "text-[#FDF9F3]/70 hover:text-white hover:bg-[#3a1d04] border-l-2 border-transparent"
+      ? "text-brand bg-espresso-deep border-l-2 border-brand"
+      : "text-cream/70 hover:text-white hover:bg-espresso-deep border-l-2 border-transparent"
   }`;
 }
 
@@ -168,7 +169,7 @@ function Sidebar({
         }}
         className={`
         inset-y-0 left-0 z-50 transform transition-[translate,width] duration-300 ease-in-out flex flex-col
-        bg-[#562D07] text-[#FDF9F3] shadow-2xl
+        bg-espresso text-cream shadow-2xl
         ${
           isDesktopRail
             ? // Same 300ms ease-in-out growth as the Chams rail, but absolute
@@ -183,7 +184,7 @@ function Sidebar({
       >
         {/* Brand Area */}
         <div
-          className={`p-5 border-b border-[#F3B978]/20 flex justify-between items-center whitespace-nowrap overflow-hidden ${
+          className={`p-5 border-b border-caramel/20 flex justify-between items-center whitespace-nowrap overflow-hidden ${
             isDesktopRail ? "h-[76px]" : ""
           }`}
         >
@@ -194,7 +195,7 @@ function Sidebar({
             title={canSwitchToChams ? "Switch to Chams Branch Stock Ledger" : undefined}
           >
             <div className="w-10 h-10 bg-white rounded-full flex flex-shrink-0 items-center justify-center mr-4 p-1 shadow-inner">
-              <span className="text-[#562D07] font-bold text-xs text-center leading-tight">
+              <span className="text-espresso font-bold text-xs text-center leading-tight">
                 RBC
                 <br />
                 <span className="text-[6px]">BAKERY</span>
@@ -212,21 +213,9 @@ function Sidebar({
               onClick={() => setIsSidebarOpen(false)}
               aria-label="Close navigation"
               // 44px target; the negative margins keep the 24px icon where it was.
-              className="p-2.5 -my-0.5 -mr-1.5 text-[#FDF9F3]/60 hover:text-white"
+              className="p-2.5 -my-0.5 -mr-1.5 text-cream/60 hover:text-white"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              <XIcon className="w-6 h-6" />
             </button>
           )}
         </div>
@@ -325,15 +314,15 @@ function Sidebar({
               <div
                 className={`flex items-center rounded-lg font-bold transition-colors whitespace-nowrap overflow-hidden ${
                   isInventoryActive
-                    ? "bg-[#F3B978]/20 text-white shadow-md"
-                    : "text-[#FDF9F3]/60 hover:bg-[#F3B978]/10 hover:text-white"
+                    ? "bg-caramel/20 text-white shadow-md"
+                    : "text-cream/60 hover:bg-caramel/10 hover:text-white"
                 }`}
               >
                 <NavLink
                   to={PATH_BY_TAB.inventory}
                   onClick={onNavSelect}
                   className={`flex items-center min-w-0 flex-1 p-3 border-l-4 ${
-                    isInventoryActive ? "border-[#F17D0C]" : "border-transparent"
+                    isInventoryActive ? "border-brand" : "border-transparent"
                   }`}
                 >
                   <div className="flex items-center justify-center w-8 flex-shrink-0">
@@ -360,22 +349,11 @@ function Sidebar({
                     // 12px from the row edge, where the old 40px padding put it.
                     className="ml-2 py-3.5 pl-4 pr-3 flex-shrink-0"
                   >
-                    <svg
+                    <ChevronDownIcon
                       className={`w-4 h-4 transition-transform duration-200 ${
                         isInventoryExpanded ? "rotate-180" : ""
                       } ${sidebarLabelCls}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
+                    />
                   </button>
                 )}
               </div>
@@ -384,7 +362,7 @@ function Sidebar({
                 <div
                   id={inventorySubmenuId}
                   hidden={submenuHidden || !isInventoryExpanded}
-                  className="mt-1 space-y-1 bg-[#4a2605] rounded-lg overflow-hidden transition-all shadow-inner"
+                  className="mt-1 space-y-1 bg-espresso-well rounded-lg overflow-hidden transition-all shadow-inner"
                 >
                   <NavLink
                     to={PATH_BY_TAB["inventory-reconciliation"]}
@@ -406,14 +384,7 @@ function Sidebar({
               className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
+                <DocumentIcon className="w-6 h-6" />
               </div>
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Recipes
@@ -485,23 +456,17 @@ function Sidebar({
                     Reports
                   </span>
                 </div>
-                <svg
+                <ChevronDownIcon
                   className={`w-4 h-4 ml-2 transition-transform duration-200 ${
                     isReportsExpanded ? "rotate-180" : ""
                   } ${sidebarLabelCls}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+                />
               </button>
 
               <div
                 id={reportsSubmenuId}
                 hidden={submenuHidden || !isReportsExpanded}
-                className="mt-1 space-y-1 bg-[#4a2605] rounded-lg overflow-hidden transition-all shadow-inner"
+                className="mt-1 space-y-1 bg-espresso-well rounded-lg overflow-hidden transition-all shadow-inner"
               >
                 <NavLink
                   to={PATH_BY_TAB["reports-dashboard"]}
@@ -539,14 +504,7 @@ function Sidebar({
               className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
+                <DocumentIcon className="w-6 h-6" />
               </div>
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Audit Logs
@@ -579,16 +537,16 @@ function Sidebar({
         </nav>
 
         {/* Bottom Logout Area */}
-        <div className="p-3 mb-4 mt-auto border-t border-[#F3B978]/20 pt-4">
+        <div className="p-3 mb-4 mt-auto border-t border-caramel/20 pt-4">
           <div
             className={`px-3 mb-2 overflow-hidden whitespace-nowrap ${sidebarLabelCls} transition-opacity duration-300`}
           >
             <p className="text-sm font-bold text-white truncate">{currentUser.name}</p>
-            <p className="text-xs text-[#FDF9F3]/70 truncate">{currentUser.email}</p>
+            <p className="text-xs text-cream/70 truncate">{currentUser.email}</p>
           </div>
           <button
             onClick={onLogout}
-            className="w-full flex items-center p-3 rounded-lg font-bold text-[#FDF9F3]/60 hover:text-white hover:bg-[#F3B978]/10 transition-colors whitespace-nowrap overflow-hidden"
+            className="w-full flex items-center p-3 rounded-lg font-bold text-cream/60 hover:text-white hover:bg-caramel/10 transition-colors whitespace-nowrap overflow-hidden"
           >
             <div className="flex items-center justify-center w-8 flex-shrink-0">
               <svg

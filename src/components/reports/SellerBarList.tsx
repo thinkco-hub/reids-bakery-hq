@@ -1,16 +1,17 @@
 import React from "react";
+import EmptyState from "../common/EmptyState";
 import { formatMoney } from "../../utils/money";
 import type { ItemSalesLine } from "../../types/domain";
 
 export default function SellerBarList({
   items,
-  barColor = "bg-[var(--color-brand)]",
+  barColor = "bg-brand",
 }: {
   items: ItemSalesLine[];
   barColor?: string;
 }) {
   if (items.length === 0) {
-    return <p className="text-sm text-gray-500 py-6 text-center">No item sales in this range.</p>;
+    return <EmptyState title="No item sales in this range." hint="Pick a date range with recorded sales." />;
   }
 
   const maxQty = Math.max(...items.map((i) => i.qty), 1);
@@ -23,7 +24,7 @@ export default function SellerBarList({
           <li key={item.id}>
             <div className="flex justify-between items-baseline mb-1">
               <span className="text-sm font-semibold text-gray-800 truncate pr-2">{item.name}</span>
-              <span className="text-xs font-bold text-gray-900 whitespace-nowrap">
+              <span className="text-xs font-bold text-gray-900 whitespace-nowrap tabular-nums">
                 {item.qty} sold · {formatMoney(item.revenue)}
               </span>
             </div>

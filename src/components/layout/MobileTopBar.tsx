@@ -2,6 +2,7 @@ import React, { memo, useState } from "react";
 import type { RefObject } from "react";
 import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
 import { useAnnounce } from "../common/Announcer";
+import { CheckIcon, MenuIcon, TrashIcon, UserPlusIcon } from "../icons";
 import type { TicketCustomer } from "../../types/domain";
 
 /** Ticket header shown in place of the app title while the POS tab is open. */
@@ -38,34 +39,22 @@ function MobileTopBar({ onOpenMobileNav, triggerRef, pos }: MobileTopBarProps) {
   };
 
   return (
-    <header className="bg-[#562D07] text-[#FDF9F3] p-4 flex items-center gap-3 shadow-md z-30">
+    <header className="bg-espresso text-cream p-4 flex items-center gap-3 shadow-md z-30">
       <button
         ref={triggerRef}
         onClick={onOpenMobileNav}
         aria-label="Open navigation"
         // 44px target; the negative margins keep the 24px icon in place.
-        className="p-2.5 -m-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#562D07] bg-[#F3B978]/20 rounded-md flex-shrink-0"
+        className="p-2.5 -m-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-espresso bg-caramel/20 rounded-md flex-shrink-0"
       >
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 6h16M4 12h16M4 18h16"
-          />
-        </svg>
+        <MenuIcon className="w-6 h-6" />
       </button>
 
       {pos ? (
         <>
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <span className="text-lg font-bold">Ticket</span>
-            <span className="min-w-[1.75rem] px-1 py-0.5 rounded border border-[#FDF9F3]/40 text-center font-mono text-sm">
+            <span className="min-w-[1.75rem] px-1 py-0.5 rounded border border-cream/40 text-center font-mono text-sm">
               {pos.ticketCount}
             </span>
           </div>
@@ -80,8 +69,8 @@ function MobileTopBar({ onOpenMobileNav, triggerRef, pos }: MobileTopBarProps) {
               }
               className={`max-w-[9rem] min-h-[2.75rem] px-2 rounded-md flex items-center gap-1.5 transition-colors ${
                 pos.customer
-                  ? "bg-[#F3B978]/40 hover:bg-[#F3B978]/60"
-                  : "bg-[#F3B978]/20 hover:bg-[#F3B978]/40"
+                  ? "bg-caramel/40 hover:bg-caramel/60"
+                  : "bg-caramel/20 hover:bg-caramel/40"
               }`}
             >
               {pos.customer ? (
@@ -89,32 +78,10 @@ function MobileTopBar({ onOpenMobileNav, triggerRef, pos }: MobileTopBarProps) {
                   <span className="truncate text-sm font-bold">
                     {pos.customer.name}
                   </span>
-                  <svg
-                    className="w-4 h-4 flex-shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={3}
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
+                  <CheckIcon className="w-4 h-4 flex-shrink-0" />
                 </>
               ) : (
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                  <circle cx="8.5" cy="7" r="4" />
-                  <path d="M20 8v6M23 11h-6" />
-                </svg>
+                <UserPlusIcon className="w-6 h-6" />
               )}
             </button>
 
@@ -125,24 +92,11 @@ function MobileTopBar({ onOpenMobileNav, triggerRef, pos }: MobileTopBarProps) {
               title="Clear Ticket"
               className={`min-h-[2.75rem] min-w-[2.75rem] px-2 rounded-md flex items-center justify-center transition-colors ${
                 pos.ticketCount === 0
-                  ? "text-[#FDF9F3]/30 cursor-not-allowed"
-                  : "bg-[#F3B978]/20 hover:bg-red-500/60"
+                  ? "text-cream/30 cursor-not-allowed"
+                  : "bg-caramel/20 hover:bg-red-500/60"
               }`}
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
-              </svg>
+              <TrashIcon className="w-6 h-6" />
             </button>
           </div>
 

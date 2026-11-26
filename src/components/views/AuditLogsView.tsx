@@ -1,5 +1,9 @@
 import { useId, useState } from "react";
 import SearchField from "../common/SearchField";
+import Table, { TableHead } from "../common/Table";
+import EmptyState from "../common/EmptyState";
+import Badge from "../common/Badge";
+import Button from "../common/Button";
 import { getAuditLog } from "../../utils/auditLog";
 import { formatTime, toISODate, todayISO } from "../../utils/dates";
 import { roleLabel } from "../../utils/permissions";
@@ -64,11 +68,12 @@ export default function AuditLogsView() {
   });
 
   const today = todayISO();
+  const hasFilters = !!search || dateFilter !== today;
 
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8">
-        <h2 id={headingId} className="text-3xl font-bold text-[#121212]">Audit Logs</h2>
+        <h2 id={headingId} className="text-3xl font-bold text-ink">Audit Logs</h2>
         <p className="text-gray-500 mt-1">
           Sign-ins and changes made by users across the system.
         </p>
@@ -90,15 +95,12 @@ export default function AuditLogsView() {
             value={dateFilter}
             max={today}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="px-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-600 focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none flex-1 md:flex-none cursor-pointer"
+            className="px-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-600 focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none flex-1 md:flex-none cursor-pointer"
           />
           {dateFilter !== today && (
-            <button
-              onClick={() => setDateFilter(today)}
-              className="px-3 py-1.5 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap"
-            >
+            <Button variant="secondary" size="sm" onClick={() => setDateFilter(today)}>
               Today
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -108,66 +110,70 @@ export default function AuditLogsView() {
         {dateFilter ? ` on ${dateFilter}` : ""}
       </p>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div
-          className="overflow-x-auto w-full"
-          tabIndex={0}
-          role="region"
-          aria-label="Audit log entries"
-        >
-          <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[860px]">
-            <thead>
-              <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-                <th scope="col" className="px-6 py-4">Time</th>
-                <th scope="col" className="px-6 py-4">User</th>
-                <th scope="col" className="px-6 py-4">Action</th>
-                <th scope="col" className="px-6 py-4">Entity</th>
-                <th scope="col" className="px-6 py-4">Details</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 text-sm">
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                    No activity found for the selected filters.
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((entry) => (
-                  <tr key={entry.id} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
-                      {formatTime(entry.timestamp)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-gray-900">{entry.userName}</div>
-                      {entry.userRole && (
-                        <div className="text-xs text-gray-500">{roleLabel(entry.userRole)}</div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-xs font-bold whitespace-nowrap ${
-                          WARNING_ACTIONS.has(entry.action)
-                            ? "bg-red-50 text-red-700"
-                            : "bg-orange-50 text-[#562D07]"
-                        }`}
+      <Table label="Audit log entries" labelledBy={headingId} minWidth="min-w-[860px]">
+        <TableHead>
+          <th scope="col" className="px-6 py-4">Time</th>
+          <th scope="col" className="px-6 py-4">User</th>
+          <th scope="col" className="px-6 py-4">Action</th>
+          <th scope="col" className="px-6 py-4">Entity</th>
+          <th scope="col" className="px-6 py-4">Details</th>
+        </TableHead>
+        <tbody className="divide-y divide-gray-200 text-sm">
+          {filtered.length === 0 ? (
+            <tr>
+              <td colSpan={5}>
+                <EmptyState
+                  title={hasFilters ? "No activity found for the selected filters." : "No activity logged today."}
+                  hint={hasFilters ? "Try another date or clear the search." : undefined}
+                  action={
+                    hasFilters ? (
+                      <Button
+                        size="sm"
+                        variant="ghostBrand"
+                        onClick={() => {
+                          setSearch("");
+                          setDateFilter(today);
+                        }}
                       >
-                        {ACTION_LABELS[entry.action]}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
-                      {entry.entityType
-                        ? `${entry.entityType}${entry.entityId ? ` ${entry.entityId}` : ""}`
-                        : "—"}
-                    </td>
-                    <td className="px-6 py-4 text-gray-800">{entry.details ?? "—"}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                        Clear filters
+                      </Button>
+                    ) : undefined
+                  }
+                />
+              </td>
+            </tr>
+          ) : (
+            filtered.map((entry) => (
+              <tr key={entry.id} className="hover:bg-gray-50/50 transition-colors">
+                <td className="px-6 py-4 text-gray-600 whitespace-nowrap tabular-nums">
+                  {formatTime(entry.timestamp)}
+                </td>
+                <td className="px-6 py-4">
+                  <div className="font-medium text-gray-900">{entry.userName}</div>
+                  {entry.userRole && (
+                    <div className="text-xs text-gray-500">{roleLabel(entry.userRole)}</div>
+                  )}
+                </td>
+                <td className="px-6 py-4">
+                  <Badge
+                    family="micro"
+                    tone={WARNING_ACTIONS.has(entry.action) ? "danger" : "attention"}
+                    className="whitespace-nowrap"
+                  >
+                    {ACTION_LABELS[entry.action]}
+                  </Badge>
+                </td>
+                <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
+                  {entry.entityType
+                    ? `${entry.entityType}${entry.entityId ? ` ${entry.entityId}` : ""}`
+                    : "—"}
+                </td>
+                <td className="px-6 py-4 text-gray-800">{entry.details ?? "—"}</td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </Table>
     </div>
   );
 }

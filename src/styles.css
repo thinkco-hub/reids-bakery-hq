@@ -1,10 +1,9 @@
 @import "tailwindcss";
 
 /* Hides the scrollbar while keeping the element scrollable (wheel, touch,
-   keyboard all still work). Used wherever a visible scrollbar would clutter
-   the UI, e.g. the sidebar nav (Sidebar.tsx) and the POS category chips
-   (PosView.tsx). scrollbar-width covers Firefox; ::-webkit-scrollbar covers
-   Chromium/WebKit (Chrome, Edge, Safari). */
+   keyboard all still work). Used by the sidebar navs (Sidebar.tsx,
+   ChamsStockLedger.tsx), where a visible scrollbar would clutter the chrome.
+   scrollbar-width covers Firefox; ::-webkit-scrollbar covers Chromium/WebKit. */
 @utility hide-scrollbar {
   scrollbar-width: none;
 
@@ -13,15 +12,29 @@
   }
 }
 
-
-/* Brand orange splits by role: #F17D0C is a fill (2.73:1 against white, so it
-   can never carry text or a focus ring on a light surface), while the darker
-   steps below carry white CTA labels and orange text at WCAG AA. */
+/* The design system's colour ladder (DESIGN.md). Components use the token
+   utilities (bg-espresso, text-ink, border-caramel/20, …) — raw hex belongs
+   here only. */
 @theme {
+  --color-espresso: #562d07;
+  --color-espresso-deep: #3a1d04;
+  --color-espresso-well: #4a2605;
+  --color-cream: #fdf9f3;
+  --color-ink: #121212;
+  --color-caramel: #f3b978;
+  --color-amber-disc: #ffb74d;
+  --color-chams-navy: #1b2a4a;
+  --color-chams-navy-deep: #12203a;
+  --color-chams-blue: #3b5ba5;
+  --color-chams-blue-soft: #5b84d6;
+  --color-chams-blue-wash: #eaf0fb;
+
+  /* Brand orange splits by role: #F17D0C is a fill (2.73:1 against white, so it
+     can never carry text or a focus ring on a light surface), while the darker
+     steps below carry white CTA labels and orange text at WCAG AA. */
   --color-brand: #f17d0c;
   --color-brand-strong: #b45309;
   --color-brand-strong-hover: #9a3412;
-  --color-brand-text: #b45309;
 }
 
 /* Restores the fade-in entrance animation that was lost when the project

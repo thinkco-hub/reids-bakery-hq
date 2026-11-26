@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import EmptyState from "../common/EmptyState";
 import { formatShortDate } from "../../utils/dates";
 import { formatMoney } from "../../utils/money";
 import type { RevenueByDay } from "../../types/domain";
@@ -24,8 +25,8 @@ export default function RevenueByDayChart({ data }: { data: RevenueByDay[] }) {
 
   if (data.length === 0) {
     return (
-      <div className="h-[240px] flex items-center justify-center text-gray-500 text-sm">
-        No sales in this range.
+      <div className="h-[240px] flex items-center justify-center">
+        <EmptyState title="No sales in this range." hint="Record a sale in POS or widen the date range." />
       </div>
     );
   }
@@ -70,14 +71,14 @@ export default function RevenueByDayChart({ data }: { data: RevenueByDay[] }) {
                   tabIndex={0}
                 >
                   {isHovered && (
-                    <div className="absolute bottom-full mb-2 z-10 bg-[#121212] text-white text-xs rounded-lg px-3 py-2 shadow-lg whitespace-nowrap pointer-events-none">
+                    <div className="absolute bottom-full mb-2 z-10 bg-ink text-white text-xs rounded-lg px-3 py-2 shadow-lg whitespace-nowrap pointer-events-none">
                       <div className="font-bold">{formatMoney(d.revenue)}</div>
                       <div className="text-gray-300">{formatShortDate(d.date)}</div>
                     </div>
                   )}
                   <div
                     className={`w-full max-w-[24px] rounded-t-[4px] transition-colors ${
-                      isHovered ? "bg-[var(--color-brand)]" : "bg-[#F3B978]"
+                      isHovered ? "bg-brand" : "bg-caramel"
                     }`}
                     style={{ height: barHeight }}
                   />

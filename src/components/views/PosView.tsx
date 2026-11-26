@@ -4,7 +4,7 @@ import { useAnnounce } from "../common/Announcer";
 import PosMobile from "../pos/PosMobile";
 import SelectField from "../common/SelectField";
 import TicketLineItem from "../pos/TicketLineItem";
-import { SearchIcon } from "../icons";
+import { ClipboardListIcon, SearchIcon, TrashIcon, UserPlusIcon, XIcon } from "../icons";
 import { POS_CATEGORIES } from "../../data/initialCatalogue";
 import { formatMoney } from "../../utils/money";
 import type {
@@ -102,7 +102,7 @@ export default function PosView({
                 value={posCategory}
                 onChange={(e) => setPosCategory(e.target.value as PosCategory)}
                 aria-label="Filter items by category"
-                className="min-h-[2.75rem] w-56 pl-3 bg-gray-100 border border-gray-200 rounded-lg text-sm font-bold text-gray-800 focus:ring-2 focus:ring-[var(--color-brand-text)] outline-none"
+                className="min-h-[2.75rem] w-56 pl-3 bg-gray-100 border border-gray-200 rounded-lg text-sm font-bold text-gray-800 focus:ring-2 focus:ring-brand-strong outline-none"
               >
                 {POS_CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
@@ -117,7 +117,7 @@ export default function PosView({
                   onChange={(e) => setPosSearch(e.target.value)}
                   placeholder="Search items..."
                   aria-label="Search POS items"
-                  className="pl-10 pr-4 py-2 bg-gray-100 border-none rounded-full text-sm focus:ring-2 focus:ring-[var(--color-brand-text)] outline-none"
+                  className="pl-10 pr-4 py-2 bg-gray-100 border-none rounded-full text-sm focus:ring-2 focus:ring-brand-strong outline-none"
                 />
                 <SearchIcon className="w-5 h-5 text-gray-500 absolute left-3 top-2.5" />
               </div>
@@ -134,10 +134,10 @@ export default function PosView({
                 >
                   {/* Any catalogue colour can be the swatch, so the label brings its own plate. */}
                   <span className="flex flex-col gap-0.5 bg-white px-3 py-2 text-left border-t border-black/10">
-                    <span className="text-base font-bold leading-tight text-[#121212] group-hover:underline">
+                    <span className="text-base font-bold leading-tight text-ink group-hover:underline">
                       {product.name}
                     </span>
-                    <span className="text-sm font-bold text-[var(--color-brand-text)]">
+                    <span className="text-sm font-bold text-brand-strong">
                       {formatMoney(product.price)}
                     </span>
                   </span>
@@ -150,20 +150,8 @@ export default function PosView({
         {/* RIGHT: Current Ticket / Cart */}
         <div className="@container w-full min-w-[240px] basis-0 grow-[25] h-full bg-white border-l border-gray-200 shadow-xl flex flex-col z-20 relative [--tk-title:clamp(1.05rem,4.5cqw,1.45rem)] [--tk-body:clamp(0.95rem,3.6cqw,1.15rem)] [--tk-pad:clamp(0.85rem,4cqw,1.4rem)]">
           <div className="p-[var(--tk-pad)] border-b border-gray-200 flex justify-between items-center bg-gray-50 flex-shrink-0">
-            <div className="flex items-center gap-2 text-[#562D07] text-[length:var(--tk-title)]">
-              <svg
-                className="w-[1.15em] h-[1.15em] flex-shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                />
-              </svg>
+            <div className="flex items-center gap-2 text-espresso text-[length:var(--tk-title)]">
+              <ClipboardListIcon className="w-[1.15em] h-[1.15em] flex-shrink-0" />
               <h2 className="font-bold text-[length:var(--tk-title)]">
                 Current Ticket
               </h2>
@@ -179,20 +167,7 @@ export default function PosView({
               title="Clear Ticket"
               aria-label="Clear Ticket"
             >
-              <svg
-                className="w-[1.4em] h-[1.4em]"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
-              </svg>
+              <TrashIcon className="w-[1.4em] h-[1.4em]" />
             </button>
           </div>
 
@@ -226,37 +201,15 @@ export default function PosView({
                   aria-label={`Remove ${customer.name} from the ticket`}
                   className="flex-shrink-0 min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center rounded-lg text-gray-500 hover:text-red-500 hover:bg-gray-100 transition-colors"
                 >
-                  <svg
-                    className="w-[1.15em] h-[1.15em]"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <XIcon className="w-[1.15em] h-[1.15em]" />
                 </button>
               </div>
             ) : (
               <button
                 onClick={onAddCustomer}
-                className="w-full min-h-[2.75rem] px-2 rounded-lg border border-dashed border-gray-300 flex items-center justify-center gap-2 font-bold text-[#562D07] hover:bg-gray-50 transition-colors"
+                className="w-full min-h-[2.75rem] px-2 rounded-lg border border-dashed border-gray-300 flex items-center justify-center gap-2 font-bold text-espresso hover:bg-gray-50 transition-colors"
               >
-                <svg
-                  className="w-[1.15em] h-[1.15em] flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                  <circle cx="8.5" cy="7" r="4" />
-                  <path d="M20 8v6M23 11h-6" />
-                </svg>
+                <UserPlusIcon className="w-[1.15em] h-[1.15em] flex-shrink-0" />
                 Add customer
               </button>
             )}
@@ -297,15 +250,15 @@ export default function PosView({
             <div className="space-y-[0.4em] mb-[var(--tk-pad)]">
               <div className="flex justify-between text-gray-500 text-[length:var(--tk-body)] font-medium">
                 <span>Subtotal</span>
-                <span>{formatMoney(cartSubtotal)}</span>
+                <span className="tabular-nums">{formatMoney(cartSubtotal)}</span>
               </div>
               <div className="flex justify-between text-gray-500 text-[length:var(--tk-body)] font-medium border-b border-gray-200 pb-[0.5em]">
                 <span>Tax (5%)</span>
-                <span>{formatMoney(cartTax)}</span>
+                <span className="tabular-nums">{formatMoney(cartTax)}</span>
               </div>
-              <div className="flex justify-between text-[#121212] text-[length:var(--tk-title)] font-bold pt-[0.25em]">
+              <div className="flex justify-between text-ink text-[length:var(--tk-title)] font-bold pt-[0.25em]">
                 <span>Total</span>
-                <span>{formatMoney(cartTotal)}</span>
+                <span className="tabular-nums">{formatMoney(cartTotal)}</span>
               </div>
             </div>
 
@@ -314,7 +267,7 @@ export default function PosView({
               onClick={openConfirmModal}
               className={`w-full min-h-[3rem] py-[var(--tk-pad)] rounded-xl text-[length:var(--tk-title)] font-bold shadow-lg transition-all transform active:scale-[0.98] ${
                 cart.length > 0
-                  ? "bg-[var(--color-brand-strong)] hover:bg-[var(--color-brand-strong-hover)] text-white"
+                  ? "bg-brand-strong hover:bg-brand-strong-hover text-white"
                   : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
               }`}
             >

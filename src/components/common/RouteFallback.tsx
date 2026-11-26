@@ -7,10 +7,10 @@ export default function RouteFallback() {
   return (
     <div
       role="status"
-      className="flex-1 flex items-center justify-center gap-3 py-16 text-[#562D07]"
+      className="flex-1 flex items-center justify-center gap-3 py-16 text-espresso"
     >
       <span
-        className="h-6 w-6 rounded-full border-2 border-[#562D07]/25 border-t-[#562D07] animate-spin"
+        className="h-6 w-6 rounded-full border-2 border-espresso/25 border-t-espresso animate-spin"
         aria-hidden="true"
       />
       <span className="font-bold">Loading…</span>

@@ -1,5 +1,7 @@
 import React, { useId } from "react";
 import Modal from "../common/Modal";
+import Button from "../common/Button";
+import { XIcon } from "../icons";
 import { toContactDigits } from "../../utils/orders";
 import type { FormEvent } from "react";
 import type { TicketCustomer } from "../../types/domain";
@@ -36,7 +38,7 @@ export function TicketCustomerFields({
           placeholder="Enter customer name..."
           value={name}
           onChange={(e) => onNameChange(e.target.value)}
-          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
         />
       </div>
       <div>
@@ -50,7 +52,7 @@ export function TicketCustomerFields({
           placeholder="09XXXXXXXXX"
           value={contact}
           onChange={(e) => onContactChange(toContactDigits(e.target.value))}
-          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
         />
       </div>
     </div>
@@ -96,25 +98,16 @@ export default function TicketCustomerInput({
       labelledBy={headingId}
       onClose={onClose}
       dismissOnBackdrop={false}
-      overlayClassName="z-[100] bg-[#FDF9F3]"
+      overlayClassName="z-[100] bg-cream"
       className="w-full h-full flex flex-col animate-fadeIn"
     >
-      <header className="flex-shrink-0 bg-[#562D07] text-[#FDF9F3] p-4 flex items-center gap-3 shadow-md">
+      <header className="flex-shrink-0 bg-espresso text-cream p-4 flex items-center gap-3 shadow-md">
         <button
           onClick={onClose}
           aria-label="Cancel and return to the ticket"
-          className="min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center rounded-md bg-[#F3B978]/20 hover:bg-[#F3B978]/40 transition-colors"
+          className="min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center rounded-md bg-caramel/20 hover:bg-caramel/40 transition-colors"
         >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <XIcon className="w-6 h-6" />
         </button>
         <h2 id={headingId} className="text-lg font-bold">Add customer to ticket</h2>
       </header>
@@ -131,24 +124,12 @@ export default function TicketCustomerInput({
             Saved to this ticket only. No client record is created.
           </p>
           <div className="flex gap-3 mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-colors"
-            >
+            <Button type="button" variant="secondary" size="lg" className="flex-1" onClick={onClose}>
               Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSaveDisabled}
-              className={`flex-1 py-3 rounded-xl text-white font-bold transition-colors ${
-                isSaveDisabled
-                  ? "bg-gray-300 cursor-not-allowed"
-                  : "bg-[var(--color-brand-strong)] hover:bg-[var(--color-brand-strong-hover)]"
-              }`}
-            >
+            </Button>
+            <Button type="submit" variant="cta" size="lg" className="flex-1" disabled={isSaveDisabled}>
               Save to ticket
-            </button>
+            </Button>
           </div>
         </div>
       </form>

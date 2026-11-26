@@ -3,7 +3,13 @@ import { formatMonthLabel, shiftMonthKey } from "../../utils/dates";
 import { buildLedgerForMonth, computeBranchRevenueForMonth } from "../../utils/ledger";
 import { formatMoney } from "../../utils/money";
 import { discrepancyLabel } from "../../utils/counts";
+import { TONE_TEXT } from "../../utils/status";
 import SearchField from "../common/SearchField";
+import Table, { TableHead } from "../common/Table";
+import EmptyState from "../common/EmptyState";
+import StatCard from "../common/StatCard";
+import Badge from "../common/Badge";
+import { ChevronLeftIcon, ChevronRightIcon } from "../icons";
 import type {
   ChamsBeginning,
   ChamsBranch,
@@ -45,8 +51,8 @@ export default function LedgerView({ branches, products, beginnings, movements, 
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
-          <h2 id={headingId} className="text-2xl md:text-3xl font-bold text-[#1B2A4A]">Branch Stock Ledger</h2>
-          <p className="text-[#1B2A4A]/70 mt-1 font-medium text-sm md:text-base">
+          <h2 id={headingId} className="text-2xl md:text-3xl font-bold text-chams-navy">Branch Stock Ledger</h2>
+          <p className="text-chams-navy/70 mt-1 font-medium text-sm md:text-base">
             Beginning, restocked, spoilage, sold and remaining siopao stock per branch.
           </p>
         </div>
@@ -57,41 +63,25 @@ export default function LedgerView({ branches, products, beginnings, movements, 
             title="Previous month"
             aria-label="Previous month"
           >
-            <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            <ChevronLeftIcon className="w-4 h-4" />
           </button>
-          <span className="text-sm font-bold text-[#1B2A4A] w-32 text-center">{formatMonthLabel(month)}</span>
+          <span className="text-sm font-bold text-chams-navy w-32 text-center">{formatMonthLabel(month)}</span>
           <button
             onClick={() => onMonthChange(shiftMonthKey(month, 1))}
             className="p-1.5 rounded-md hover:bg-gray-100 text-gray-600"
             title="Next month"
             aria-label="Next month"
           >
-            <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronRightIcon className="w-4 h-4" />
           </button>
         </div>
       </header>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
-        <div className="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm">
-          <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">Branches</p>
-          <p className="text-xl md:text-2xl font-bold text-[#1B2A4A]">{branches.length}</p>
-        </div>
-        <div className="bg-white p-4 md:p-5 rounded-2xl border border-red-100 shadow-sm">
-          <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">Flagged Discrepancies</p>
-          <p className="text-xl md:text-2xl font-bold text-red-600">{flaggedCount}</p>
-        </div>
-        <div className="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm">
-          <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">Total Remaining (Calc.)</p>
-          <p className="text-xl md:text-2xl font-bold text-[#1B2A4A]">{totalRemaining}</p>
-        </div>
-        <div className="bg-white p-4 md:p-5 rounded-2xl border border-green-100 shadow-sm">
-          <p className="text-gray-500 text-xs md:text-sm font-medium mb-0.5">Total Revenue</p>
-          <p className="text-xl md:text-2xl font-bold text-green-600">{formatMoney(totalRevenue)}</p>
-        </div>
+        <StatCard label="Branches" value={branches.length} accent="text-chams-navy" />
+        <StatCard label="Flagged Discrepancies" value={flaggedCount} accent={TONE_TEXT.danger} />
+        <StatCard label="Total Remaining (Calc.)" value={totalRemaining} accent="text-chams-navy" />
+        <StatCard label="Total Revenue" value={formatMoney(totalRevenue)} accent={TONE_TEXT.success} />
       </div>
 
       {notSubmittedCount > 0 && (
@@ -102,12 +92,12 @@ export default function LedgerView({ branches, products, beginnings, movements, 
       )}
 
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
-        <h3 className="text-lg font-bold text-[#1B2A4A] mb-4">Revenue by Branch</h3>
+        <h3 className="text-lg font-bold text-chams-navy mb-4">Revenue by Branch</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {branchRevenues.map(({ branch, revenue }) => (
             <div key={branch.id} className="text-center p-4 bg-gray-50 rounded-xl">
               <p className="text-xs font-medium text-gray-500 mb-1">{branch.name}</p>
-              <p className="text-lg font-bold text-[#1B2A4A]">{formatMoney(revenue)}</p>
+              <p className="text-lg font-bold text-chams-navy tabular-nums">{formatMoney(revenue)}</p>
             </div>
           ))}
         </div>
@@ -122,74 +112,66 @@ export default function LedgerView({ branches, products, beginnings, movements, 
         />
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div
-          className="overflow-x-auto w-full"
-          tabIndex={0}
-          role="region"
-          aria-label="Monthly stock ledger"
-        >
-          <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[1020px]">
-            <thead>
-              <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-                <th scope="col" className="px-5 py-4">Branch</th>
-                <th scope="col" className="px-5 py-4">Siopao Type</th>
-                <th scope="col" className="px-5 py-4 text-right">Beginning</th>
-                <th scope="col" className="px-5 py-4 text-right">Restocked</th>
-                <th scope="col" className="px-5 py-4 text-right">Spoilage</th>
-                <th scope="col" className="px-5 py-4 text-right">Sold</th>
-                <th scope="col" className="px-5 py-4 text-right">Revenue</th>
-                <th scope="col" className="px-5 py-4 text-right">Remaining (Calc.)</th>
-                <th scope="col" className="px-5 py-4 text-right">Remaining (Reported)</th>
-                <th scope="col" className="px-5 py-4">Discrepancy</th>
+      <Table label="Monthly stock ledger" labelledBy={headingId} minWidth="min-w-[1020px]">
+        <TableHead>
+          <th scope="col" className="px-5 py-4">Branch</th>
+          <th scope="col" className="px-5 py-4">Siopao Type</th>
+          <th scope="col" className="px-5 py-4 text-right">Beginning</th>
+          <th scope="col" className="px-5 py-4 text-right">Restocked</th>
+          <th scope="col" className="px-5 py-4 text-right">Spoilage</th>
+          <th scope="col" className="px-5 py-4 text-right">Sold</th>
+          <th scope="col" className="px-5 py-4 text-right">Revenue</th>
+          <th scope="col" className="px-5 py-4 text-right">Remaining (Calc.)</th>
+          <th scope="col" className="px-5 py-4 text-right">Remaining (Reported)</th>
+          <th scope="col" className="px-5 py-4">Discrepancy</th>
+        </TableHead>
+        <tbody className="divide-y divide-gray-200 text-sm">
+          {visibleRows.length === 0 ? (
+            <tr>
+              <td colSpan={10}>
+                <EmptyState
+                  title="No ledger rows match your search."
+                  hint="Clear the search to see every branch and siopao type."
+                />
+              </td>
+            </tr>
+          ) : (
+            visibleRows.map((r) => (
+              <tr
+                key={`${r.branchId}-${r.productId}`}
+                className={`hover:bg-gray-50/50 transition-colors ${r.flagged ? "bg-red-50/40" : ""}`}
+              >
+                <th scope="row" className="px-5 py-4 text-left font-medium text-gray-900">{r.branchName}</th>
+                <td className="px-5 py-4 text-gray-600">{r.productName}</td>
+                <td className="px-5 py-4 text-right text-gray-600 tabular-nums">{r.beginning}</td>
+                <td className="px-5 py-4 text-right text-gray-600 tabular-nums">{r.restocked}</td>
+                <td className="px-5 py-4 text-right text-gray-600 tabular-nums">{r.spoilage}</td>
+                <td className="px-5 py-4 text-right text-gray-600 tabular-nums">{r.sold}</td>
+                <td className="px-5 py-4 text-right text-green-700 font-medium tabular-nums">{formatMoney(r.revenue)}</td>
+                <td className="px-5 py-4 text-right font-semibold text-gray-900 tabular-nums">{r.remainingCalculated}</td>
+                <td className="px-5 py-4 text-right text-gray-600 tabular-nums">
+                  {r.countSubmitted ? r.remainingReported : <span className="text-gray-500">—</span>}
+                </td>
+                <td className="px-5 py-4">
+                  {!r.countSubmitted ? (
+                    <Badge family="stock" tone="neutral">
+                      Not Submitted
+                    </Badge>
+                  ) : r.flagged ? (
+                    <Badge family="stock" tone="danger">
+                      {discrepancyLabel(r.discrepancy as number)}
+                    </Badge>
+                  ) : (
+                    <Badge family="stock" tone="success">
+                      Match
+                    </Badge>
+                  )}
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 text-sm">
-              {visibleRows.length === 0 ? (
-                <tr>
-                  <td colSpan={10} className="px-5 py-8 text-center text-gray-500">
-                    No ledger rows match your search.
-                  </td>
-                </tr>
-              ) : (
-                visibleRows.map((r) => (
-                <tr
-                  key={`${r.branchId}-${r.productId}`}
-                  className={`hover:bg-gray-50/50 transition-colors ${r.flagged ? "bg-red-50/40" : ""}`}
-                >
-                  <th scope="row" className="px-5 py-4 text-left font-medium text-gray-900">{r.branchName}</th>
-                  <td className="px-5 py-4 text-gray-600">{r.productName}</td>
-                  <td className="px-5 py-4 text-right text-gray-600">{r.beginning}</td>
-                  <td className="px-5 py-4 text-right text-gray-600">{r.restocked}</td>
-                  <td className="px-5 py-4 text-right text-gray-600">{r.spoilage}</td>
-                  <td className="px-5 py-4 text-right text-gray-600">{r.sold}</td>
-                  <td className="px-5 py-4 text-right text-green-700 font-medium">{formatMoney(r.revenue)}</td>
-                  <td className="px-5 py-4 text-right font-semibold text-gray-900">{r.remainingCalculated}</td>
-                  <td className="px-5 py-4 text-right text-gray-600">
-                    {r.countSubmitted ? r.remainingReported : <span className="text-gray-500">—</span>}
-                  </td>
-                  <td className="px-5 py-4">
-                    {!r.countSubmitted ? (
-                      <span className="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
-                        Not Submitted
-                      </span>
-                    ) : r.flagged ? (
-                      <span className="text-xs font-bold text-red-700 bg-red-100 px-2 py-1 rounded-full">
-                        {discrepancyLabel(r.discrepancy as number)}
-                      </span>
-                    ) : (
-                      <span className="text-xs font-bold text-green-700 bg-green-100 px-2 py-1 rounded-full">
-                        Match
-                      </span>
-                    )}
-                  </td>
-                </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            ))
+          )}
+        </tbody>
+      </Table>
     </div>
   );
 }

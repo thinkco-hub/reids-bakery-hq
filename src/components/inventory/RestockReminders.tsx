@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import SelectField from "../common/SelectField";
+import Button from "../common/Button";
+import EmptyState from "../common/EmptyState";
 import type { FormEvent } from "react";
 import type { IngredientStock, IngredientId, ISODate, RestockReminder, RestockReminderData } from "../../types/domain";
 
@@ -32,15 +34,15 @@ export default function RestockReminders({ ingredients, reminders, onAdd, onTogg
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-[#562D07]">Restock Reminders</h2>
-        <p className="text-[#562D07]/70 mt-1 font-medium text-sm md:text-base">
+        <h2 className="text-2xl md:text-3xl font-bold text-espresso">Restock Reminders</h2>
+        <p className="text-espresso/70 mt-1 font-medium text-sm md:text-base">
           Manual reminders to reorder ingredients ahead of time
         </p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 bg-white rounded-2xl border border-gray-200 shadow-sm p-6 h-max">
-          <h3 className="text-lg font-bold text-[#121212] mb-4">New Reminder</h3>
+          <h3 className="text-lg font-bold text-ink mb-4">New Reminder</h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="reminder-ingredient" className="block text-sm font-semibold text-gray-700 mb-1">Ingredient</label>
@@ -48,7 +50,7 @@ export default function RestockReminders({ ingredients, reminders, onAdd, onTogg
                 id="reminder-ingredient"
                 value={form.ingredientId}
                 onChange={(e) => setForm({ ...form, ingredientId: e.target.value })}
-                className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
               >
                 {ingredients.map((i) => (
                   <option key={i.id} value={i.id}>
@@ -64,7 +66,7 @@ export default function RestockReminders({ ingredients, reminders, onAdd, onTogg
                 type="date"
                 value={form.dueDate}
                 onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                 required
               />
             </div>
@@ -75,28 +77,25 @@ export default function RestockReminders({ ingredients, reminders, onAdd, onTogg
                 value={form.note}
                 onChange={(e) => setForm({ ...form, note: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800"
                 placeholder="Optional note..."
               />
             </div>
-            <button
-              type="submit"
-              className="w-full py-3 rounded-xl text-white font-bold bg-[#562D07] hover:bg-[#3a1d04] transition-colors"
-            >
+            <Button type="submit" size="lg" className="w-full">
               Add Reminder
-            </button>
+            </Button>
           </form>
         </div>
 
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="p-5 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-[#121212]">
+              <h3 className="text-lg font-bold text-ink">
                 Pending <span className="text-gray-500 font-medium text-sm">({pending.length})</span>
               </h3>
             </div>
             {pending.length === 0 ? (
-              <p className="p-6 text-center text-gray-500 text-sm">No pending reminders.</p>
+              <EmptyState title="No pending reminders." hint="Add one above to reorder an ingredient ahead of time." />
             ) : (
               <ul className="divide-y divide-gray-100">
                 {pending.map((r) => (
@@ -106,13 +105,14 @@ export default function RestockReminders({ ingredients, reminders, onAdd, onTogg
                       {r.note && <p className="text-sm text-gray-500 mt-0.5">{r.note}</p>}
                       <p className="text-xs text-gray-500 mt-1">Due {r.dueDate}</p>
                     </div>
-                    <button
+                    <Button
+                      size="sm"
+                      variant="ghostBrand"
                       onClick={() => onToggleDone(r.id)}
                       aria-label={`Mark ${ingredientName(r.ingredientId)} reminder as done`}
-                      className="px-3 py-1.5 rounded-md text-xs font-bold bg-orange-50 text-[var(--color-brand-text)] hover:bg-orange-100 transition-colors whitespace-nowrap"
                     >
                       Mark Done
-                    </button>
+                    </Button>
                   </li>
                 ))}
               </ul>
@@ -122,7 +122,7 @@ export default function RestockReminders({ ingredients, reminders, onAdd, onTogg
           {done.length > 0 && (
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
               <div className="p-5 border-b border-gray-100">
-                <h3 className="text-lg font-bold text-[#121212]">
+                <h3 className="text-lg font-bold text-ink">
                   Completed <span className="text-gray-500 font-medium text-sm">({done.length})</span>
                 </h3>
               </div>
@@ -135,13 +135,14 @@ export default function RestockReminders({ ingredients, reminders, onAdd, onTogg
                       </p>
                       <p className="text-xs text-gray-500 mt-1">Due {r.dueDate}</p>
                     </div>
-                    <button
+                    <Button
+                      size="sm"
+                      variant="ghost"
                       onClick={() => onToggleDone(r.id)}
                       aria-label={`Reopen ${ingredientName(r.ingredientId)} reminder`}
-                      className="px-3 py-1.5 rounded-md text-xs font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors whitespace-nowrap"
                     >
                       Reopen
-                    </button>
+                    </Button>
                   </li>
                 ))}
               </ul>

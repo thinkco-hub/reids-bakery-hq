@@ -22,7 +22,7 @@ export default function UnknownRoute() {
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <section className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 md:p-8">
-        <h2 className="text-3xl font-bold text-[#121212]">Page not found</h2>
+        <h2 className="text-3xl font-bold text-ink">Page not found</h2>
         <p className="text-gray-500 mt-2">
           There is no screen at <code className="font-mono break-all">{pathname}</code>
         </p>
@@ -30,7 +30,7 @@ export default function UnknownRoute() {
         {/* Every role's ROLE_TABS includes dashboard, so this exit always lands. */}
         <Link
           to={PATH_BY_TAB[DEFAULT_TAB]}
-          className="inline-flex mt-6 px-4 py-2.5 rounded-lg bg-[#562D07] hover:bg-[#3a1d04] text-white font-bold text-sm shadow-sm transition-colors"
+          className="inline-flex mt-6 px-4 py-2.5 rounded-lg bg-espresso hover:bg-espresso-deep text-white font-bold text-sm shadow-sm transition-colors"
         >
           Go to Dashboard
         </Link>

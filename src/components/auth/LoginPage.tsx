@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
+import Button from "../common/Button";
 import type { LoginCredentials } from "../../types/domain";
 import type { LoginResult } from "../../hooks/useAuth";
 
@@ -70,12 +71,12 @@ export default function LoginPage({ onLogin, getLockedUntil }: LoginPageProps) {
   };
 
   return (
-    <main className="fixed inset-0 flex items-center justify-center bg-[#FDF9F3] px-4">
+    <main className="fixed inset-0 flex items-center justify-center bg-cream px-4">
       <form
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm animate-fadeIn"
       >
-        <h1 className="text-2xl font-bold text-[#121212] mb-1">Bakery Command Center</h1>
+        <h1 className="text-2xl font-bold text-ink mb-1">Bakery Command Center</h1>
         <p className="text-gray-500 text-sm mb-6">Sign in to continue</p>
 
         <div className="space-y-4">
@@ -88,7 +89,7 @@ export default function LoginPage({ onLogin, getLockedUntil }: LoginPageProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               aria-describedby={errorMessage ? "login-error" : undefined}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 disabled:bg-gray-100 disabled:text-gray-400"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800 disabled:bg-gray-100 disabled:text-gray-400"
               autoComplete="username"
               disabled={isLocked}
               required
@@ -102,7 +103,7 @@ export default function LoginPage({ onLogin, getLockedUntil }: LoginPageProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               aria-describedby={errorMessage ? "login-error" : undefined}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800 disabled:bg-gray-100 disabled:text-gray-400"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none text-gray-800 disabled:bg-gray-100 disabled:text-gray-400"
               autoComplete="current-password"
               disabled={isLocked}
               required
@@ -121,13 +122,9 @@ export default function LoginPage({ onLogin, getLockedUntil }: LoginPageProps) {
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={submitting || isLocked}
-          className="w-full mt-6 py-3 rounded-xl text-white font-bold bg-[#562D07] hover:bg-[#3a1d04] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+        <Button type="submit" size="lg" className="w-full mt-6" disabled={submitting || isLocked}>
           {isLocked ? "Locked" : submitting ? "Signing in..." : "Log In"}
-        </button>
+        </Button>
       </form>
     </main>
   );
