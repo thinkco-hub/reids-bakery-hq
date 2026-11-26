@@ -1,27 +1,57 @@
-import { useBakeryStore } from "./BakeryProvider";
+import { useContext } from "react";
+import type { Context } from "react";
+import {
+  CatalogueContext,
+  ClientsContext,
+  ClosingContext,
+  CurrentUserContext,
+  OrdersContext,
+  PosContext,
+  ProductionContext,
+} from "./BakeryProvider";
 import { canAccessIngredients, canViewRecipeCosts } from "../utils/permissions";
-import type { BakeryStore } from "./BakeryProvider";
-import type { IngredientStock } from "../types/domain";
+import type {
+  CatalogueSlice,
+  ClientsSlice,
+  ClosingSlice,
+  OrdersSlice,
+  PosSlice,
+  ProductionSlice,
+} from "./BakeryProvider";
+import type { IngredientStock, User } from "../types/domain";
 
-export type CatalogueSlice = BakeryStore["catalogue"];
-export type ClientsSlice = BakeryStore["clients"];
-export type ProductionSlice = BakeryStore["production"];
-export type OrdersSlice = BakeryStore["orders"];
-export type ClosingSlice = BakeryStore["closing"];
-export type PosSlice = BakeryStore["pos"];
+export type {
+  CatalogueSlice,
+  ClientsSlice,
+  ClosingSlice,
+  OrdersSlice,
+  PosSlice,
+  ProductionSlice,
+};
 
-export const useCatalogueSlice = (): CatalogueSlice => useBakeryStore().catalogue;
-export const useClientsSlice = (): ClientsSlice => useBakeryStore().clients;
-export const useProductionSlice = (): ProductionSlice => useBakeryStore().production;
-export const useOrdersSlice = (): OrdersSlice => useBakeryStore().orders;
-export const useClosingSlice = (): ClosingSlice => useBakeryStore().closing;
-export const usePosSlice = (): PosSlice => useBakeryStore().pos;
+/** A slice a component asked for outside the provider is a wiring bug, not a type. */
+function useRequired<T>(context: Context<T | null>, name: string): T {
+  const value = useContext(context);
+  if (!value) throw new Error(`${name} must be used inside BakeryProvider`);
+  return value;
+}
+
+export const useCurrentUser = (): User => useRequired(CurrentUserContext, "useCurrentUser");
+
+export const useCatalogueSlice = (): CatalogueSlice =>
+  useRequired(CatalogueContext, "useCatalogueSlice");
+export const useClientsSlice = (): ClientsSlice => useRequired(ClientsContext, "useClientsSlice");
+export const useProductionSlice = (): ProductionSlice =>
+  useRequired(ProductionContext, "useProductionSlice");
+export const useOrdersSlice = (): OrdersSlice => useRequired(OrdersContext, "useOrdersSlice");
+export const useClosingSlice = (): ClosingSlice => useRequired(ClosingContext, "useClosingSlice");
+export const usePosSlice = (): PosSlice => useRequired(PosContext, "usePosSlice");
 
 export const useCanViewIngredients = (): boolean =>
-  canAccessIngredients(useBakeryStore().currentUser.role);
+  canAccessIngredients(useCurrentUser().role);
 
 export const useCanViewIngredientCosts = (): boolean =>
-  canViewRecipeCosts(useBakeryStore().currentUser.role);
+  canViewRecipeCosts(useCurrentUser().role);
 
 /**
  * Raw-material stock reduced to the one projection the screens may read. Its

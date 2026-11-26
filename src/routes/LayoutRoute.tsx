@@ -1,9 +1,9 @@
-import React, { useRef } from "react";
+import React, { Suspense, useCallback, useMemo, useRef } from "react";
 import { Outlet } from "react-router";
 import MobileTopBar from "../components/layout/MobileTopBar";
+import RouteFallback from "../components/common/RouteFallback";
 import Sidebar from "../components/layout/Sidebar";
 import { usePosSlice } from "../store/slices";
-import { canUseSidebarRail, isPhoneViewport } from "../utils/responsive";
 import { useShell } from "./shell";
 
 /**
@@ -22,7 +22,8 @@ export default function LayoutRoute() {
     setIsInventoryExpanded,
     isReportsExpanded,
     setIsReportsExpanded,
-    windowWidth,
+    canUseSidebarRail: isDesktopRail,
+    isPhoneViewport,
   } = useShell();
   const { cartQty, ticketCustomer, openCustomerPicker, clearTicket } = usePosSlice();
 
@@ -30,11 +31,27 @@ export default function LayoutRoute() {
   // the top bar rather than in the sidebar.
   const navTriggerRef = useRef<HTMLButtonElement>(null);
 
-  // Wide, mouse-driven viewports keep the pinned sidebar rail; phones and
-  // tablets (including touch devices that report a desktop viewport) use the
-  // hamburger drawer, so the top bar and the drawer share one test.
-  const isDesktopRail = canUseSidebarRail(windowWidth);
+  // The shell's predicate is the one test both the top bar and the drawer use:
+  // wide mouse viewports keep the pinned rail; phones and tablets, including
+  // touch devices reporting a desktop viewport, get the hamburger drawer.
   const isPosRoute = activeTab === "pos";
+
+  // The chrome is memoized, so its props have to keep their identity across a
+  // route re-render; an inline arrow here would re-commit the whole sidebar.
+  const openMobileNav = useCallback(() => setIsSidebarOpen(true), [setIsSidebarOpen]);
+  const closeMobileNav = useCallback(() => setIsSidebarOpen(false), [setIsSidebarOpen]);
+  const ticket = useMemo(
+    () =>
+      isPosRoute && isPhoneViewport
+        ? {
+            ticketCount: cartQty,
+            customer: ticketCustomer,
+            onAddCustomer: openCustomerPicker,
+            onClearTicket: clearTicket,
+          }
+        : null,
+    [isPosRoute, isPhoneViewport, cartQty, ticketCustomer, openCustomerPicker, clearTicket]
+  );
 
   return (
     <>
@@ -46,26 +63,13 @@ export default function LayoutRoute() {
       </a>
 
       {!isDesktopRail && (
-        <MobileTopBar
-          onOpenMobileNav={() => setIsSidebarOpen(true)}
-          triggerRef={navTriggerRef}
-          pos={
-            isPosRoute && isPhoneViewport(windowWidth)
-              ? {
-                  ticketCount: cartQty,
-                  customer: ticketCustomer,
-                  onAddCustomer: openCustomerPicker,
-                  onClearTicket: clearTicket,
-                }
-              : null
-          }
-        />
+        <MobileTopBar onOpenMobileNav={openMobileNav} triggerRef={navTriggerRef} pos={ticket} />
       )}
 
       <Sidebar
         currentUser={currentUser}
         onLogout={logout}
-        windowWidth={windowWidth}
+        isDesktopRail={isDesktopRail}
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
         triggerRef={navTriggerRef}
@@ -73,7 +77,7 @@ export default function LayoutRoute() {
         setIsInventoryExpanded={setIsInventoryExpanded}
         isReportsExpanded={isReportsExpanded}
         setIsReportsExpanded={setIsReportsExpanded}
-        onNavSelect={() => setIsSidebarOpen(false)}
+        onNavSelect={closeMobileNav}
       />
 
       <main
@@ -86,8 +90,12 @@ export default function LayoutRoute() {
         {/* The view titles are h2s; this is the one page heading, and it sits in
             the landmark the skip link targets. */}
         <h1 className="sr-only">Reid's Bakery HQ</h1>
-        {/* Each route guards its own tab; see src/components/RequireAccess.tsx. */}
-        <Outlet />
+        {/* Each route guards its own tab; see src/components/RequireAccess.tsx.
+            The boundary sits inside the shell so the chrome never unmounts
+            while a screen's chunk arrives. */}
+        <Suspense fallback={<RouteFallback />}>
+          <Outlet />
+        </Suspense>
       </main>
     </>
   );

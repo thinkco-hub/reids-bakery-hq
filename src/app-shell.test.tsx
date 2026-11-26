@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter, useLocation, useNavigate } from "react-router";
 import userEvent from "@testing-library/user-event";
 import type { UserEvent } from "@testing-library/user-event";
@@ -41,6 +41,14 @@ function renderShellAt(path: string, behind: string[] = []) {
 
 const pathInAddressBar = () => screen.getByTestId("pathname").textContent;
 
+/**
+ * Routes arrive as chunks and the router commits a navigation inside a
+ * transition, so the address bar follows the click a moment later than it did
+ * with eager imports. Wait for it the way the destination screen is awaited.
+ */
+const expectPath = (expected: string) =>
+  waitFor(() => expect(pathInAddressBar()).toBe(expected));
+
 /** useNavigation reads the width when it mounts, so this runs before rendering. */
 function setViewportWidth(width: number) {
   Object.defineProperty(window, "innerWidth", {
@@ -76,7 +84,8 @@ async function addProduct(
   times: number
 ) {
   for (let i = 0; i < times; i++) {
-    const [card] = screen.getAllByRole("button", { name: new RegExp(name) });
+    // Routes arrive as chunks now; the first POS tap may land before the chunk.
+    const [card] = await screen.findAllByRole("button", { name: new RegExp(name) });
     await user.click(card);
   }
 }
@@ -112,7 +121,7 @@ describe("app shell state identity", () => {
     await user.type(ticketName, "Ampara Catering");
 
     await openTab(user, "Orders");
-    expect(screen.getByRole("heading", { name: "Orders" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Orders" })).toBeInTheDocument();
     expect(screen.queryByText("Current Ticket")).toBeNull();
 
     await openTab(user, "Point of Sale");
@@ -133,7 +142,9 @@ describe("app shell state identity", () => {
     expect(screen.getByText("Ampara Catering")).toBeInTheDocument();
     // The ticket owns the name; no client record was created for it.
     expect(within(sidebar()).queryByText("Clients")).toBeNull();
-  });
+    // Lazy route chunks add real async work to every first tab visit; under the
+    // full suite's parallel jsdom load this test needs more than the 5s default.
+  }, 15000);
 
   /**
    * The same overlay for a role that does own the Clients tab still reads the
@@ -213,13 +224,13 @@ describe("nested routes", () => {
     expect(
       await screen.findByRole("heading", { name: "Closing Inventory Count" })
     ).toBeInTheDocument();
-    expect(pathInAddressBar()).toBe("/inventory/closing-count");
+    await expectPath("/inventory/closing-count");
 
     await user.click(screen.getByRole("button", { name: "Back to Inventory" }));
     expect(
       await screen.findByRole("heading", { name: "Inventory: Menu Items" })
     ).toBeInTheDocument();
-    expect(pathInAddressBar()).toBe("/inventory");
+    await expectPath("/inventory");
   });
 
   it("closes the phone drawer when a nested screen is chosen from it", async () => {
@@ -235,7 +246,7 @@ describe("nested routes", () => {
     expect(
       await screen.findByRole("heading", { name: "Inventory Reconciliation" })
     ).toBeInTheDocument();
-    expect(pathInAddressBar()).toBe("/inventory/reconciliation");
+    await expectPath("/inventory/reconciliation");
     // Off-canvas is the only thing that hides the drawer, so the transform is
     // the state under test — the submenu link itself stays in the document.
     expect(drawer.className).toContain("-translate-x-full");
@@ -256,7 +267,7 @@ describe("nested routes", () => {
     );
 
     expect(within(drawer).queryByRole("link", { name: "Reconciliation" })).toBeNull();
-    expect(pathInAddressBar()).toBe("/inventory");
+    await expectPath("/inventory");
   });
 
   it("keeps the Reports header's layout utilities as separate classes", async () => {
@@ -442,10 +453,10 @@ describe("order detail routes", () => {
 
     // The id has to survive as a path segment. /orders/ plus a "#1042" fragment
     // leaves the list on screen and reads to a cashier as an inert button.
-    expect(pathInAddressBar()).toBe(`/orders/${encodeURIComponent(clickedId)}`);
     expect(
       await screen.findByRole("heading", { name: `Order ${clickedId}` })
     ).toBeInTheDocument();
+    await expectPath(`/orders/${encodeURIComponent(clickedId)}`);
   });
 
   it("opens the same record when its URL is loaded cold", async () => {
@@ -468,7 +479,7 @@ describe("order detail routes", () => {
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Back to list" }));
-    expect(pathInAddressBar()).toBe("/orders");
+    await expectPath("/orders");
     expect(await screen.findByRole("heading", { name: "Orders" })).toBeInTheDocument();
   });
 });
@@ -508,15 +519,15 @@ describe("record dismissal", () => {
     const [firstRow] = screen.getAllByRole("button", { name: /^View order #/ });
     const clickedId = firstRow.getAttribute("aria-label")!.replace("View order ", "");
     await user.click(firstRow);
-    expect(pathInAddressBar()).toBe(`/orders/${encodeURIComponent(clickedId)}`);
+    await expectPath(`/orders/${encodeURIComponent(clickedId)}`);
 
     await user.click(panelBack("Orders"));
-    expect(pathInAddressBar()).toBe("/orders");
+    await expectPath("/orders");
 
     // A push would leave the record on the history stack, so Back would land on
     // the order this test has already dismissed.
     await user.click(screen.getByRole("button", { name: "Browser back" }));
-    expect(pathInAddressBar()).toBe("/");
+    await expectPath("/");
     expect(await screen.findByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
   });
 
@@ -532,7 +543,7 @@ describe("record dismissal", () => {
     await screen.findByRole("heading", { name: "Order #1042" });
 
     await user.click(panelBack("Orders"));
-    expect(pathInAddressBar()).toBe("/orders");
+    await expectPath("/orders");
     expect(await screen.findByRole("heading", { name: "Orders" })).toBeInTheDocument();
   });
 });
@@ -547,7 +558,7 @@ describe("client record routes", () => {
     const [firstClient] = screen.getAllByRole("button", { name: /^View / });
     await user.click(firstClient);
 
-    expect(pathInAddressBar()).toBe("/clients/CL-001");
+    await expectPath("/clients/CL-001");
     expect(await screen.findByRole("heading", { name: "Cafe Luna" })).toBeInTheDocument();
   });
 
@@ -568,11 +579,11 @@ describe("client record routes", () => {
     await screen.findByRole("heading", { name: "Cafe Luna" });
 
     await user.click(screen.getByText("#1042"));
-    expect(pathInAddressBar()).toBe("/orders/%231042");
+    await expectPath("/orders/%231042");
     expect(await screen.findByRole("heading", { name: "Order #1042" })).toBeInTheDocument();
 
     await user.click(panelBack("Orders"));
-    expect(pathInAddressBar()).toBe("/clients/CL-001");
+    await expectPath("/clients/CL-001");
     expect(await screen.findByRole("heading", { name: "Cafe Luna" })).toBeInTheDocument();
   });
 });
@@ -594,8 +605,8 @@ describe("recipe record routes", () => {
     await screen.findByRole("heading", { name: "Recipes / BOM" });
 
     await user.click(screen.getByRole("button", { name: "+ New Recipe" }));
-    expect(pathInAddressBar()).toBe("/recipes/new");
     expect(await screen.findByText("New Recipe")).toBeInTheDocument();
+    await expectPath("/recipes/new");
   });
 
   it("saves onto the list and leaves the saved editor off the history stack", async () => {
@@ -606,15 +617,15 @@ describe("recipe record routes", () => {
 
     const [firstRecipe] = screen.getAllByRole("button", { name: /^Edit / });
     await user.click(firstRecipe);
-    expect(pathInAddressBar()).toBe("/recipes/B-101");
+    await expectPath("/recipes/B-101");
 
     await user.click(screen.getByRole("button", { name: "Save Recipe" }));
-    expect(pathInAddressBar()).toBe("/recipes");
+    await expectPath("/recipes");
 
     // The save replaced the editor entry. A push would put Back on a form that
     // has already been saved.
     await user.click(screen.getByRole("button", { name: "Browser back" }));
-    expect(pathInAddressBar()).toBe("/recipes");
+    await expectPath("/recipes");
     expect(await screen.findByRole("heading", { name: "Recipes / BOM" })).toBeInTheDocument();
   });
 
@@ -625,7 +636,7 @@ describe("recipe record routes", () => {
     await screen.findByText("New Recipe");
 
     await user.click(screen.getByRole("button", { name: "Cancel" }));
-    expect(pathInAddressBar()).toBe("/recipes");
+    await expectPath("/recipes");
     expect(await screen.findByRole("heading", { name: "Recipes / BOM" })).toBeInTheDocument();
   });
 });
@@ -648,7 +659,7 @@ describe("route access guards", () => {
     // The guard navigates while mounting, so the dashboard is awaited before the
     // address is read; an unwrapped leaf would sit on its own path and time out.
     await screen.findByRole("heading", { name: "Dashboard" });
-    expect(pathInAddressBar()).toBe("/");
+    await expectPath("/");
   });
 
   /**
@@ -664,7 +675,7 @@ describe("route access guards", () => {
       await signInAsCashier(user);
 
       await screen.findByRole("heading", { name: "Dashboard" });
-      expect(pathInAddressBar()).toBe("/");
+      await expectPath("/");
     }
   );
 
@@ -679,7 +690,7 @@ describe("route access guards", () => {
     expect(
       await screen.findByRole("heading", { name: "Order #1042" })
     ).toBeInTheDocument();
-    expect(pathInAddressBar()).toBe("/orders/%231042");
+    await expectPath("/orders/%231042");
   });
 });
 
@@ -703,10 +714,10 @@ describe("unknown route", () => {
 
     // The assertion that pins the redirect's removal: the address bar still
     // holds what was typed, so the screen can name it.
-    expect(pathInAddressBar()).toBe("/ordres");
+    await expectPath("/ordres");
 
     await user.click(screen.getByRole("link", { name: "Go to Dashboard" }));
-    expect(pathInAddressBar()).toBe("/");
+    await expectPath("/");
     expect(await screen.findByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
   });
 
@@ -731,7 +742,7 @@ describe("unknown route", () => {
     await signInAsCashier(user);
 
     await screen.findByRole("heading", { name: "Dashboard" });
-    expect(pathInAddressBar()).toBe("/");
+    await expectPath("/");
     expect(screen.queryByRole("heading", { name: "Page not found" })).not.toBeInTheDocument();
   });
 
@@ -746,7 +757,7 @@ describe("unknown route", () => {
       await screen.findByRole("button", { name: /Chams Ledger/ })
     ).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Page not found" })).not.toBeInTheDocument();
-    expect(pathInAddressBar()).toBe("/chams");
+    await expectPath("/chams");
   });
 
   /**

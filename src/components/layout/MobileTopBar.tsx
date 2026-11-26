@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import type { RefObject } from "react";
 import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
 import { useAnnounce } from "../common/Announcer";
@@ -27,7 +27,7 @@ interface MobileTopBarProps {
  * navigation drawer rather than here, which frees the phone row up for the
  * ticket controls the POS needs within thumb reach at all times.
  */
-export default function MobileTopBar({ onOpenMobileNav, triggerRef, pos }: MobileTopBarProps) {
+function MobileTopBar({ onOpenMobileNav, triggerRef, pos }: MobileTopBarProps) {
   const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
   const announce = useAnnounce();
 
@@ -162,3 +162,7 @@ export default function MobileTopBar({ onOpenMobileNav, triggerRef, pos }: Mobil
     </header>
   );
 }
+
+// Same contract as the rail: it re-commits when its own props change, not
+// because a screen below the shell re-rendered.
+export default memo(MobileTopBar);

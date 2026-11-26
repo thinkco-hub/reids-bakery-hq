@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from "react";
+import { memo, useId, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router";
 import type { User } from "../../types/domain";
 import type { Dispatch, RefObject, SetStateAction } from "react";
@@ -7,14 +7,14 @@ import {
   canAccessReconciliation,
   canAccessTab,
 } from "../../utils/permissions";
-import { canUseSidebarRail } from "../../utils/responsive";
 import { useDrawerA11y } from "../../hooks/useDrawerA11y";
 import { CHAMS_PATH, PATH_BY_TAB, isWithinPath } from "../../routes";
 
 interface SidebarProps {
   currentUser: User;
   onLogout: () => void;
-  windowWidth: number;
+  /** The shell's drawer/rail predicate; the rail waits for a wide fine pointer. */
+  isDesktopRail: boolean;
   isSidebarOpen: boolean;
   setIsSidebarOpen: Dispatch<SetStateAction<boolean>>;
   /** The hamburger in the top bar; focus returns to it when the drawer closes. */
@@ -47,10 +47,10 @@ function subItemCls(active: boolean) {
   }`;
 }
 
-export default function Sidebar({
+function Sidebar({
   currentUser,
   onLogout,
-  windowWidth,
+  isDesktopRail,
   isSidebarOpen,
   setIsSidebarOpen,
   triggerRef,
@@ -75,10 +75,9 @@ export default function Sidebar({
   const reportsSubmenuId = useId();
 
   // --- SIDEBAR RESPONSIVE HELPERS ---
-  // Phones and tablets open the sidebar from the hamburger as an off-canvas
-  // drawer. Only a mouse-driven viewport gets the pinned rail, because the rail
-  // relies on hover to reveal its labels.
-  const isDesktopRail = canUseSidebarRail(windowWidth);
+  // Drawer or rail is the shell's call (useCanUseSidebarRail): only a wide,
+  // mouse-driven viewport gets the pinned rail, because the rail relies on
+  // hover to reveal its labels.
 
   // Desktop rail: expanded while the pointer is anywhere inside the panel or
   // focus is inside it, collapsed once both leave. Testing clientX against the
@@ -168,7 +167,7 @@ export default function Sidebar({
           }
         }}
         className={`
-        inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out flex flex-col
+        inset-y-0 left-0 z-50 transform transition-[translate,width] duration-300 ease-in-out flex flex-col
         bg-[#562D07] text-[#FDF9F3] shadow-2xl
         ${
           isDesktopRail
@@ -615,3 +614,7 @@ export default function Sidebar({
     </>
   );
 }
+
+// A POS search keystroke re-renders LayoutRoute; the chrome behind a stable
+// prop set does not commit with it.
+export default memo(Sidebar);

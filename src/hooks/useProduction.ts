@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { initialProductionRuns } from "../data/initialProductionRuns";
 import { computeBatches } from "../utils/production";
 import { recordAuditEvent } from "../utils/auditLog";
@@ -42,87 +42,91 @@ export function useProduction({
     seededProductionRuns ?? initialProductionRuns
   );
 
-  const logProductionEvent = (
-    action: "production.run_scheduled" | "production.run_completed" | "production.run_deleted",
-    runId: ProductionRunId,
-    details: string
-  ) => {
-    if (!currentUser) return;
-    recordAuditEvent({
-      userId: currentUser.id,
-      userName: currentUser.name,
-      userRole: currentUser.role,
-      action,
-      entityType: "ProductionRun",
-      entityId: runId,
-      details,
-    });
-  };
+  // One memoized slice object: consumers re-render only when runs state, the
+  // recipes it completes against or an injected stock action changes.
+  return useMemo(() => {
+    const logProductionEvent = (
+      action: "production.run_scheduled" | "production.run_completed" | "production.run_deleted",
+      runId: ProductionRunId,
+      details: string
+    ) => {
+      if (!currentUser) return;
+      recordAuditEvent({
+        userId: currentUser.id,
+        userName: currentUser.name,
+        userRole: currentUser.role,
+        action,
+        entityType: "ProductionRun",
+        entityId: runId,
+        details,
+      });
+    };
 
-  const scheduleProductionRun = (data: ScheduleRunData) => {
-    const id: ProductionRunId = `PR-${String(productionRuns.length + 1).padStart(3, "0")}`;
-    setProductionRuns((prev) => [
-      ...prev,
-      {
+    const scheduleProductionRun = (data: ScheduleRunData) => {
+      const id: ProductionRunId = `PR-${String(productionRuns.length + 1).padStart(3, "0")}`;
+      setProductionRuns((prev) => [
+        ...prev,
+        {
+          id,
+          recipeId: data.recipeId,
+          plannedQty: data.plannedQty,
+          plannedDate: data.plannedDate,
+          notes: data.notes,
+          status: "scheduled",
+          completedDate: null,
+        },
+      ]);
+      logProductionEvent(
+        "production.run_scheduled",
         id,
-        recipeId: data.recipeId,
-        plannedQty: data.plannedQty,
-        plannedDate: data.plannedDate,
-        notes: data.notes,
-        status: "scheduled",
-        completedDate: null,
-      },
-    ]);
-    logProductionEvent(
-      "production.run_scheduled",
-      id,
-      `Scheduled production run ${id} (${data.plannedQty} units on ${data.plannedDate})`
-    );
-  };
+        `Scheduled production run ${id} (${data.plannedQty} units on ${data.plannedDate})`
+      );
+    };
 
-  const completeProductionRun = (id: ProductionRunId) => {
-    const run = productionRuns.find((r) => r.id === id);
-    const recipe = recipes.find((r) => r.id === run?.recipeId);
-    if (!run || !recipe) return;
+    const completeProductionRun = (id: ProductionRunId) => {
+      const run = productionRuns.find((r) => r.id === id);
+      const recipe = recipes.find((r) => r.id === run?.recipeId);
+      if (!run || !recipe) return;
 
-    const batches = computeBatches(run.plannedQty, recipe);
-    const actualYield = batches * (Number(recipe.yieldQty) || 0);
+      const batches = computeBatches(run.plannedQty, recipe);
+      const actualYield = batches * (Number(recipe.yieldQty) || 0);
 
-    deductRecipeLines(recipe.ingredients, batches);
-    addMenuStock(recipe.id, actualYield);
+      deductRecipeLines(recipe.ingredients, batches);
+      addMenuStock(recipe.id, actualYield);
 
-    setProductionRuns((prev) =>
-      prev.map((r) =>
-        r.id === id
-          ? {
-              ...r,
-              status: "completed",
-              completedDate: todayISO(),
-              actualYield,
-              batches,
-            }
-          : r
-      )
-    );
-    logProductionEvent(
-      "production.run_completed",
-      id,
-      `Completed production run ${id} (${batches} batches, yield ${actualYield})`
-    );
-  };
+      setProductionRuns((prev) =>
+        prev.map((r) =>
+          r.id === id
+            ? {
+                ...r,
+                status: "completed",
+                completedDate: todayISO(),
+                actualYield,
+                batches,
+              }
+            : r
+        )
+      );
+      logProductionEvent(
+        "production.run_completed",
+        id,
+        `Completed production run ${id} (${batches} batches, yield ${actualYield})`
+      );
+    };
 
-  const deleteProductionRun = (id: ProductionRunId) => {
-    const run = productionRuns.find((r) => r.id === id);
-    if (!run || run.status === "completed") return;
+    const deleteProductionRun = (id: ProductionRunId) => {
+      const run = productionRuns.find((r) => r.id === id);
+      if (!run || run.status === "completed") return;
 
-    setProductionRuns((prev) => prev.filter((r) => r.id !== id));
-    logProductionEvent("production.run_deleted", id, `Deleted production run ${id}`);
-  };
+      setProductionRuns((prev) => prev.filter((r) => r.id !== id));
+      logProductionEvent("production.run_deleted", id, `Deleted production run ${id}`);
+    };
 
-  return {
-    productionRuns,
-    scheduleProductionRun,
-    completeProductionRun,
-    deleteProductionRun,
-  };
+    return {
+      productionRuns,
+      scheduleProductionRun,
+      completeProductionRun,
+      deleteProductionRun,
+    };
+  }, [productionRuns, recipes, deductRecipeLines, addMenuStock, currentUser]);
 }

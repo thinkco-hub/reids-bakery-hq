@@ -37,7 +37,8 @@ export function fixtureShell(currentUser: User): ShellContextValue {
     setIsInventoryExpanded: noop,
     isReportsExpanded: false,
     setIsReportsExpanded: noop,
-    windowWidth: 1024,
+    canUseSidebarRail: true,
+    isPhoneViewport: false,
   };
 }
 
