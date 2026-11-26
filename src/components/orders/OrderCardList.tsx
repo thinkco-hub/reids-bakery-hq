@@ -50,7 +50,7 @@ export default function OrderCardList({ orders, menuInventory, getClientName, on
           id="orders-mobile-sort"
           value={mobileSort}
           onChange={(e) => setMobileSort(e.target.value as SortKey)}
-          className="pl-3 py-2 border border-gray-200 rounded-lg bg-white text-sm font-medium text-gray-700 focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
+          className="pl-3 py-2 border border-gray-200 rounded-lg bg-white text-sm font-medium text-gray-700 focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
         >
           <option value="created">Newest first</option>
           <option value="date">Requested date</option>

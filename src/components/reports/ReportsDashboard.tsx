@@ -231,7 +231,7 @@ export default function ReportsDashboard({
               setPreset("custom");
             }}
             aria-label="Report start date"
-            className="px-3 py-1.5 border border-gray-200 rounded-md text-sm text-gray-600 focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
+            className="px-3 py-1.5 border border-gray-200 rounded-md text-sm text-gray-600 focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
           />
           <span className="text-gray-500 text-sm">to</span>
           <input
@@ -242,7 +242,7 @@ export default function ReportsDashboard({
               setPreset("custom");
             }}
             aria-label="Report end date"
-            className="px-3 py-1.5 border border-gray-200 rounded-md text-sm text-gray-600 focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
+            className="px-3 py-1.5 border border-gray-200 rounded-md text-sm text-gray-600 focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
           />
         </div>
       </div>
@@ -301,7 +301,7 @@ export default function ReportsDashboard({
               value={logSearch}
               onChange={(e) => setLogSearch(e.target.value)}
               aria-label="Search sales by sale number or customer"
-              className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-500 outline-none focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)]"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-500 outline-none focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)]"
               placeholder="Search sale # or customer..."
             />
           </div>

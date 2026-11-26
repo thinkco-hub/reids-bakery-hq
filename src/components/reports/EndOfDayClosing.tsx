@@ -96,7 +96,7 @@ export default function EndOfDayClosing({
           value={date}
           onChange={(e) => setDate(e.target.value)}
           aria-label="Closing date"
-          className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-700 focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none bg-white shadow-sm"
+          className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-700 focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none bg-white shadow-sm"
         />
       </header>
 

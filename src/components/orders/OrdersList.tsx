@@ -50,13 +50,15 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
         <div className="w-full h-px md:w-px md:h-8 bg-gray-200 my-2 md:my-0 block"></div>
         <div className="flex items-center gap-2 w-full md:w-auto px-2">
           <label htmlFor="orders-date-filter" className="text-sm text-gray-500 font-medium whitespace-nowrap">Filter Date:</label>
-          <input
-            id="orders-date-filter"
-            type="date"
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-            className="px-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-600 focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none flex-1 md:flex-none cursor-pointer"
-          />
+          <div className="flex-1 md:flex-none rounded-md focus-within:ring-2 focus-within:ring-[var(--color-brand-text)]">
+            <input
+              id="orders-date-filter"
+              type="date"
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="w-full px-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-600 focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none cursor-pointer"
+            />
+          </div>
           {dateFilter && (
             <button
               onClick={() => setDateFilter("")}
