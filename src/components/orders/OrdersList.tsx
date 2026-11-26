@@ -79,7 +79,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
         </div>
       </div>
 
-      <div className="flex overflow-x-auto hide-scrollbar gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-6">
         {(["All", ...ORDER_STATUSES] as Array<OrderStatus | "All">).map((tab) => {
           const count = tab === "All" ? orders.length : orders.filter((o) => o.status === tab).length;
           return (
@@ -87,7 +87,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
               key={tab}
               onClick={() => setStatusFilter(tab)}
               aria-pressed={statusFilter === tab}
-              className={`px-4 py-1.5 rounded border text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-text)] ${
+              className={`px-4 py-1.5 min-h-[2.75rem] rounded border text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-text)] ${
                 statusFilter === tab
                   ? "bg-blue-50 border-blue-200 text-blue-700 shadow-sm"
                   : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"

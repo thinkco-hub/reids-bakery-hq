@@ -113,7 +113,7 @@ export default function RunDetailModal({ run, recipe, ingredients, onClose, onCo
         <div className="shrink-0 flex flex-wrap gap-3 border-t border-gray-100 px-6 md:px-8 py-4 md:py-6">
           <button
             onClick={onClose}
-            className="flex-1 min-h-[2.75rem] md:min-h-0 px-4 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold whitespace-nowrap hover:bg-gray-100 transition-colors"
+            className="flex-1 min-h-[2.75rem] px-4 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold whitespace-nowrap hover:bg-gray-100 transition-colors"
           >
             Close
           </button>
@@ -121,13 +121,13 @@ export default function RunDetailModal({ run, recipe, ingredients, onClose, onCo
             <>
               <button
                 onClick={onDelete}
-                className="min-h-[2.75rem] md:min-h-0 px-4 py-3 rounded-xl border border-red-200 text-red-700 font-bold whitespace-nowrap hover:bg-red-50 transition-colors"
+                className="min-h-[2.75rem] px-4 py-3 rounded-xl border border-red-200 text-red-700 font-bold whitespace-nowrap hover:bg-red-50 transition-colors"
               >
                 Delete
               </button>
               <button
                 onClick={() => onComplete(run.id)}
-                className="flex-1 min-h-[2.75rem] md:min-h-0 px-4 py-3 rounded-xl text-white font-bold whitespace-nowrap bg-[#562D07] hover:bg-[#3a1d04] transition-colors"
+                className="flex-1 min-h-[2.75rem] px-4 py-3 rounded-xl text-white font-bold whitespace-nowrap bg-[#562D07] hover:bg-[#3a1d04] transition-colors"
               >
                 Mark Complete
               </button>

@@ -267,13 +267,20 @@ export default function OrderDetail({
         />
       )}
 
-      <div className="flex items-center text-[15px] mb-6 text-gray-500 font-medium tracking-wide">
-        <button onClick={onBack} className="hover:text-[var(--color-brand-text)] transition-colors">
-          Orders
-        </button>
-        <span className="mx-2 text-gray-500">&gt;</span>
-        <span className="text-[#121212] font-bold">Order Details</span>
-      </div>
+      <nav aria-label="Breadcrumb" className="mb-6">
+        <ol className="flex items-center text-[15px] text-gray-500 font-medium tracking-wide">
+          <li>
+            <button
+              onClick={onBack}
+              className="-my-2 py-2 hover:text-[var(--color-brand-text)] transition-colors"
+            >
+              Orders
+            </button>
+          </li>
+          <li aria-hidden="true" className="mx-2 text-gray-500">&gt;</li>
+          <li aria-current="page" className="text-[#121212] font-bold">Order Details</li>
+        </ol>
+      </nav>
 
       <div className="flex flex-col gap-3 mb-8 md:flex-row md:items-start md:justify-between">
         <div className="flex shrink-0 items-center gap-4">
@@ -307,14 +314,14 @@ export default function OrderDetail({
               onClick={() => setIsEditing(true)}
               disabled={order.status === "Delivered"}
               title={order.status === "Delivered" ? "Delivered orders can no longer be edited" : undefined}
-              className="px-4 py-1.5 min-h-[2.75rem] md:min-h-0 rounded-full border border-gray-300 bg-white text-gray-800 text-sm font-semibold shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors"
+              className="px-4 py-1.5 min-h-[2.75rem] rounded-full border border-gray-300 bg-white text-gray-800 text-sm font-semibold shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors"
             >
               Edit Details
             </button>
             {amountDue > 0 && (
               <button
                 onClick={() => setIsRecordingPayment(true)}
-                className="px-4 py-1.5 min-h-[2.75rem] md:min-h-0 rounded-full border border-gray-300 bg-white text-gray-800 text-sm font-semibold shadow-sm hover:bg-gray-50 transition-colors"
+                className="px-4 py-1.5 min-h-[2.75rem] rounded-full border border-gray-300 bg-white text-gray-800 text-sm font-semibold shadow-sm hover:bg-gray-50 transition-colors"
               >
                 Record Payment
               </button>
@@ -322,7 +329,7 @@ export default function OrderDetail({
             {advanceLabel && (
               <button
                 onClick={() => onAdvanceStatus(order.id, nextStatus(order.status))}
-                className="px-4 py-1.5 min-h-[2.75rem] md:min-h-0 rounded-full border border-gray-300 bg-white text-gray-800 text-sm font-semibold shadow-sm hover:bg-gray-50 transition-colors"
+                className="px-4 py-1.5 min-h-[2.75rem] rounded-full border border-gray-300 bg-white text-gray-800 text-sm font-semibold shadow-sm hover:bg-gray-50 transition-colors"
               >
                 {advanceLabel}
               </button>
@@ -331,13 +338,13 @@ export default function OrderDetail({
               <>
                 <button
                   onClick={() => setIsScheduling(true)}
-                  className="px-4 py-1.5 min-h-[2.75rem] md:min-h-0 rounded-full border border-gray-300 bg-white text-gray-800 text-sm font-semibold shadow-sm hover:bg-gray-50 transition-colors"
+                  className="px-4 py-1.5 min-h-[2.75rem] rounded-full border border-gray-300 bg-white text-gray-800 text-sm font-semibold shadow-sm hover:bg-gray-50 transition-colors"
                 >
                   {order.deliveryDate ? "Reschedule Delivery" : "Schedule Delivery"}
                 </button>
                 <button
                   onClick={() => onMarkDelivered(order.id)}
-                  className="px-4 py-1.5 min-h-[2.75rem] md:min-h-0 rounded-full bg-[#562D07] hover:bg-[#3a1d04] text-white text-sm font-semibold shadow-sm transition-colors"
+                  className="px-4 py-1.5 min-h-[2.75rem] rounded-full bg-[#562D07] hover:bg-[#3a1d04] text-white text-sm font-semibold shadow-sm transition-colors"
                 >
                   Mark Delivered
                 </button>

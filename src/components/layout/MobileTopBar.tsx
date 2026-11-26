@@ -43,7 +43,8 @@ export default function MobileTopBar({ onOpenMobileNav, triggerRef, pos }: Mobil
         ref={triggerRef}
         onClick={onOpenMobileNav}
         aria-label="Open navigation"
-        className="p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#562D07] bg-[#F3B978]/20 rounded-md flex-shrink-0"
+        // 44px target; the negative margins keep the 24px icon in place.
+        className="p-2.5 -m-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#562D07] bg-[#F3B978]/20 rounded-md flex-shrink-0"
       >
         <svg
           className="w-6 h-6"

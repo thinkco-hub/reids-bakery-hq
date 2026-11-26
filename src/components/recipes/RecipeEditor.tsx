@@ -172,13 +172,20 @@ export default function RecipeEditor({
 
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
-      <div className="flex items-center text-[15px] mb-6 text-gray-500 font-medium tracking-wide">
-        <button onClick={onCancel} className="hover:text-[var(--color-brand-text)] transition-colors">
-          Recipes
-        </button>
-        <span className="mx-2 text-gray-500">&gt;</span>
-        <span className="text-[#121212] font-bold">{isNew ? "New Recipe" : "Edit Recipe"}</span>
-      </div>
+      <nav aria-label="Breadcrumb" className="mb-6">
+        <ol className="flex items-center text-[15px] text-gray-500 font-medium tracking-wide">
+          <li>
+            <button
+              onClick={onCancel}
+              className="-my-2 py-2 hover:text-[var(--color-brand-text)] transition-colors"
+            >
+              Recipes
+            </button>
+          </li>
+          <li aria-hidden="true" className="mx-2 text-gray-500">&gt;</li>
+          <li aria-current="page" className="text-[#121212] font-bold">{isNew ? "New Recipe" : "Edit Recipe"}</li>
+        </ol>
+      </nav>
 
       <form onSubmit={handleSubmit} noValidate>
         {formError && (
@@ -328,7 +335,7 @@ export default function RecipeEditor({
                 <button
                   type="button"
                   onClick={addLine}
-                  className="text-sm font-bold text-[var(--color-brand-text)] hover:underline"
+                  className="-my-2 py-2 text-sm font-bold text-[var(--color-brand-text)] hover:underline"
                 >
                   + Add Ingredient
                 </button>
