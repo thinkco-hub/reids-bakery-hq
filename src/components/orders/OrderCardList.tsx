@@ -50,7 +50,7 @@ export default function OrderCardList({ orders, menuInventory, getClientName, on
           id="orders-mobile-sort"
           value={mobileSort}
           onChange={(e) => setMobileSort(e.target.value as SortKey)}
-          className="pl-3 py-2 border border-gray-200 rounded-lg bg-white text-sm font-medium text-gray-700 focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
+          className="pl-3 py-2 border border-gray-200 rounded-lg bg-white text-sm font-medium text-gray-700 focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
         >
           <option value="created">Newest first</option>
           <option value="date">Requested date</option>
@@ -99,7 +99,7 @@ function OrderCard({ order, clientName, menuInventory, expanded, onToggle, onVie
         type="button"
         onClick={onToggle}
         aria-expanded={expanded}
-        className="w-full text-left px-4 pt-3.5 pb-2 active:bg-gray-50 transition-colors"
+        className="w-full text-left px-4 pt-3.5 pb-2 active:bg-gray-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--color-brand-text)]"
       >
         {/* Line 1: Identity (left) · Primary Value (right, fixed tabular slot). */}
         <div className="flex items-start justify-between gap-3">
@@ -182,7 +182,7 @@ function OrderCard({ order, clientName, menuInventory, expanded, onToggle, onVie
           </dl>
           <button
             onClick={() => onView(order)}
-            className="w-full mt-3 px-3 py-2 rounded-lg bg-[#562D07] text-white text-sm font-bold active:bg-[#3a1d04] transition-colors"
+            className="w-full mt-3 px-3 py-2 rounded-lg bg-[#562D07] text-white text-sm font-bold active:bg-[#3a1d04] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#562D07]"
           >
             Manage order
           </button>

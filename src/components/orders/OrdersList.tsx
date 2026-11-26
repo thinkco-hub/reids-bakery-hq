@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
 import OrderCardList from "./OrderCardList";
 import OrderStatusBadge from "./OrderStatusBadge";
 import PaymentStatusBadge from "./PaymentStatusBadge";
@@ -15,6 +15,7 @@ interface OrdersListProps {
 }
 
 export default function OrdersList({ orders, clients, menuInventory, onView }: OrdersListProps) {
+  const headingId = useId();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "All">("All");
   const [dateFilter, setDateFilter] = useState("");
@@ -35,7 +36,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8">
-        <h2 className="text-3xl font-bold text-[#121212]">Orders</h2>
+        <h2 id={headingId} className="text-3xl font-bold text-[#121212]">Orders</h2>
         <p className="text-gray-500 mt-1">Manage all customer orders and production status.</p>
       </header>
 
@@ -49,18 +50,20 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
         <div className="w-full h-px md:w-px md:h-8 bg-gray-200 my-2 md:my-0 block"></div>
         <div className="flex items-center gap-2 w-full md:w-auto px-2">
           <label htmlFor="orders-date-filter" className="text-sm text-gray-500 font-medium whitespace-nowrap">Filter Date:</label>
-          <input
-            id="orders-date-filter"
-            type="date"
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-            className="px-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-600 focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none flex-1 md:flex-none cursor-pointer"
-          />
+          <div className="flex-1 md:flex-none rounded-md focus-within:ring-2 focus-within:ring-[var(--color-brand-text)]">
+            <input
+              id="orders-date-filter"
+              type="date"
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="w-full px-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-600 focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none cursor-pointer"
+            />
+          </div>
           {dateFilter && (
             <button
               onClick={() => setDateFilter("")}
               aria-label="Clear date filter"
-              className="text-gray-500 hover:text-red-500 p-1 transition-colors"
+              className="text-gray-500 hover:text-red-500 p-1 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-text)]"
               title="Clear Date Filter"
             >
               <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,7 +86,8 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
             <button
               key={tab}
               onClick={() => setStatusFilter(tab)}
-              className={`px-4 py-1.5 rounded border text-sm font-medium whitespace-nowrap transition-colors ${
+              aria-pressed={statusFilter === tab}
+              className={`px-4 py-1.5 rounded border text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-text)] ${
                 statusFilter === tab
                   ? "bg-blue-50 border-blue-200 text-blue-700 shadow-sm"
                   : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -100,17 +104,17 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
         {/* Desktop table — original structure and styling preserved; hidden only at <1024px container width. */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden @max-[1024px]:hidden">
         <div className="overflow-x-auto w-full">
-          <table className="w-full text-left border-collapse min-w-[1040px]">
+          <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[1040px]">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-                <th className="px-6 py-4">Order #</th>
-                <th className="px-6 py-4">Client</th>
-                <th className="px-6 py-4">Items</th>
-                <th className="px-6 py-4">Requested Date</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Payment</th>
-                <th className="px-6 py-4">Total</th>
-                <th className="px-4 py-4 text-center">Action</th>
+                <th scope="col" className="px-6 py-4">Order #</th>
+                <th scope="col" className="px-6 py-4">Client</th>
+                <th scope="col" className="px-6 py-4">Items</th>
+                <th scope="col" className="px-6 py-4">Requested Date</th>
+                <th scope="col" className="px-6 py-4">Status</th>
+                <th scope="col" className="px-6 py-4">Payment</th>
+                <th scope="col" className="px-6 py-4">Total</th>
+                <th scope="col" className="px-4 py-4 text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 text-sm">
@@ -125,7 +129,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
                   const shortfall = order.status !== "Delivered" && hasShortfall(order, menuInventory);
                   return (
                     <tr key={order.id} className="hover:bg-gray-50/50 transition-colors group">
-                      <td className="px-6 py-4 font-medium text-gray-900">{order.id}</td>
+                      <th scope="row" className="px-6 py-4 text-left font-medium text-gray-900">{order.id}</th>
                       <td className="px-6 py-4 text-gray-800">{clientName(order)}</td>
                       <td className="px-6 py-4 text-gray-600">{order.items.length} item(s)</td>
                       <td className="px-6 py-4 text-gray-800 font-medium">{order.requestedDate}</td>
@@ -149,7 +153,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
                         <button
                           onClick={() => onView(order)}
                           aria-label={`View order ${order.id}`}
-                          className="text-gray-500 hover:text-[var(--color-brand-text)] transition-colors p-2 rounded-md hover:bg-orange-50"
+                          className="text-gray-500 hover:text-[var(--color-brand-text)] transition-colors p-2 rounded-md hover:bg-orange-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-text)]"
                           title="View Order Details"
                         >
                           <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

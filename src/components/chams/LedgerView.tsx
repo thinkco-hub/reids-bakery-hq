@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
 import { formatMonthLabel, shiftMonthKey } from "../../utils/dates";
 import { buildLedgerForMonth, computeBranchRevenueForMonth } from "../../utils/ledger";
 import { formatMoney } from "../../utils/money";
@@ -21,6 +21,7 @@ export default function LedgerView({ branches, products, beginnings, movements, 
   month: string;
   onMonthChange: (month: string) => void;
 }) {
+  const headingId = useId();
   const [search, setSearch] = useState("");
   const rows = buildLedgerForMonth(branches, products, month, beginnings, movements, counts).sort(
     (a, b) => a.branchName.localeCompare(b.branchName) || a.productName.localeCompare(b.productName)
@@ -44,7 +45,7 @@ export default function LedgerView({ branches, products, beginnings, movements, 
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-[#1B2A4A]">Branch Stock Ledger</h2>
+          <h2 id={headingId} className="text-2xl md:text-3xl font-bold text-[#1B2A4A]">Branch Stock Ledger</h2>
           <p className="text-[#1B2A4A]/70 mt-1 font-medium text-sm md:text-base">
             Beginning, restocked, spoilage, sold and remaining siopao stock per branch.
           </p>
@@ -128,19 +129,19 @@ export default function LedgerView({ branches, products, beginnings, movements, 
           role="region"
           aria-label="Monthly stock ledger"
         >
-          <table className="w-full text-left border-collapse min-w-[1020px]">
+          <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[1020px]">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-                <th className="px-5 py-4">Branch</th>
-                <th className="px-5 py-4">Siopao Type</th>
-                <th className="px-5 py-4 text-right">Beginning</th>
-                <th className="px-5 py-4 text-right">Restocked</th>
-                <th className="px-5 py-4 text-right">Spoilage</th>
-                <th className="px-5 py-4 text-right">Sold</th>
-                <th className="px-5 py-4 text-right">Revenue</th>
-                <th className="px-5 py-4 text-right">Remaining (Calc.)</th>
-                <th className="px-5 py-4 text-right">Remaining (Reported)</th>
-                <th className="px-5 py-4">Discrepancy</th>
+                <th scope="col" className="px-5 py-4">Branch</th>
+                <th scope="col" className="px-5 py-4">Siopao Type</th>
+                <th scope="col" className="px-5 py-4 text-right">Beginning</th>
+                <th scope="col" className="px-5 py-4 text-right">Restocked</th>
+                <th scope="col" className="px-5 py-4 text-right">Spoilage</th>
+                <th scope="col" className="px-5 py-4 text-right">Sold</th>
+                <th scope="col" className="px-5 py-4 text-right">Revenue</th>
+                <th scope="col" className="px-5 py-4 text-right">Remaining (Calc.)</th>
+                <th scope="col" className="px-5 py-4 text-right">Remaining (Reported)</th>
+                <th scope="col" className="px-5 py-4">Discrepancy</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 text-sm">
@@ -156,7 +157,7 @@ export default function LedgerView({ branches, products, beginnings, movements, 
                   key={`${r.branchId}-${r.productId}`}
                   className={`hover:bg-gray-50/50 transition-colors ${r.flagged ? "bg-red-50/40" : ""}`}
                 >
-                  <td className="px-5 py-4 font-medium text-gray-900">{r.branchName}</td>
+                  <th scope="row" className="px-5 py-4 text-left font-medium text-gray-900">{r.branchName}</th>
                   <td className="px-5 py-4 text-gray-600">{r.productName}</td>
                   <td className="px-5 py-4 text-right text-gray-600">{r.beginning}</td>
                   <td className="px-5 py-4 text-right text-gray-600">{r.restocked}</td>

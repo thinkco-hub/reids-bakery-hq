@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
 import ClientFormModal from "./ClientFormModal";
 import SearchField from "../common/SearchField";
 import type { Client, ClientFormData, ClientId, Order } from "../../types/domain";
@@ -12,6 +12,7 @@ interface ClientsListProps {
 }
 
 export default function ClientsList({ clients, orders, onAdd, onUpdate, onView }: ClientsListProps) {
+  const headingId = useId();
   const [search, setSearch] = useState("");
   const [modalState, setModalState] = useState<{ isOpen: boolean; editing: Client | null }>({
     isOpen: false,
@@ -39,7 +40,7 @@ export default function ClientsList({ clients, orders, onAdd, onUpdate, onView }
 
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-[#121212]">Clients</h2>
+          <h2 id={headingId} className="text-3xl font-bold text-[#121212]">Clients</h2>
           <p className="text-gray-500 mt-1">Client records and standing order preferences.</p>
         </div>
         <button
@@ -61,14 +62,14 @@ export default function ClientsList({ clients, orders, onAdd, onUpdate, onView }
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto w-full">
-          <table className="w-full text-left border-collapse min-w-[720px]">
+          <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[720px]">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-                <th className="px-6 py-4">Client</th>
-                <th className="px-6 py-4">Contact</th>
-                <th className="px-6 py-4">Standing Order</th>
-                <th className="px-6 py-4 text-right">Orders</th>
-                <th className="px-4 py-4 text-center">Action</th>
+                <th scope="col" className="px-6 py-4">Client</th>
+                <th scope="col" className="px-6 py-4">Contact</th>
+                <th scope="col" className="px-6 py-4">Standing Order</th>
+                <th scope="col" className="px-6 py-4 text-right">Orders</th>
+                <th scope="col" className="px-4 py-4 text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 text-sm">
@@ -81,7 +82,7 @@ export default function ClientsList({ clients, orders, onAdd, onUpdate, onView }
               ) : (
                 filtered.map((client) => (
                   <tr key={client.id} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-gray-900">{client.name}</td>
+                    <th scope="row" className="px-6 py-4 text-left font-medium text-gray-900">{client.name}</th>
                     <td className="px-6 py-4 text-gray-600">
                       <div>{client.contact || "—"}</div>
                       {client.email && <div className="text-xs text-gray-500">{client.email}</div>}

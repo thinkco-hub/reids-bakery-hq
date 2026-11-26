@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SelectField from "../common/SelectField";
+import { useAnnounce } from "../common/Announcer";
 import { formatMonthLabel, monthKey } from "../../utils/dates";
 import type { FormEvent } from "react";
 import type { ChamsBeginning, ChamsBranch, ChamsProduct, MonthKey } from "../../types/domain";
@@ -27,6 +28,13 @@ export default function BeginningInventoryForm({ branches, products, beginnings,
   const [productId, setProductId] = useState(products[0]?.id || "");
   const [month, setMonth] = useState(MONTH_OPTIONS[0]);
   const [submittedMsg, setSubmittedMsg] = useState("");
+  const announce = useAnnounce();
+  const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // The form can unmount (tab switch) while its 4s dismissal is pending.
+  useEffect(() => () => {
+    if (dismissTimer.current) clearTimeout(dismissTimer.current);
+  }, []);
 
   const existing = beginnings.find(
     (b) => b.branchId === branchId && b.productId === productId && b.month === month
@@ -40,8 +48,11 @@ export default function BeginningInventoryForm({ branches, products, beginnings,
     e.preventDefault();
     const data = new FormData(e.currentTarget);
     onSubmit({ branchId, productId, month, openingCount: parseFloat(String(data.get("openingCount"))) || 0 });
-    setSubmittedMsg(`Beginning inventory for ${formatMonthLabel(month)} saved.`);
-    setTimeout(() => setSubmittedMsg(""), 4000);
+    const message = `Beginning inventory for ${formatMonthLabel(month)} saved.`;
+    setSubmittedMsg(message);
+    announce(message);
+    if (dismissTimer.current) clearTimeout(dismissTimer.current);
+    dismissTimer.current = setTimeout(() => setSubmittedMsg(""), 4000);
   };
 
   return (

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useId, useMemo, useState } from "react";
 import { downloadCSV } from "../../utils/sales";
 import { discrepancyLabel } from "../../utils/counts";
 import {
@@ -78,10 +78,11 @@ function ClosingSection({
   rows: ClosingInventoryRow[];
   emptyText: string;
 }) {
+  const headingId = useId();
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
       <div className="p-5 border-b border-gray-100">
-        <h3 className="text-base font-bold text-[#121212]">
+        <h3 id={headingId} className="text-base font-bold text-[#121212]">
           {title}
         </h3>
       </div>
@@ -91,17 +92,17 @@ function ClosingSection({
         role="region"
         aria-label={`${title} closing inventory`}
       >
-        <table className="w-full text-left border-collapse min-w-[760px]">
+        <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[760px]">
           <thead>
             <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-              <th className="px-6 py-3">Item</th>
-              <th className="px-6 py-3">Unit</th>
-              <th className="px-6 py-3 text-right">System Qty</th>
-              <th className="px-6 py-3 text-right">Closing Qty</th>
-              <th className="px-6 py-3">Source</th>
-              <th className="px-6 py-3 text-right">Unit Value</th>
-              <th className="px-6 py-3 text-right">Closing Value</th>
-              <th className="px-6 py-3">Count Discrepancy</th>
+              <th scope="col" className="px-6 py-3">Item</th>
+              <th scope="col" className="px-6 py-3">Unit</th>
+              <th scope="col" className="px-6 py-3 text-right">System Qty</th>
+              <th scope="col" className="px-6 py-3 text-right">Closing Qty</th>
+              <th scope="col" className="px-6 py-3">Source</th>
+              <th scope="col" className="px-6 py-3 text-right">Unit Value</th>
+              <th scope="col" className="px-6 py-3 text-right">Closing Value</th>
+              <th scope="col" className="px-6 py-3">Count Discrepancy</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 text-sm">
@@ -114,7 +115,7 @@ function ClosingSection({
             ) : (
               rows.map((row) => (
                 <tr key={row.id} className="hover:bg-gray-50/50">
-                  <td className="px-6 py-3 font-medium text-gray-900">{row.name}</td>
+                  <th scope="row" className="px-6 py-3 text-left font-medium text-gray-900">{row.name}</th>
                   <td className="px-6 py-3 text-gray-500">{row.unit}</td>
                   <td className="px-6 py-3 text-right text-gray-500 tabular-nums">{row.systemQty}</td>
                   <td className="px-6 py-3 text-right font-semibold text-gray-900 tabular-nums">{row.closingQty}</td>
@@ -248,13 +249,13 @@ export default function ClosingInventory({ menuInventory, ingredients, inventory
 
       {/* View toggle + period navigation */}
       <div className="bg-white border border-gray-200 rounded-lg p-3 mb-6 flex flex-wrap items-center gap-2">
-        <button onClick={() => setView("day")} className={pillCls(view === "day")}>
+        <button onClick={() => setView("day")} aria-pressed={view === "day"} className={pillCls(view === "day")}>
           Daily
         </button>
-        <button onClick={() => setView("week")} className={pillCls(view === "week")}>
+        <button onClick={() => setView("week")} aria-pressed={view === "week"} className={pillCls(view === "week")}>
           Weekly
         </button>
-        <button onClick={() => setView("month")} className={pillCls(view === "month")}>
+        <button onClick={() => setView("month")} aria-pressed={view === "month"} className={pillCls(view === "month")}>
           Monthly
         </button>
         <div className="w-px h-6 bg-gray-200 mx-1 hidden sm:block" />

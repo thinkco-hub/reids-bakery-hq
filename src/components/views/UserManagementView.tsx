@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import SelectField from "../common/SelectField";
 import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
 import SearchField from "../common/SearchField";
@@ -24,6 +24,7 @@ export default function UserManagementView({
   onChangeRole,
   onSetActive,
 }: UserManagementViewProps) {
+  const headingId = useId();
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [pendingDeactivate, setPendingDeactivate] = useState<User | null>(null);
   const [search, setSearch] = useState("");
@@ -67,7 +68,7 @@ export default function UserManagementView({
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8">
-        <h2 className="text-3xl font-bold text-[#121212]">Roles</h2>
+        <h2 id={headingId} className="text-3xl font-bold text-[#121212]">Roles</h2>
         <p className="text-gray-500 mt-1">
           Assign roles and manage account status. A role controls which views a user can open.
         </p>
@@ -103,7 +104,7 @@ export default function UserManagementView({
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto w-full">
-          <table className="w-full text-left border-collapse min-w-[760px]">
+          <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[760px]">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
                 <th scope="col" className="px-6 py-4">User</th>
@@ -157,7 +158,7 @@ export default function UserManagementView({
                               ? "Only a Super Admin can change this user's role"
                               : undefined
                           }
-                          className="pl-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-800 focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed cursor-pointer"
+                          className="pl-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-800 focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed cursor-pointer"
                         >
                           {options.map(({ role, allowed }) => (
                             <option key={role} value={role} disabled={!allowed}>

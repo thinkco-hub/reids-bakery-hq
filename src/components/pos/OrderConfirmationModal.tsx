@@ -40,6 +40,32 @@ export default function OrderConfirmationModal({
   const headingId = useId();
   const deliveryFieldId = useId();
   const notesFieldId = useId();
+  const saleTypeLabelId = useId();
+  const paymentLabelId = useId();
+
+  // Arrow keys move the checked radio and focus with it, so each group is one
+  // tab stop whose selection is reachable without a mouse.
+  const roveGroup = (
+    event: React.KeyboardEvent<HTMLButtonElement>,
+    values: readonly string[],
+    current: string,
+    select: (value: string) => void
+  ) => {
+    const step =
+      event.key === "ArrowRight" || event.key === "ArrowDown"
+        ? 1
+        : event.key === "ArrowLeft" || event.key === "ArrowUp"
+        ? -1
+        : 0;
+    if (!step) return;
+    event.preventDefault();
+    const next = values[(values.indexOf(current) + step + values.length) % values.length];
+    select(next);
+    const radios = event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>(
+      '[role="radio"]'
+    );
+    radios?.[values.indexOf(next)]?.focus();
+  };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -103,13 +129,27 @@ export default function OrderConfirmationModal({
         </div>
 
         <div className="mb-6">
-          <p className="text-sm font-semibold text-gray-700 mb-2">Sale Type</p>
-          <div className="grid grid-cols-2 gap-2">
+          <p id={saleTypeLabelId} className="text-sm font-semibold text-gray-700 mb-2">Sale Type</p>
+          <div
+            role="radiogroup"
+            aria-labelledby={saleTypeLabelId}
+            className="grid grid-cols-2 gap-2"
+          >
             {SALE_TYPES.map((type) => (
               <button
                 key={type}
                 type="button"
+                role="radio"
+                aria-checked={modal.saleType === type}
+                tabIndex={
+                  modal.saleType === type || (!modal.saleType && type === SALE_TYPES[0]) ? 0 : -1
+                }
                 onClick={() => onSaleTypeChange(type)}
+                onKeyDown={(e) =>
+                  roveGroup(e, SALE_TYPES, modal.saleType, (value) =>
+                    onSaleTypeChange(value as SaleType)
+                  )
+                }
                 className={`py-2.5 rounded-lg border text-sm font-semibold transition-colors ${
                   modal.saleType === type
                     ? "border-[var(--color-brand-text)] bg-orange-50 text-[var(--color-brand-text)]"
@@ -159,13 +199,29 @@ export default function OrderConfirmationModal({
         )}
 
         <div className="mb-8">
-          <p className="text-sm font-semibold text-gray-700 mb-2">Payment Method</p>
-          <div className="grid grid-cols-2 gap-2">
-            {PAYMENT_METHODS.map((method) => (
+          <p id={paymentLabelId} className="text-sm font-semibold text-gray-700 mb-2">Payment Method</p>
+          <div
+            role="radiogroup"
+            aria-labelledby={paymentLabelId}
+            className="grid grid-cols-2 gap-2"
+          >
+            {PAYMENT_METHODS.map((method, index) => (
               <button
                 key={method}
                 type="button"
+                role="radio"
+                aria-checked={modal.paymentMethod === method}
+                tabIndex={
+                  modal.paymentMethod === method || (!modal.paymentMethod && index === 0)
+                    ? 0
+                    : -1
+                }
                 onClick={() => onFieldChange("paymentMethod", method)}
+                onKeyDown={(e) =>
+                  roveGroup(e, PAYMENT_METHODS, modal.paymentMethod, (value) =>
+                    onFieldChange("paymentMethod", value)
+                  )
+                }
                 className={`py-2.5 rounded-lg border text-sm font-semibold transition-colors ${
                   modal.paymentMethod === method
                     ? "border-[var(--color-brand-text)] bg-orange-50 text-[var(--color-brand-text)]"

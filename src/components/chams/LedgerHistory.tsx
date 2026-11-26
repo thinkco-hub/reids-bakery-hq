@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
 import SelectField from "../common/SelectField";
 import { formatMonthLabel } from "../../utils/dates";
 import { buildLedgerHistoryForBranchProduct } from "../../utils/ledger";
@@ -39,6 +39,7 @@ interface LedgerHistoryProps {
 }
 
 export default function LedgerHistory({ branches, products, beginnings, movements, counts }: LedgerHistoryProps) {
+  const headingId = useId();
   const [branchId, setBranchId] = useState(branches[0]?.id || "");
   const [productId, setProductId] = useState(products[0]?.id || "");
   const branch = branches.find((b) => b.id === branchId);
@@ -50,7 +51,7 @@ export default function LedgerHistory({ branches, products, beginnings, movement
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <header className="mb-6 md:mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-[#1B2A4A]">Ledger History</h2>
+          <h2 id={headingId} className="text-2xl md:text-3xl font-bold text-[#1B2A4A]">Ledger History</h2>
           <p className="text-[#1B2A4A]/70 mt-1 font-medium text-sm md:text-base">
             Multi-month trend of remaining stock per branch and siopao type.
           </p>
@@ -90,24 +91,24 @@ export default function LedgerHistory({ branches, products, beginnings, movement
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto w-full">
-          <table className="w-full text-left border-collapse min-w-[940px]">
+          <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[940px]">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
-                <th className="px-5 py-4">Month</th>
-                <th className="px-5 py-4 text-right">Beginning</th>
-                <th className="px-5 py-4 text-right">Restocked</th>
-                <th className="px-5 py-4 text-right">Spoilage</th>
-                <th className="px-5 py-4 text-right">Sold</th>
-                <th className="px-5 py-4 text-right">Revenue</th>
-                <th className="px-5 py-4 text-right">Remaining (Calc.)</th>
-                <th className="px-5 py-4 text-right">Remaining (Reported)</th>
-                <th className="px-5 py-4">Discrepancy</th>
+                <th scope="col" className="px-5 py-4">Month</th>
+                <th scope="col" className="px-5 py-4 text-right">Beginning</th>
+                <th scope="col" className="px-5 py-4 text-right">Restocked</th>
+                <th scope="col" className="px-5 py-4 text-right">Spoilage</th>
+                <th scope="col" className="px-5 py-4 text-right">Sold</th>
+                <th scope="col" className="px-5 py-4 text-right">Revenue</th>
+                <th scope="col" className="px-5 py-4 text-right">Remaining (Calc.)</th>
+                <th scope="col" className="px-5 py-4 text-right">Remaining (Reported)</th>
+                <th scope="col" className="px-5 py-4">Discrepancy</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 text-sm">
               {rows.map((r) => (
                 <tr key={r.month} className={`hover:bg-gray-50/50 transition-colors ${r.flagged ? "bg-red-50/40" : ""}`}>
-                  <td className="px-5 py-4 font-medium text-gray-900">{formatMonthLabel(r.month)}</td>
+                  <th scope="row" className="px-5 py-4 text-left font-medium text-gray-900">{formatMonthLabel(r.month)}</th>
                   <td className="px-5 py-4 text-right text-gray-600">{r.beginning}</td>
                   <td className="px-5 py-4 text-right text-gray-600">{r.restocked}</td>
                   <td className="px-5 py-4 text-right text-gray-600">{r.spoilage}</td>

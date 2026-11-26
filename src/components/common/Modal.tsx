@@ -27,6 +27,8 @@ export interface ModalProps {
   role?: "dialog" | "alertdialog";
   /** id of the heading that names the dialog */
   labelledBy: string;
+  /** id of the text that explains the dialog's consequence or context. */
+  describedBy?: string;
   onClose: () => void;
   /** Defaults to the dialog container, so the title is announced before the first Tab. */
   initialFocusRef?: React.RefObject<HTMLElement>;
@@ -41,6 +43,7 @@ export interface ModalProps {
 export default function Modal({
   role = "dialog",
   labelledBy,
+  describedBy,
   onClose,
   initialFocusRef,
   className = "",
@@ -116,6 +119,7 @@ export default function Modal({
         role={role}
         aria-modal="true"
         aria-labelledby={labelledBy}
+        aria-describedby={describedBy}
         tabIndex={-1}
         onKeyDown={handleKeyDown}
         className={`outline-none my-auto ${className}`}

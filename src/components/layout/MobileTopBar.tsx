@@ -38,7 +38,7 @@ export default function MobileTopBar({ onOpenMobileNav, triggerRef, pos }: Mobil
   };
 
   return (
-    <div className="bg-[#562D07] text-[#FDF9F3] p-4 flex items-center gap-3 shadow-md z-30">
+    <header className="bg-[#562D07] text-[#FDF9F3] p-4 flex items-center gap-3 shadow-md z-30">
       <button
         ref={triggerRef}
         onClick={onOpenMobileNav}
@@ -158,6 +158,6 @@ export default function MobileTopBar({ onOpenMobileNav, triggerRef, pos }: Mobil
       ) : (
         <span className="text-lg font-bold">Bakery HQ</span>
       )}
-    </div>
+    </header>
   );
 }

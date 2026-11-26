@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
 import InventoryStatsBar from "./InventoryStatsBar";
 import StockStatusBadge from "./StockStatusBadge";
 import SearchField from "../common/SearchField";
@@ -12,6 +12,7 @@ interface FinishedGoodsTableProps {
 }
 
 export default function FinishedGoodsTable({ menuInventory, onRestock }: FinishedGoodsTableProps) {
+  const headingId = useId();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | StockStatus>("all");
 
@@ -48,18 +49,18 @@ export default function FinishedGoodsTable({ menuInventory, onRestock }: Finishe
 
       <div className="bg-white rounded-lg shadow-sm border border-[#F3B978] mb-6 md:mb-8 overflow-hidden w-full">
         <div className="px-4 md:px-6 py-4 border-b border-[#F3B978] bg-[#F3B978]/20">
-          <h2 className="text-base md:text-lg font-bold text-[#562D07]">📦 Finished Goods Stock</h2>
+          <h2 id={headingId} className="text-base md:text-lg font-bold text-[#562D07]">📦 Finished Goods Stock</h2>
         </div>
         <div className="overflow-x-auto w-full">
-          <table className="w-full text-left border-collapse min-w-[600px]">
+          <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[600px]">
             <thead>
               <tr className="bg-[#FDF9F3] border-b border-[#F3B978] text-sm text-[#562D07]/80">
-                <th className="px-4 md:px-6 py-3 font-semibold">Pastry Type</th>
-                <th className="px-4 md:px-6 py-3 font-semibold">Batch ID</th>
-                <th className="px-4 md:px-6 py-3 font-semibold">Qty Ready</th>
-                <th className="px-4 md:px-6 py-3 font-semibold">Shelf Life</th>
-                <th className="px-4 md:px-6 py-3 font-semibold">Status</th>
-                <th className="px-4 md:px-6 py-3 font-semibold text-center">Action</th>
+                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Pastry Type</th>
+                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Batch ID</th>
+                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Qty Ready</th>
+                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Shelf Life</th>
+                <th scope="col" className="px-4 md:px-6 py-3 font-semibold">Status</th>
+                <th scope="col" className="px-4 md:px-6 py-3 font-semibold text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F3B978]/50">
@@ -84,7 +85,7 @@ export default function FinishedGoodsTable({ menuInventory, onRestock }: Finishe
                     )}
                     {group.items.map((item) => (
                       <tr key={item.id} className="hover:bg-[#FDF9F3]/50 transition-colors">
-                        <td className="px-4 md:px-6 py-4 font-semibold text-[#121212]">{item.name}</td>
+                        <th scope="row" className="px-4 md:px-6 py-4 text-left font-semibold text-[#121212]">{item.name}</th>
                         <td className="px-4 md:px-6 py-4 text-sm text-[#562D07]/70 font-medium">{item.id}</td>
                         <td className="px-4 md:px-6 py-4 font-bold text-[#121212] text-lg tabular-nums">{item.qty}</td>
                         <td className="px-4 md:px-6 py-4 text-sm text-[#562D07]/70 font-medium">

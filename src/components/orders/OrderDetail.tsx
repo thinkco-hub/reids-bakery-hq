@@ -226,6 +226,7 @@ export default function OrderDetail({
   const [isScheduling, setIsScheduling] = useState(false);
   const [isRecordingPayment, setIsRecordingPayment] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const itemsHeadingId = useId();
   const shortfalls = order.status !== "Delivered" ? getOrderShortfalls(order, menuInventory) : [];
   const total = computeOrderTotal(order);
   const amountDue = computeAmountDue(order);
@@ -371,7 +372,7 @@ export default function OrderDetail({
         <div className="flex-1 p-6 flex flex-col items-start">
           <p className="text-xs font-bold text-gray-800 mb-4 tracking-wide">Client</p>
           <div className="flex items-center">
-            <div className="w-12 h-12 rounded-full bg-[#ffb74d] text-white flex items-center justify-center mr-4">
+            <div className="w-12 h-12 rounded-full bg-[#ffb74d] text-[#562D07] flex items-center justify-center mr-4">
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
@@ -394,7 +395,7 @@ export default function OrderDetail({
           <div className="w-full max-w-[220px]">
             <p className="text-xs font-bold text-gray-800 mb-4 tracking-wide">Delivery</p>
             <div className="flex items-center">
-              <div className="w-12 h-12 rounded-full bg-[#ffb74d] text-white flex items-center justify-center mr-4">
+              <div className="w-12 h-12 rounded-full bg-[#ffb74d] text-[#562D07] flex items-center justify-center mr-4">
                 <CalendarIcon className="w-6 h-6" />
               </div>
               <div>
@@ -408,7 +409,7 @@ export default function OrderDetail({
           <div className="w-full max-w-[200px]">
             <p className="text-xs font-bold text-gray-800 mb-4 tracking-wide">Total Amount</p>
             <div className="flex items-center">
-              <div className="w-12 h-12 rounded-full bg-[#ffb74d] text-white flex items-center justify-center mr-4">
+              <div className="w-12 h-12 rounded-full bg-[#ffb74d] text-[#562D07] flex items-center justify-center mr-4">
                 <span className="text-2xl font-bold font-serif">{MONEY_SYMBOL}</span>
               </div>
               <div>
@@ -421,26 +422,26 @@ export default function OrderDetail({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-          <h3 className="text-lg font-bold text-[#121212] mb-6">Order Items</h3>
+          <h3 id={itemsHeadingId} className="text-lg font-bold text-[#121212] mb-6">Order Items</h3>
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table aria-labelledby={itemsHeadingId} className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-gray-100 text-xs font-semibold text-gray-500">
-                  <th className="pb-4 font-medium">Item</th>
-                  <th className="pb-4 text-center font-medium">Quantity</th>
-                  <th className="pb-4 text-right font-medium">Unit Price</th>
-                  <th className="pb-4 text-right font-medium">Total</th>
+                  <th scope="col" className="pb-4 font-medium">Item</th>
+                  <th scope="col" className="pb-4 text-center font-medium">Quantity</th>
+                  <th scope="col" className="pb-4 text-right font-medium">Unit Price</th>
+                  <th scope="col" className="pb-4 text-right font-medium">Total</th>
                 </tr>
               </thead>
               <tbody className="text-sm border-b border-gray-200">
                 {order.items.map((line, idx) => (
                   <tr key={idx}>
-                    <td className="py-4">
+                    <th scope="row" className="py-4 text-left">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-gray-200 rounded-md"></div>
                         <span className="font-medium text-gray-800">{itemName(line)}</span>
                       </div>
-                    </td>
+                    </th>
                     <td className="py-4 text-center text-gray-700">{line.qty}</td>
                     <td className="py-4 text-right text-gray-700">{formatMoney(line.unitPrice)}</td>
                     <td className="py-4 text-right font-semibold text-gray-900">

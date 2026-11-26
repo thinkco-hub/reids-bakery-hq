@@ -849,3 +849,30 @@ describe("shell announcer", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Ticket cleared.");
   });
 });
+
+describe("view announcements", () => {
+  it("retitles the tab, focuses main and announces each view", async () => {
+    const user = userEvent.setup();
+    renderShell("/");
+    await signInAsAdmin(user);
+    await screen.findByRole("heading", { name: "Dashboard" });
+
+    // The landing view is not a navigation: it keeps the document default.
+    expect(document.title).toBe("Reid's Bakery HQ");
+
+    await openTab(user, "Orders");
+    await screen.findByRole("heading", { name: "Orders" });
+    expect(document.title).toBe("Orders — Reid's Bakery HQ");
+    expect(document.activeElement).toBe(screen.getByRole("main"));
+    expect(screen.getByRole("status")).toHaveTextContent("Navigated to Orders.");
+
+    await openTab(user, "Recipes");
+    await screen.findByRole("heading", { name: "Recipes / BOM" });
+    expect(document.title).toBe("Recipes — Reid's Bakery HQ");
+
+    await openTab(user, "Roles");
+    await screen.findByRole("heading", { name: "Roles" });
+    expect(document.title).toBe("Roles — Reid's Bakery HQ");
+    expect(screen.getByRole("status")).toHaveTextContent("Navigated to Roles.");
+  });
+});
