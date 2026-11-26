@@ -853,13 +853,12 @@ describe("shell announcer", () => {
 describe("view announcements", () => {
   it("retitles the tab, focuses main and announces each view", async () => {
     const user = userEvent.setup();
-    const landingTitle = document.title;
     renderShell("/");
     await signInAsAdmin(user);
     await screen.findByRole("heading", { name: "Dashboard" });
 
     // The landing view is not a navigation: it keeps the document default.
-    expect(document.title).toBe(landingTitle);
+    expect(document.title).toBe("Reid's Bakery HQ");
 
     await openTab(user, "Orders");
     await screen.findByRole("heading", { name: "Orders" });
