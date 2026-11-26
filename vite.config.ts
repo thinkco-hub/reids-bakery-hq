@@ -5,6 +5,18 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    rollupOptions: {
+      output: {
+        // Framework code changes on dependency bumps, route code on every
+        // feature change; separate chunks let browsers keep the vendors cached.
+        manualChunks: {
+          react: ["react", "react-dom"],
+          "react-router": ["react-router"],
+        },
+      },
+    },
+  },
   test: {
     environment: "jsdom",
     globals: true,

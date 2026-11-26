@@ -25,7 +25,9 @@ export interface ShellContextValue {
   setIsInventoryExpanded: Dispatch<SetStateAction<boolean | null>>;
   isReportsExpanded: boolean;
   setIsReportsExpanded: Dispatch<SetStateAction<boolean | null>>;
-  windowWidth: number;
+  /** The viewport classes the shells share; both change only at a crossing. */
+  canUseSidebarRail: boolean;
+  isPhoneViewport: boolean;
 }
 
 const ShellContext = createContext<ShellContextValue | null>(null);

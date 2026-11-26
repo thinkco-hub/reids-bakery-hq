@@ -1,37 +1,41 @@
-import React, { useEffect, useRef } from "react";
+import React, { Suspense, lazy, useEffect, useRef } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router";
 import LoginPage from "./components/auth/LoginPage";
 import { AnnouncerProvider, useAnnounce } from "./components/common/Announcer";
+import RouteFallback from "./components/common/RouteFallback";
 import UnknownRoute from "./components/common/UnknownRoute";
 import { useAuth } from "./hooks/useAuth";
 import { useNavigation } from "./hooks/useNavigation";
 import { BakeryProvider } from "./store/BakeryProvider";
-import AuditLogsRoute from "./routes/AuditLogsRoute";
-import CalendarRoute from "./routes/CalendarRoute";
-import ChamsRoute from "./routes/ChamsRoute";
-import ClientDetailRoute from "./routes/ClientDetailRoute";
-import ClientsRoute from "./routes/ClientsRoute";
-import ClosingCountRoute from "./routes/ClosingCountRoute";
-import DashboardRoute from "./routes/DashboardRoute";
-import InventoryRoute from "./routes/InventoryRoute";
 import LayoutRoute from "./routes/LayoutRoute";
-import OrderDetailRoute from "./routes/OrderDetailRoute";
-import OrdersRoute from "./routes/OrdersRoute";
-import PosRoute from "./routes/PosRoute";
-import ProductionRoute from "./routes/ProductionRoute";
-import RecipeDetailRoute from "./routes/RecipeDetailRoute";
-import RecipeNewRoute from "./routes/RecipeNewRoute";
-import RecipesRoute from "./routes/RecipesRoute";
-import ReconciliationRoute from "./routes/ReconciliationRoute";
-import ReportsClosingRoute from "./routes/ReportsClosingRoute";
-import ReportsInventoryRoute from "./routes/ReportsInventoryRoute";
-import ReportsRoute from "./routes/ReportsRoute";
-import RolesRoute from "./routes/RolesRoute";
 import { ShellProvider } from "./routes/shell";
 import type { ShellContextValue } from "./routes/shell";
 import { CHAMS_PATH, PATH_BY_TAB, viewNameFromPath } from "./routes";
 import { DEFAULT_TAB, canAccessTab } from "./utils/permissions";
-import { canUseSidebarRail } from "./utils/responsive";
+
+// The shell stays eager; every screen below it arrives as its own chunk on
+// first navigation. UnknownRoute stays eager too — the fallback for a bad URL
+// should not itself need a round trip.
+const AuditLogsRoute = lazy(() => import("./routes/AuditLogsRoute"));
+const CalendarRoute = lazy(() => import("./routes/CalendarRoute"));
+const ChamsRoute = lazy(() => import("./routes/ChamsRoute"));
+const ClientDetailRoute = lazy(() => import("./routes/ClientDetailRoute"));
+const ClientsRoute = lazy(() => import("./routes/ClientsRoute"));
+const ClosingCountRoute = lazy(() => import("./routes/ClosingCountRoute"));
+const DashboardRoute = lazy(() => import("./routes/DashboardRoute"));
+const InventoryRoute = lazy(() => import("./routes/InventoryRoute"));
+const OrderDetailRoute = lazy(() => import("./routes/OrderDetailRoute"));
+const OrdersRoute = lazy(() => import("./routes/OrdersRoute"));
+const PosRoute = lazy(() => import("./routes/PosRoute"));
+const ProductionRoute = lazy(() => import("./routes/ProductionRoute"));
+const RecipeDetailRoute = lazy(() => import("./routes/RecipeDetailRoute"));
+const RecipeNewRoute = lazy(() => import("./routes/RecipeNewRoute"));
+const RecipesRoute = lazy(() => import("./routes/RecipesRoute"));
+const ReconciliationRoute = lazy(() => import("./routes/ReconciliationRoute"));
+const ReportsClosingRoute = lazy(() => import("./routes/ReportsClosingRoute"));
+const ReportsInventoryRoute = lazy(() => import("./routes/ReportsInventoryRoute"));
+const ReportsRoute = lazy(() => import("./routes/ReportsRoute"));
+const RolesRoute = lazy(() => import("./routes/RolesRoute"));
 
 /**
  * A route change has to retitle the tab, move focus into the new view and say
@@ -100,7 +104,7 @@ export default function BakeryCommandCenter() {
         <BakeryProvider currentUser={currentUser}>
           <div
             className={`flex flex-col ${
-              canUseSidebarRail(navigation.windowWidth) ? "md:flex-row" : ""
+              navigation.canUseSidebarRail ? "md:flex-row" : ""
             } h-screen bg-[#FDF9F3] font-sans text-[#121212] overflow-hidden relative`}
           >
             <Routes>
@@ -138,7 +142,15 @@ export default function BakeryCommandCenter() {
                     behind a tab guard: no tab is involved. */}
                 <Route path="*" element={<UnknownRoute />} />
               </Route>
-              <Route path={CHAMS_PATH} element={<ChamsRoute />} />
+              {/* The ledger renders outside the layout, so it owns this boundary. */}
+              <Route
+                path={CHAMS_PATH}
+                element={
+                  <Suspense fallback={<RouteFallback />}>
+                    <ChamsRoute />
+                  </Suspense>
+                }
+              />
             </Routes>
           </div>
         </BakeryProvider>

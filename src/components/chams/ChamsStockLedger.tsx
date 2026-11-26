@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import LedgerView from "./LedgerView";
 import BeginningInventoryForm from "./BeginningInventoryForm";
 import MovementLogForm from "./MovementLogForm";
 import RemainingCountForm from "./RemainingCountForm";
 import LedgerHistory from "./LedgerHistory";
-import { canUseSidebarRail } from "../../utils/responsive";
+import { useCanUseSidebarRail } from "../../utils/responsive";
 import { useDrawerA11y } from "../../hooks/useDrawerA11y";
 import { monthKey, shiftMonthKey } from "../../utils/dates";
 import type {
@@ -169,15 +169,6 @@ interface ChamsStockLedgerProps {
 export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps) {
   const [activeChamsTab, setActiveChamsTab] = useState<ChamsTabId>("ledger");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(
-    typeof window !== "undefined" ? window.innerWidth : 1024
-  );
-
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   const [month, setMonth] = useState(CURRENT_MONTH);
   const [branches] = useState(INITIAL_BRANCHES);
@@ -189,7 +180,7 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
 
   // Same rule as the Bakery HQ shell: only a mouse-driven viewport gets the
   // pinned hover rail, everything else uses the hamburger drawer.
-  const isDesktopRail = canUseSidebarRail(windowWidth);
+  const isDesktopRail = useCanUseSidebarRail();
   // Same expansion model as the bakery rail: pointer inside or keyboard focus
   // inside, collapsed once both leave; the scrim dismisses it on click.
   const [isRailPointerInside, setIsRailPointerInside] = useState(false);

@@ -1,16 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { PATH_BY_TAB, isWithinPath, tabFromPath } from "../routes";
+import { useCanUseSidebarRail, useIsPhoneViewport } from "../utils/responsive";
 
 /**
  * Owns application navigation: the tab named by the URL, the off-canvas sidebar
- * drawer state and the window width used by the responsive sidebar and POS ticket.
+ * drawer state and the viewport classes the responsive shell reads.
  *
  * Which record is on screen is no longer state at all: `/orders/:orderId`,
  * `/clients/:clientId` and `/recipes/:recipeId` look it up in the feature arrays.
  * `tabFromPath` answers null for those URLs and that is deliberate — its only
  * consumer here is `isPosRoute`, and POS has no detail routes. Nothing should
  * widen it back to the owning tab, because the tab is not what guards a record.
+ *
+ * Viewport size is not state either: two media-query listeners answer the only
+ * questions the shell asks, and they fire on a crossing rather than on every
+ * resize pixel.
  */
 export function useNavigation() {
   const { pathname } = useLocation();
@@ -24,20 +29,13 @@ export function useNavigation() {
   // header, and that choice outlasts the route it was made on.
   const [inventoryGroup, setInventoryGroup] = useState<boolean | null>(null);
   const [reportsGroup, setReportsGroup] = useState<boolean | null>(null);
-  const [windowWidth, setWindowWidth] = useState(
-    typeof window !== "undefined" ? window.innerWidth : 1024
-  );
+  const canUseSidebarRail = useCanUseSidebarRail();
+  const isPhoneViewport = useIsPhoneViewport();
 
   const isInventoryExpanded =
     inventoryGroup ?? isWithinPath(PATH_BY_TAB.inventory, pathname);
   const isReportsExpanded =
     reportsGroup ?? isWithinPath(PATH_BY_TAB["reports-dashboard"], pathname);
-
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   /**
    * Leaves a record URL for the list that owns it. Popping is right when the app
@@ -61,6 +59,7 @@ export function useNavigation() {
     setIsInventoryExpanded: setInventoryGroup,
     isReportsExpanded,
     setIsReportsExpanded: setReportsGroup,
-    windowWidth,
+    canUseSidebarRail,
+    isPhoneViewport,
   };
 }
