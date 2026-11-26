@@ -26,12 +26,41 @@ function CountSection({
   onUpdate: (id: string, value: string) => void;
 }) {
   const headingId = useId();
+  // Phone inputs would sit off-screen inside the 420px table, so phones get a
+  // stacked row per item and the table only ships from md up.
+  const inputCls =
+    "px-2 py-1.5 border border-gray-300 rounded-md text-right focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800";
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
       <h3 id={headingId} className="text-base font-bold text-[#121212] mb-4">
         {icon} {title}
       </h3>
-      <div className="overflow-x-auto">
+      <ul className="md:hidden space-y-4">
+        {items.map((item) => (
+          <li key={item.id}>
+            <div className="flex items-baseline justify-between gap-2 mb-1.5">
+              <span className="text-sm font-medium text-gray-900">{item.name}</span>
+              <span className="text-xs text-gray-500">{("unit" in item && item.unit) || "pcs"}</span>
+            </div>
+            <input
+              type="number"
+              min="0"
+              step="any"
+              aria-label={`${title} count for ${item.name}`}
+              value={counts[item.id] ?? ""}
+              onChange={(e) => onUpdate(item.id, e.target.value)}
+              placeholder="Enter count"
+              className={`w-full min-h-[2.75rem] ${inputCls}`}
+            />
+          </li>
+        ))}
+      </ul>
+      <div
+        className="hidden md:block overflow-x-auto"
+        tabIndex={0}
+        role="region"
+        aria-label={`${title} count table`}
+      >
         <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[420px]">
           <thead>
             <tr className="bg-gray-50/50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -54,7 +83,7 @@ function CountSection({
                     value={counts[item.id] ?? ""}
                     onChange={(e) => onUpdate(item.id, e.target.value)}
                     placeholder="Enter count"
-                    className="w-32 px-2 py-1.5 border border-gray-300 rounded-md text-right focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
+                    className={`w-32 ${inputCls}`}
                   />
                 </td>
               </tr>
@@ -128,7 +157,7 @@ export default function ClosingCountForm({ menuInventory, ingredients, onSubmit,
     <div className="max-w-4xl mx-auto animate-fadeIn pb-10 w-full">
       <button
         onClick={onBack}
-        className="inline-flex items-center gap-2 mb-4 text-sm font-semibold text-[#562D07]/70 hover:text-[#562D07] transition-colors"
+        className="inline-flex items-center gap-2 -mt-2 mb-2 py-2 text-sm font-semibold text-[#562D07]/70 hover:text-[#562D07] transition-colors"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
