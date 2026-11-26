@@ -29,7 +29,7 @@ export default function ClientDetail({ client, orders, onBack }: ClientDetailPro
 
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-full bg-[#ffb74d] text-white flex items-center justify-center font-bold text-xl flex-shrink-0">
+          <div className="w-14 h-14 rounded-full bg-[#ffb74d] text-[#562D07] flex items-center justify-center font-bold text-xl flex-shrink-0">
             {client.name.charAt(0).toUpperCase()}
           </div>
           <div>

@@ -371,7 +371,7 @@ export default function OrderDetail({
         <div className="flex-1 p-6 flex flex-col items-start">
           <p className="text-xs font-bold text-gray-800 mb-4 tracking-wide">Client</p>
           <div className="flex items-center">
-            <div className="w-12 h-12 rounded-full bg-[#ffb74d] text-white flex items-center justify-center mr-4">
+            <div className="w-12 h-12 rounded-full bg-[#ffb74d] text-[#562D07] flex items-center justify-center mr-4">
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
@@ -394,7 +394,7 @@ export default function OrderDetail({
           <div className="w-full max-w-[220px]">
             <p className="text-xs font-bold text-gray-800 mb-4 tracking-wide">Delivery</p>
             <div className="flex items-center">
-              <div className="w-12 h-12 rounded-full bg-[#ffb74d] text-white flex items-center justify-center mr-4">
+              <div className="w-12 h-12 rounded-full bg-[#ffb74d] text-[#562D07] flex items-center justify-center mr-4">
                 <CalendarIcon className="w-6 h-6" />
               </div>
               <div>
@@ -408,7 +408,7 @@ export default function OrderDetail({
           <div className="w-full max-w-[200px]">
             <p className="text-xs font-bold text-gray-800 mb-4 tracking-wide">Total Amount</p>
             <div className="flex items-center">
-              <div className="w-12 h-12 rounded-full bg-[#ffb74d] text-white flex items-center justify-center mr-4">
+              <div className="w-12 h-12 rounded-full bg-[#ffb74d] text-[#562D07] flex items-center justify-center mr-4">
                 <span className="text-2xl font-bold font-serif">{MONEY_SYMBOL}</span>
               </div>
               <div>
