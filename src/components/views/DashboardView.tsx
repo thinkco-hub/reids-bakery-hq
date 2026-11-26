@@ -195,7 +195,7 @@ export default function DashboardView({
             </h3>
             <button
               onClick={() => onNavClick("orders")}
-              className="text-sm text-[var(--color-brand-text)] font-medium hover:underline"
+              className="-my-2 py-2 text-sm text-[var(--color-brand-text)] font-medium hover:underline"
             >
               View All
             </button>

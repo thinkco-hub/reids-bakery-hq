@@ -20,13 +20,20 @@ export default function ClientDetail({ client, orders, onBack }: ClientDetailPro
 
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
-      <div className="flex items-center text-[15px] mb-6 text-gray-500 font-medium tracking-wide">
-        <button onClick={onBack} className="hover:text-[var(--color-brand-text)] transition-colors">
-          Clients
-        </button>
-        <span className="mx-2 text-gray-500">&gt;</span>
-        <span className="text-[#121212] font-bold">{client.name}</span>
-      </div>
+      <nav aria-label="Breadcrumb" className="mb-6">
+        <ol className="flex items-center text-[15px] text-gray-500 font-medium tracking-wide">
+          <li>
+            <button
+              onClick={onBack}
+              className="-my-2 py-2 hover:text-[var(--color-brand-text)] transition-colors"
+            >
+              Clients
+            </button>
+          </li>
+          <li aria-hidden="true" className="mx-2 text-gray-500">&gt;</li>
+          <li aria-current="page" className="text-[#121212] font-bold">{client.name}</li>
+        </ol>
+      </nav>
 
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
         <div className="flex items-center gap-4 mb-6">
