@@ -141,7 +141,9 @@ export default function OrderConfirmationModal({
                 type="button"
                 role="radio"
                 aria-checked={modal.saleType === type}
-                tabIndex={modal.saleType === type ? 0 : -1}
+                tabIndex={
+                  modal.saleType === type || (!modal.saleType && type === SALE_TYPES[0]) ? 0 : -1
+                }
                 onClick={() => onSaleTypeChange(type)}
                 onKeyDown={(e) =>
                   roveGroup(e, SALE_TYPES, modal.saleType, (value) =>
@@ -203,13 +205,17 @@ export default function OrderConfirmationModal({
             aria-labelledby={paymentLabelId}
             className="grid grid-cols-2 gap-2"
           >
-            {PAYMENT_METHODS.map((method) => (
+            {PAYMENT_METHODS.map((method, index) => (
               <button
                 key={method}
                 type="button"
                 role="radio"
                 aria-checked={modal.paymentMethod === method}
-                tabIndex={modal.paymentMethod === method ? 0 : -1}
+                tabIndex={
+                  modal.paymentMethod === method || (!modal.paymentMethod && index === 0)
+                    ? 0
+                    : -1
+                }
                 onClick={() => onFieldChange("paymentMethod", method)}
                 onKeyDown={(e) =>
                   roveGroup(e, PAYMENT_METHODS, modal.paymentMethod, (value) =>
