@@ -59,7 +59,12 @@ export default function OrderConfirmationModal({
         : 0;
     if (!step) return;
     event.preventDefault();
-    const next = values[(values.indexOf(current) + step + values.length) % values.length];
+    const currentIndex = values.indexOf(current);
+    // With nothing checked yet, either arrow lands on an end of the group.
+    const next =
+      currentIndex === -1
+        ? values[step > 0 ? 0 : values.length - 1]
+        : values[(currentIndex + step + values.length) % values.length];
     select(next);
     const radios = event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>(
       '[role="radio"]'
@@ -141,9 +146,7 @@ export default function OrderConfirmationModal({
                 type="button"
                 role="radio"
                 aria-checked={modal.saleType === type}
-                tabIndex={
-                  modal.saleType === type || (!modal.saleType && type === SALE_TYPES[0]) ? 0 : -1
-                }
+                tabIndex={modal.saleType === type ? 0 : -1}
                 onClick={() => onSaleTypeChange(type)}
                 onKeyDown={(e) =>
                   roveGroup(e, SALE_TYPES, modal.saleType, (value) =>
