@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext } from "react";
 import { useCatalogue } from "../hooks/useCatalogue";
 import { useClients } from "../hooks/useClients";
 import { useClosing } from "../hooks/useClosing";
@@ -32,17 +32,25 @@ export interface BakerySeed {
   sales?: Sale[];
 }
 
-export interface BakeryStore {
-  currentUser: User;
-  catalogue: ReturnType<typeof useCatalogue>;
-  clients: ReturnType<typeof useClients>;
-  production: ReturnType<typeof useProduction>;
-  orders: ReturnType<typeof useOrders>;
-  closing: ReturnType<typeof useClosing>;
-  pos: ReturnType<typeof usePos>;
-}
+export type CatalogueSlice = ReturnType<typeof useCatalogue>;
+export type ClientsSlice = ReturnType<typeof useClients>;
+export type ProductionSlice = ReturnType<typeof useProduction>;
+export type OrdersSlice = ReturnType<typeof useOrders>;
+export type ClosingSlice = ReturnType<typeof useClosing>;
+export type PosSlice = ReturnType<typeof usePos>;
 
-const BakeryContext = createContext<BakeryStore | null>(null);
+/**
+ * One context per slice, each holding the hook's memoized object. A feature
+ * writing its own state invalidates only the slices that changed, so a POS
+ * search keystroke cannot re-render the inventory or orders screens.
+ */
+export const CurrentUserContext = createContext<User | null>(null);
+export const CatalogueContext = createContext<CatalogueSlice | null>(null);
+export const ClientsContext = createContext<ClientsSlice | null>(null);
+export const ProductionContext = createContext<ProductionSlice | null>(null);
+export const OrdersContext = createContext<OrdersSlice | null>(null);
+export const ClosingContext = createContext<ClosingSlice | null>(null);
+export const PosContext = createContext<PosSlice | null>(null);
 
 interface BakeryProviderProps {
   currentUser: User;
@@ -92,17 +100,18 @@ export function BakeryProvider({ currentUser, seed, children }: BakeryProviderPr
   });
 
   return (
-    <BakeryContext.Provider
-      value={{ currentUser, catalogue, clients, production, orders, closing, pos }}
-    >
-      {children}
-    </BakeryContext.Provider>
+    <CurrentUserContext.Provider value={currentUser}>
+      <CatalogueContext.Provider value={catalogue}>
+        <ClientsContext.Provider value={clients}>
+          <ProductionContext.Provider value={production}>
+            <OrdersContext.Provider value={orders}>
+              <ClosingContext.Provider value={closing}>
+                <PosContext.Provider value={pos}>{children}</PosContext.Provider>
+              </ClosingContext.Provider>
+            </OrdersContext.Provider>
+          </ProductionContext.Provider>
+        </ClientsContext.Provider>
+      </CatalogueContext.Provider>
+    </CurrentUserContext.Provider>
   );
-}
-
-/** The whole store, for a module that legitimately spans several features. */
-export function useBakeryStore(): BakeryStore {
-  const store = useContext(BakeryContext);
-  if (!store) throw new Error("useBakeryStore must be used inside BakeryProvider");
-  return store;
 }

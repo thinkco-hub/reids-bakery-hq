@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { initialOrders } from "../data/initialOrders";
 import { recordAuditEvent } from "../utils/auditLog";
 import { buildOrderFromSale } from "../utils/checkout";
@@ -52,137 +52,141 @@ export function useOrders({
 }: UseOrdersOptions) {
   const [orders, setOrders] = useState<Order[]>(seededOrders ?? initialOrders);
 
-  const logOrderEvent = (
-    action: AuditActionType,
-    orderId: OrderId,
-    details: string
-  ) => {
-    if (!currentUser) return;
-    recordAuditEvent({
-      userId: currentUser.id,
-      userName: currentUser.name,
-      userRole: currentUser.role,
-      action,
-      entityType: "Order",
-      entityId: orderId,
-      details,
-    });
-  };
+  // One memoized slice object: consumers re-render only when orders state,
+  // the session or the injected stock deduction changes.
+  return useMemo(() => {
+    const logOrderEvent = (
+      action: AuditActionType,
+      orderId: OrderId,
+      details: string
+    ) => {
+      if (!currentUser) return;
+      recordAuditEvent({
+        userId: currentUser.id,
+        userName: currentUser.name,
+        userRole: currentUser.role,
+        action,
+        entityType: "Order",
+        entityId: orderId,
+        details,
+      });
+    };
 
-  /** Creates the order side of a POS Order-type sale and returns its new id,
-   *  which the sale stores as `Sale.orderId`. */
-  const createOrderFromSale = (sale: Sale): OrderId => {
-    const order: Order = { ...buildOrderFromSale(sale), id: nextOrderId() };
-    setOrders((prev) => [order, ...prev]);
-    logOrderEvent(
-      "order.created",
-      order.id,
-      `Created order ${order.id} via POS${order.customerName ? ` for ${order.customerName}` : ""}`
-    );
-    return order.id;
-  };
+    /** Creates the order side of a POS Order-type sale and returns its new id,
+     *  which the sale stores as `Sale.orderId`. */
+    const createOrderFromSale = (sale: Sale): OrderId => {
+      const order: Order = { ...buildOrderFromSale(sale), id: nextOrderId() };
+      setOrders((prev) => [order, ...prev]);
+      logOrderEvent(
+        "order.created",
+        order.id,
+        `Created order ${order.id} via POS${order.customerName ? ` for ${order.customerName}` : ""}`
+      );
+      return order.id;
+    };
 
-  /**
-   * Applies a patch to `orders`. The patch may be a plain object or a function
-   * of the current order, so a caller can reach for a field it has not read.
-   */
-  const patchOrder = (
-    id: OrderId,
-    patch: Partial<Order> | ((order: Order) => Partial<Order>)
-  ) => {
-    const apply = (o: Order): Order => ({
-      ...o,
-      ...(typeof patch === "function" ? patch(o) : patch),
-    });
-    setOrders((prev) => prev.map((o) => (o.id === id ? apply(o) : o)));
-  };
+    /**
+     * Applies a patch to `orders`. The patch may be a plain object or a function
+     * of the current order, so a caller can reach for a field it has not read.
+     */
+    const patchOrder = (
+      id: OrderId,
+      patch: Partial<Order> | ((order: Order) => Partial<Order>)
+    ) => {
+      const apply = (o: Order): Order => ({
+        ...o,
+        ...(typeof patch === "function" ? patch(o) : patch),
+      });
+      setOrders((prev) => prev.map((o) => (o.id === id ? apply(o) : o)));
+    };
 
-  /**
-   * Applies customer-detail and item edits to an order, appending a history
-   * entry describing every changed field. Delivered orders keep their
-   * recorded items (stock was already deducted at delivery).
-   */
-  const editOrder = (id: OrderId, input: EditOrderInput) => {
-    const order = orders.find((o) => o.id === id);
-    // Guardrail: never edit a delivered order (also disabled in OrderDetail).
-    if (!order || order.status === "Delivered") return;
-    const isClientOrder = order.clientId !== null;
-    // Contact is only editable on walk-in/POS orders; client records own their
-    // own contact details.
-    if (!isClientOrder && !isValidCustomerContact(input.customerContact)) return;
+    /**
+     * Applies customer-detail and item edits to an order, appending a history
+     * entry describing every changed field. Delivered orders keep their
+     * recorded items (stock was already deducted at delivery).
+     */
+    const editOrder = (id: OrderId, input: EditOrderInput) => {
+      const order = orders.find((o) => o.id === id);
+      // Guardrail: never edit a delivered order (also disabled in OrderDetail).
+      if (!order || order.status === "Delivered") return;
+      const isClientOrder = order.clientId !== null;
+      // Contact is only editable on walk-in/POS orders; client records own their
+      // own contact details.
+      if (!isClientOrder && !isValidCustomerContact(input.customerContact)) return;
 
-    const changes: FieldEdit[] = [];
-    if (!isClientOrder) {
-      const name = diffField("customerName", "Customer name", order.customerName || "", input.customerName);
-      if (name) changes.push(name);
-      const contact = diffField("customerContact", "Contact number", order.customerContact || "", input.customerContact);
-      if (contact) changes.push(contact);
-    }
-    const items = diffLines("items", "Ordered items", order.items, input.items, input.describeItem);
-    if (items) changes.push(items);
-    if (changes.length === 0) return;
+      const changes: FieldEdit[] = [];
+      if (!isClientOrder) {
+        const name = diffField("customerName", "Customer name", order.customerName || "", input.customerName);
+        if (name) changes.push(name);
+        const contact = diffField("customerContact", "Contact number", order.customerContact || "", input.customerContact);
+        if (contact) changes.push(contact);
+      }
+      const items = diffLines("items", "Ordered items", order.items, input.items, input.describeItem);
+      if (items) changes.push(items);
+      if (changes.length === 0) return;
 
-    const entry = buildEditHistoryEntry(currentUser?.name || "Unknown", changes);
-    patchOrder(id, (o) => ({
-      ...(isClientOrder
-        ? {}
-        : { customerName: input.customerName.trim(), customerContact: input.customerContact.trim() }),
-      items: input.items,
-      editHistory: [...(o.editHistory || []), entry],
-    }));
-    logOrderEvent(
-      "order.edited",
-      id,
-      `Edited order ${id}: ${changes.map((c) => `${c.label} "${c.from}" -> "${c.to}"`).join("; ")}`
-    );
-  };
+      const entry = buildEditHistoryEntry(currentUser?.name || "Unknown", changes);
+      patchOrder(id, (o) => ({
+        ...(isClientOrder
+          ? {}
+          : { customerName: input.customerName.trim(), customerContact: input.customerContact.trim() }),
+        items: input.items,
+        editHistory: [...(o.editHistory || []), entry],
+      }));
+      logOrderEvent(
+        "order.edited",
+        id,
+        `Edited order ${id}: ${changes.map((c) => `${c.label} "${c.from}" -> "${c.to}"`).join("; ")}`
+      );
+    };
 
-  const recordOrderPayment = (id: OrderId, { method, amount }: OrderPaymentInput) => {
-    const order = orders.find((o) => o.id === id);
-    if (!order) return;
-    // This hook, not the form, owns the payment bound: every caller reaches the
-    // mutation directly and the audit log below records whatever it is given.
-    if (!isPayableAmount(amount, computeAmountDue(order))) return;
-    patchOrder(id, (o) => ({
-      paymentMethod: method,
-      amountPaid: Math.min((o.amountPaid || 0) + amount, computeOrderTotal(o)),
-    }));
-    logOrderEvent("order.payment_recorded", id, `Recorded payment of ${amount} (${method}) on order ${id}`);
-  };
+    const recordOrderPayment = (id: OrderId, { method, amount }: OrderPaymentInput) => {
+      const order = orders.find((o) => o.id === id);
+      if (!order) return;
+      // This hook, not the form, owns the payment bound: every caller reaches the
+      // mutation directly and the audit log below records whatever it is given.
+      if (!isPayableAmount(amount, computeAmountDue(order))) return;
+      patchOrder(id, (o) => ({
+        paymentMethod: method,
+        amountPaid: Math.min((o.amountPaid || 0) + amount, computeOrderTotal(o)),
+      }));
+      logOrderEvent("order.payment_recorded", id, `Recorded payment of ${amount} (${method}) on order ${id}`);
+    };
 
-  const advanceOrderStatus = (id: OrderId, status: OrderStatus | null) => {
-    if (!status) return;
-    patchOrder(id, { status });
-    logOrderEvent("order.status_advanced", id, `Advanced order ${id} to ${status}`);
-  };
+    const advanceOrderStatus = (id: OrderId, status: OrderStatus | null) => {
+      if (!status) return;
+      patchOrder(id, { status });
+      logOrderEvent("order.status_advanced", id, `Advanced order ${id} to ${status}`);
+    };
 
-  const scheduleOrderDelivery = (
-    id: OrderId,
-    { deliveryDate, assignedTo }: OrderDeliveryInput
-  ) => {
-    patchOrder(id, { deliveryDate, assignedTo });
-    logOrderEvent("order.delivery_scheduled", id, `Scheduled delivery for order ${id} on ${deliveryDate}`);
-  };
+    const scheduleOrderDelivery = (
+      id: OrderId,
+      { deliveryDate, assignedTo }: OrderDeliveryInput
+    ) => {
+      patchOrder(id, { deliveryDate, assignedTo });
+      logOrderEvent("order.delivery_scheduled", id, `Scheduled delivery for order ${id} on ${deliveryDate}`);
+    };
 
-  const markOrderDelivered = (id: OrderId) => {
-    const order = orders.find((o) => o.id === id);
-    // Guard against re-delivering: deduction must run only once per order.
-    if (!order || order.status === "Delivered") return;
-    const deliveredAt = todayISO();
+    const markOrderDelivered = (id: OrderId) => {
+      const order = orders.find((o) => o.id === id);
+      // Guard against re-delivering: deduction must run only once per order.
+      if (!order || order.status === "Delivered") return;
+      const deliveredAt = todayISO();
 
-    deductOrderLines(order.items);
+      deductOrderLines(order.items);
 
-    patchOrder(id, { status: "Delivered", deliveredAt });
-    logOrderEvent("order.delivered", id, `Marked order ${id} delivered`);
-  };
+      patchOrder(id, { status: "Delivered", deliveredAt });
+      logOrderEvent("order.delivered", id, `Marked order ${id} delivered`);
+    };
 
-  return {
-    orders,
-    createOrderFromSale,
-    editOrder,
-    recordOrderPayment,
-    advanceOrderStatus,
-    scheduleOrderDelivery,
-    markOrderDelivered,
-  };
+    return {
+      orders,
+      createOrderFromSale,
+      editOrder,
+      recordOrderPayment,
+      advanceOrderStatus,
+      scheduleOrderDelivery,
+      markOrderDelivered,
+    };
+  }, [orders, currentUser, deductOrderLines]);
 }
