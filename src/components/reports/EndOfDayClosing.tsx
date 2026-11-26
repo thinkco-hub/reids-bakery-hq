@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useAnnounce } from "../common/Announcer";
 import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
 import { computeDailyClosing } from "../../utils/closing";
@@ -28,6 +28,8 @@ export default function EndOfDayClosing({
   const [date, setDate] = useState(todayISO());
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
+  const [expenseError, setExpenseError] = useState<string | null>(null);
+  const expenseErrorId = useId();
   const [pendingExpense, setPendingExpense] = useState<Expense | null>(null);
   const [confirmingClose, setConfirmingClose] = useState(false);
   const expensesHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -48,7 +50,14 @@ export default function EndOfDayClosing({
   const handleAddExpense = (e: FormEvent) => {
     e.preventDefault();
     const parsed = parseFloat(amount);
-    if (!description.trim() || isNaN(parsed) || parsed <= 0) return;
+    const missing: string[] = [];
+    if (!description.trim()) missing.push("a description");
+    if (isNaN(parsed) || parsed <= 0) missing.push("an amount greater than zero");
+    if (missing.length > 0) {
+      setExpenseError(`Expense not added — enter ${missing.join(" and ")}.`);
+      return;
+    }
+    setExpenseError(null);
     onAddExpense({ date, description: description.trim(), amount: parsed });
     setDescription("");
     setAmount("");
@@ -139,14 +148,17 @@ export default function EndOfDayClosing({
         <h3 ref={expensesHeadingRef} tabIndex={-1} className="text-base font-bold text-[#121212] mb-4">Expenses for {date}</h3>
 
         {!alreadyClosed && (
-          <form onSubmit={handleAddExpense} className="flex flex-col sm:flex-row gap-2 mb-4">
+          <form onSubmit={handleAddExpense} noValidate className="flex flex-col sm:flex-row gap-2 mb-4">
             <input
               type="text"
               placeholder="Description (e.g. flour delivery)"
               aria-label="Expense description"
+              aria-invalid={expenseError && !description.trim() ? true : undefined}
+              aria-describedby={expenseError ? expenseErrorId : undefined}
+              required
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
             />
             <input
               type="number"
@@ -154,9 +166,14 @@ export default function EndOfDayClosing({
               step="0.01"
               placeholder="Amount"
               aria-label="Expense amount"
+              aria-invalid={
+                expenseError && !(parseFloat(amount) > 0) ? true : undefined
+              }
+              aria-describedby={expenseError ? expenseErrorId : undefined}
+              required
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="sm:w-40 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-1 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
+              className="sm:w-40 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none"
             />
             <button
               type="submit"
@@ -165,6 +182,11 @@ export default function EndOfDayClosing({
               + Add Expense
             </button>
           </form>
+        )}
+        {expenseError && (
+          <p id={expenseErrorId} role="alert" className="text-sm font-semibold text-red-700 mb-4">
+            {expenseError}
+          </p>
         )}
 
         {closing.dayExpenses.length === 0 ? (

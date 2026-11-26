@@ -136,3 +136,19 @@ describe("closing the day", () => {
     expect(screen.queryByText(/is already closed/)).not.toBeInTheDocument();
   });
 });
+describe("expense validation", () => {
+  it("names the missing fields instead of refusing silently", async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+
+    await user.click(screen.getByRole("button", { name: "+ Add Expense" }));
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent(
+      "Expense not added — enter a description and an amount greater than zero."
+    );
+    const description = screen.getByLabelText("Expense description");
+    expect(description).toHaveAttribute("aria-invalid", "true");
+    expect(description).toHaveAttribute("aria-describedby", alert.id);
+  });
+});

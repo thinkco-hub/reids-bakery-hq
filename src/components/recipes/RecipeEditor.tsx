@@ -72,6 +72,12 @@ export default function RecipeEditor({
           ingredients: [],
         }
   );
+  const [formError, setFormError] = useState<{ message: string; fields: string[] } | null>(
+    null
+  );
+  const formErrorId = useId();
+  // A yield is required exactly while the recipe has a bill of materials.
+  const hasBom = form.ingredients.some((line) => line.ingredientId && line.qty !== "");
 
   const [marginTiers, setMarginTiers] = useState<Array<number | "">>(() => {
     const base = Number(pricingRules.targetMarginPercent) || 40;
@@ -117,16 +123,34 @@ export default function RecipeEditor({
   } as Recipe;
   const { totalCost, costPerUnit } = computeRecipeCost(normalizedForCalc, ingredients);
 
+  const joinLabels = (labels: string[]) =>
+    labels.length === 1 ? labels[0] : `${labels.slice(0, -1).join(", ")} and ${labels[labels.length - 1]}`;
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.category || form.price === "" || form.qty === "" || form.target === "" || !form.shelfLife) {
-      return;
-    }
     const cleanIngredients = form.ingredients
       .filter((l) => l.ingredientId && l.qty !== "")
       .map((l) => ({ ...l, qty: parseFloat(String(l.qty)) || 0 }));
-    const hasBom = cleanIngredients.length > 0;
-    if (hasBom && (!form.yieldQty || !form.yieldUnit)) return;
+    const hasBomLines = cleanIngredients.length > 0;
+    const missing: Array<{ key: string; label: string }> = [];
+    if (!form.name) missing.push({ key: "name", label: "a recipe name" });
+    if (form.price === "") missing.push({ key: "price", label: "a price" });
+    if (form.qty === "") missing.push({ key: "qty", label: "an initial quantity" });
+    if (form.target === "") missing.push({ key: "target", label: "a target stock" });
+    if (!form.shelfLife) missing.push({ key: "shelfLife", label: "a shelf life" });
+    if (hasBomLines) {
+      if (!form.yieldQty || Number(form.yieldQty) <= 0)
+        missing.push({ key: "yieldQty", label: "a yield quantity" });
+      if (!form.yieldUnit) missing.push({ key: "yieldUnit", label: "a yield unit" });
+    }
+    if (missing.length > 0) {
+      setFormError({
+        message: `Recipe not saved — add ${joinLabels(missing.map((m) => m.label))}.`,
+        fields: missing.map((m) => m.key),
+      });
+      return;
+    }
+    setFormError(null);
     const hasYield = form.yieldQty !== "" && !!form.yieldUnit;
 
     onSave({
@@ -144,6 +168,9 @@ export default function RecipeEditor({
     });
   };
 
+  const invalidField = (key: string) => formError?.fields.includes(key) || undefined;
+  const describedBy = formError ? formErrorId : undefined;
+
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <div className="flex items-center text-[15px] mb-6 text-gray-500 font-medium tracking-wide">
@@ -154,7 +181,16 @@ export default function RecipeEditor({
         <span className="text-[#121212] font-bold">{isNew ? "New Recipe" : "Edit Recipe"}</span>
       </div>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
+        {formError && (
+          <p
+            id={formErrorId}
+            role="alert"
+            className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
+          >
+            {formError.message}
+          </p>
+        )}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
@@ -167,6 +203,8 @@ export default function RecipeEditor({
                     type="text"
                     value={form.name}
                     onChange={(e) => updateField("name", e.target.value)}
+                    aria-invalid={invalidField("name")}
+                    aria-describedby={describedBy}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                     required
                   />
@@ -195,6 +233,8 @@ export default function RecipeEditor({
                     step="any"
                     value={form.price}
                     onChange={(e) => updateField("price", e.target.value)}
+                    aria-invalid={invalidField("price")}
+                    aria-describedby={describedBy}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                     required
                   />
@@ -208,6 +248,8 @@ export default function RecipeEditor({
                     step="any"
                     value={form.qty}
                     onChange={(e) => updateField("qty", e.target.value)}
+                    aria-invalid={invalidField("qty")}
+                    aria-describedby={describedBy}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                     required
                   />
@@ -221,6 +263,8 @@ export default function RecipeEditor({
                     step="any"
                     value={form.target}
                     onChange={(e) => updateField("target", e.target.value)}
+                    aria-invalid={invalidField("target")}
+                    aria-describedby={describedBy}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                     required
                   />
@@ -233,6 +277,8 @@ export default function RecipeEditor({
                     placeholder="e.g. 24 Hours"
                     value={form.shelfLife}
                     onChange={(e) => updateField("shelfLife", e.target.value)}
+                    aria-invalid={invalidField("shelfLife")}
+                    aria-describedby={describedBy}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                     required
                   />
@@ -249,6 +295,9 @@ export default function RecipeEditor({
                       step="any"
                       value={form.yieldQty}
                       onChange={(e) => updateField("yieldQty", e.target.value)}
+                      aria-invalid={invalidField("yieldQty")}
+                      aria-describedby={describedBy}
+                      required={hasBom}
                       className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                     />
                   </div>
@@ -259,6 +308,9 @@ export default function RecipeEditor({
                       type="text"
                       value={form.yieldUnit}
                       onChange={(e) => updateField("yieldUnit", e.target.value)}
+                      aria-invalid={invalidField("yieldUnit")}
+                      aria-describedby={describedBy}
+                      required={hasBom}
                       className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-text)] focus:border-[var(--color-brand-text)] outline-none text-gray-800"
                     />
                   </div>
