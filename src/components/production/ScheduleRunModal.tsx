@@ -136,14 +136,14 @@ export default function ScheduleRunModal({ recipes, onClose, onSchedule }: Sched
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 min-h-[2.75rem] md:min-h-0 px-4 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold whitespace-nowrap hover:bg-gray-100 transition-colors"
+            className="flex-1 min-h-[2.75rem] px-4 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold whitespace-nowrap hover:bg-gray-100 transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={recipes.length === 0}
-            className="flex-1 min-h-[2.75rem] md:min-h-0 px-4 py-3 rounded-xl text-white font-bold whitespace-nowrap bg-[#562D07] hover:bg-[#3a1d04] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 min-h-[2.75rem] px-4 py-3 rounded-xl text-white font-bold whitespace-nowrap bg-[#562D07] hover:bg-[#3a1d04] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
             Schedule Run
           </button>
