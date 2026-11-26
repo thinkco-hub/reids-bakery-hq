@@ -1,17 +1,18 @@
 import React from "react";
+import { Link } from "react-router";
 import OrderStatusBadge from "../orders/OrderStatusBadge";
 import { formatMoney } from "../../utils/money";
 import { computeOrderTotal } from "../../utils/orders";
+import { orderPath } from "../../routes";
 import type { Client, Order } from "../../types/domain";
 
 interface ClientDetailProps {
   client: Client;
   orders: Order[];
   onBack: () => void;
-  onViewOrder: (order: Order) => void;
 }
 
-export default function ClientDetail({ client, orders, onBack, onViewOrder }: ClientDetailProps) {
+export default function ClientDetail({ client, orders, onBack }: ClientDetailProps) {
   const clientOrders = [...orders]
     .filter((o) => o.clientId === client.id)
     .sort((a, b) => b.requestedDate.localeCompare(a.requestedDate));
@@ -83,10 +84,16 @@ export default function ClientDetail({ client, orders, onBack, onViewOrder }: Cl
                 clientOrders.map((order) => (
                   <tr
                     key={order.id}
-                    className="hover:bg-gray-50/50 transition-colors cursor-pointer"
-                    onClick={() => onViewOrder(order)}
+                    className="hover:bg-gray-50/50 transition-colors"
                   >
-                    <td className="px-5 py-4 font-medium text-gray-900">{order.id}</td>
+                    <td className="px-5 py-4 font-medium text-gray-900">
+                      <Link
+                        to={orderPath(order.id)}
+                        className="rounded hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-text)]"
+                      >
+                        {order.id}
+                      </Link>
+                    </td>
                     <td className="px-5 py-4 text-gray-600">{order.requestedDate}</td>
                     <td className="px-5 py-4">
                       <OrderStatusBadge status={order.status} />

@@ -106,7 +106,7 @@ export default function Modal({
 
   return createPortal(
     <div
-      className={`fixed inset-0 flex items-center justify-center ${overlayClassName}`}
+      className={`fixed inset-0 flex justify-center overflow-y-auto px-4 py-4 ${overlayClassName}`}
       onClick={(event) => {
         if (dismissOnBackdrop && event.target === event.currentTarget) onClose();
       }}
@@ -118,7 +118,7 @@ export default function Modal({
         aria-labelledby={labelledBy}
         tabIndex={-1}
         onKeyDown={handleKeyDown}
-        className={`outline-none ${className}`}
+        className={`outline-none my-auto ${className}`}
       >
         {children}
       </div>
