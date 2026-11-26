@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SelectField from "../common/SelectField";
+import { useAnnounce } from "../common/Announcer";
 import { formatMonthLabel, monthKey } from "../../utils/dates";
 import type { FormEvent } from "react";
 import type { ChamsBranch, ChamsMovement, ChamsProduct, MonthKey } from "../../types/domain";
@@ -29,6 +30,13 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
   const [productId, setProductId] = useState(products[0]?.id || "");
   const [month, setMonth] = useState(MONTH_OPTIONS[0]);
   const [submittedMsg, setSubmittedMsg] = useState("");
+  const announce = useAnnounce();
+  const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // The form can unmount (tab switch) while its 4s dismissal is pending.
+  useEffect(() => () => {
+    if (dismissTimer.current) clearTimeout(dismissTimer.current);
+  }, []);
 
   const existing = movements.find(
     (m) => m.branchId === branchId && m.productId === productId && m.month === month
@@ -48,8 +56,11 @@ export default function MovementLogForm({ branches, products, movements, onSubmi
       spoilage: parseFloat(String(data.get("spoilage"))) || 0,
       sold: parseFloat(String(data.get("sold"))) || 0,
     });
-    setSubmittedMsg(`Stock movement for ${formatMonthLabel(month)} saved.`);
-    setTimeout(() => setSubmittedMsg(""), 4000);
+    const message = `Stock movement for ${formatMonthLabel(month)} saved.`;
+    setSubmittedMsg(message);
+    announce(message);
+    if (dismissTimer.current) clearTimeout(dismissTimer.current);
+    dismissTimer.current = setTimeout(() => setSubmittedMsg(""), 4000);
   };
 
   return (

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SelectField from "../common/SelectField";
+import { useAnnounce } from "../common/Announcer";
 import { formatMonthLabel, monthKey } from "../../utils/dates";
 import type { FormEvent } from "react";
 import type { ChamsBranch, ChamsCount, ChamsProduct } from "../../types/domain";
@@ -22,6 +23,13 @@ export default function RemainingCountForm({ branches, products, counts, onSubmi
   const [productId, setProductId] = useState(products[0]?.id || "");
   const [remainingReported, setRemainingReported] = useState("");
   const [submittedMsg, setSubmittedMsg] = useState("");
+  const announce = useAnnounce();
+  const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // The form can unmount (tab switch) while its 4s dismissal is pending.
+  useEffect(() => () => {
+    if (dismissTimer.current) clearTimeout(dismissTimer.current);
+  }, []);
 
   const existing = counts.find(
     (c) => c.branchId === branchId && c.productId === productId && c.month === month
@@ -32,9 +40,12 @@ export default function RemainingCountForm({ branches, products, counts, onSubmi
     if (remainingReported === "") return;
 
     onSubmit({ branchId, productId, month, remainingReported: parseFloat(remainingReported) || 0 });
-    setSubmittedMsg(`Remaining count for ${formatMonthLabel(month)} submitted.`);
+    const message = `Remaining count for ${formatMonthLabel(month)} submitted.`;
+    setSubmittedMsg(message);
+    announce(message);
     setRemainingReported("");
-    setTimeout(() => setSubmittedMsg(""), 4000);
+    if (dismissTimer.current) clearTimeout(dismissTimer.current);
+    dismissTimer.current = setTimeout(() => setSubmittedMsg(""), 4000);
   };
 
   return (

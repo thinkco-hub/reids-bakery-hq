@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAnnounce } from "../common/Announcer";
 import { todayISO } from "../../utils/dates";
 import type { FormEvent } from "react";
@@ -78,6 +78,12 @@ export default function ClosingCountForm({ menuInventory, ingredients, onSubmit,
   const [ingredientCounts, setIngredientCounts] = useState<CountMap>({});
   const [submittedMsg, setSubmittedMsg] = useState("");
   const announce = useAnnounce();
+  const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // The form can unmount (route change) while its 4s dismissal is pending.
+  useEffect(() => () => {
+    if (dismissTimer.current) clearTimeout(dismissTimer.current);
+  }, []);
 
   const updateMenuCount = (id: string, value: string) => setMenuCounts((prev) => ({ ...prev, [id]: value }));
   const updateIngredientCount = (id: string, value: string) =>
@@ -113,7 +119,8 @@ export default function ClosingCountForm({ menuInventory, ingredients, onSubmit,
     const message = `Closing count for ${date} submitted for review.`;
     setSubmittedMsg(message);
     announce(message);
-    setTimeout(() => setSubmittedMsg(""), 4000);
+    if (dismissTimer.current) clearTimeout(dismissTimer.current);
+    dismissTimer.current = setTimeout(() => setSubmittedMsg(""), 4000);
   };
 
   return (
