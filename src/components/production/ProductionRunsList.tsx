@@ -208,8 +208,16 @@ export default function ProductionRunsList({
               <div className="px-5 py-3 border-b border-gray-100 bg-gray-50/50">
                 <h3 id={groupHeadingId} className="text-sm font-bold text-gray-700">{group.date}</h3>
               </div>
-              <div className="overflow-x-auto w-full">
+              <div className="overflow-x-auto w-full" tabIndex={0} role="region" aria-label={`Production runs for ${group.date}`}>
                 <table aria-labelledby={groupHeadingId} className="w-full text-left border-collapse min-w-[720px]">
+                  <thead>
+                    <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
+                      <th scope="col" className="px-5 py-4">Recipe</th>
+                      <th scope="col" className="px-5 py-4">Qty</th>
+                      <th scope="col" className="px-5 py-4">Status</th>
+                      <th scope="col" className="px-5 py-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
                   <tbody className="divide-y divide-gray-100 text-sm">
                     {group.entries.map(({ run, recipe, status }) => (
                       <tr key={run.id} className="hover:bg-gray-50/50 transition-colors">

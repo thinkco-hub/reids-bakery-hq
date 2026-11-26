@@ -430,7 +430,7 @@ export default function OrderDetail({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
           <h3 id={itemsHeadingId} className="text-lg font-bold text-[#121212] mb-6">Order Items</h3>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Order items">
             <table aria-labelledby={itemsHeadingId} className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-gray-100 text-xs font-semibold text-gray-500">

@@ -90,7 +90,7 @@ export default function LedgerHistory({ branches, products, beginnings, movement
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto w-full">
+        <div className="overflow-x-auto w-full" tabIndex={0} role="region" aria-label="Ledger history">
           <table aria-labelledby={headingId} className="w-full text-left border-collapse min-w-[940px]">
             <thead>
               <tr className="border-b border-gray-200 text-xs font-semibold text-gray-700 bg-gray-50/50 uppercase tracking-wider">
