@@ -61,9 +61,10 @@ export default function OrderConfirmationModal({
     event.preventDefault();
     const next = values[(values.indexOf(current) + step + values.length) % values.length];
     select(next);
-    event.currentTarget.parentElement
-      ?.querySelectorAll<HTMLButtonElement>('[role="radio"]')
-      [values.indexOf(next)]?.focus();
+    const radios = event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>(
+      '[role="radio"]'
+    );
+    radios?.[values.indexOf(next)]?.focus();
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
