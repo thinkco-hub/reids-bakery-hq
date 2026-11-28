@@ -4,6 +4,7 @@ import {
   buildOrderFromSale,
   buildSale,
   buildSaleEdit,
+  canSaveSaleEdit,
   computeSaleTotals,
   linkedSaleView,
   validateCheckout,
@@ -209,6 +210,34 @@ describe("linkedSaleView", () => {
   it("falls back to the sale when its order is not loaded", () => {
     const sale: Sale = { ...builtSale({ saleType: "Order", deliveryDate: TOMORROW }), orderId: "#404" };
     expect(linkedSaleView(sale, [])).toBe(sale);
+  });
+});
+
+describe("canSaveSaleEdit", () => {
+  const guard = (
+    overrides: Partial<{ customerName: string; customerContact: string; itemCount: number }> = {}
+  ) => ({
+    customerName: "Ana Reyes",
+    customerContact: "09171234567",
+    itemCount: 1,
+    ...overrides,
+  });
+
+  it("accepts a named customer with a full 11-digit contact and one line", () => {
+    expect(canSaveSaleEdit(guard())).toBe(true);
+  });
+
+  it("refuses a blank name", () => {
+    expect(canSaveSaleEdit(guard({ customerName: "   " }))).toBe(false);
+  });
+
+  it("refuses a contact that is not exactly 11 digits", () => {
+    expect(canSaveSaleEdit(guard({ customerContact: "0917123456" }))).toBe(false);
+    expect(canSaveSaleEdit(guard({ customerContact: "091712345678" }))).toBe(false);
+  });
+
+  it("refuses an edit with no lines", () => {
+    expect(canSaveSaleEdit(guard({ itemCount: 0 }))).toBe(false);
   });
 });
 

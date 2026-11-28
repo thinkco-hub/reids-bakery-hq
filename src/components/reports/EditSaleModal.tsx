@@ -4,7 +4,7 @@ import EditHistoryList from "../common/EditHistoryList";
 import SelectField from "../common/SelectField";
 import Button from "../common/Button";
 import { XIcon } from "../icons";
-import { computeSaleTotals } from "../../utils/checkout";
+import { canSaveSaleEdit, computeSaleTotals } from "../../utils/checkout";
 import { formatMoney } from "../../utils/money";
 import type { FormEvent } from "react";
 import { isValidCustomerContact, toContactDigits } from "../../utils/orders";
@@ -55,8 +55,11 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
     ...l.item,
     qty: parseFloat(l.qty) || 0,
   }));
-  const canSave =
-    !!customerName.trim() && isValidCustomerContact(customerContact) && cleanItems.length > 0;
+  const canSave = canSaveSaleEdit({
+    customerName,
+    customerContact,
+    itemCount: cleanItems.length,
+  });
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();

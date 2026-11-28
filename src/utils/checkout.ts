@@ -156,6 +156,20 @@ export interface SaleEditResult {
 /** How one sale line reads in an edit-history entry. */
 const describeSaleLine = (line: CartItem) => `${line.qty} × ${line.name}`;
 
+/** Whether a walk-in sale edit is submittable; the edit modal's disabled state
+ *  and buildSaleEdit read the same rule. */
+export function canSaveSaleEdit({
+  customerName,
+  customerContact,
+  itemCount,
+}: {
+  customerName: string;
+  customerContact: string;
+  itemCount: number;
+}): boolean {
+  return !!customerName.trim() && isValidCustomerContact(customerContact) && itemCount > 0;
+}
+
 /**
  * A walk-in sale edit, with its history entry and recomputed totals. Linked
  * sales return null: their order is the only editor.
@@ -165,9 +179,12 @@ export function buildSaleEdit(
   input: EditSaleInput,
   editedBy: string
 ): SaleEditResult | null {
-  if (sale.orderId) return null;
-  if (!input.customerName.trim()) return null;
-  if (!isValidCustomerContact(input.customerContact)) return null;
+  const canSave = canSaveSaleEdit({
+    customerName: input.customerName,
+    customerContact: input.customerContact,
+    itemCount: input.items.length,
+  });
+  if (sale.orderId || !canSave) return null;
 
   const changes: FieldEdit[] = [];
   const name = diffField("customerName", "Customer name", sale.customerName, input.customerName);
