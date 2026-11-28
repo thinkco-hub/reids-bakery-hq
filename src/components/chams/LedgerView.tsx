@@ -1,6 +1,6 @@
 import React, { useId, useState } from "react";
 import { formatMonthLabel, shiftMonthKey } from "../../utils/dates";
-import { buildLedgerForMonth, computeBranchRevenueForMonth } from "../../utils/ledger";
+import { buildLedgerForMonth } from "../../utils/ledger";
 import { formatMoney } from "../../utils/money";
 import { discrepancyLabel } from "../../utils/counts";
 import { TONE_TEXT } from "../../utils/status";
@@ -39,7 +39,9 @@ export default function LedgerView({ branches, products, beginnings, movements, 
 
   const branchRevenues = branches.map((branch) => ({
     branch,
-    revenue: computeBranchRevenueForMonth(branch, products, month, beginnings, movements, counts),
+    revenue: rows
+      .filter((r) => r.branchId === branch.id)
+      .reduce((sum, r) => sum + r.revenue, 0),
   }));
 
   const query = search.toLowerCase();

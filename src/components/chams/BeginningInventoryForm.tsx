@@ -2,15 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import SelectField from "../common/SelectField";
 import Button from "../common/Button";
 import { useAnnounce } from "../common/Announcer";
-import { formatMonthLabel, monthKey } from "../../utils/dates";
+import { formatMonthLabel, recentMonthKeys } from "../../utils/dates";
 import type { FormEvent } from "react";
 import type { ChamsBeginning, ChamsBranch, ChamsProduct, MonthKey } from "../../types/domain";
-
-const MONTH_OPTIONS = Array.from({ length: 6 }, (_, i) => {
-  const d = new Date();
-  d.setMonth(d.getMonth() - i);
-  return monthKey(d);
-});
 
 interface BeginningInventoryFormProps {
   branches: ChamsBranch[];
@@ -27,7 +21,8 @@ interface BeginningInventoryFormProps {
 export default function BeginningInventoryForm({ branches, products, beginnings, onSubmit }: BeginningInventoryFormProps) {
   const [branchId, setBranchId] = useState(branches[0]?.id || "");
   const [productId, setProductId] = useState(products[0]?.id || "");
-  const [month, setMonth] = useState(MONTH_OPTIONS[0]);
+  const monthOptions = recentMonthKeys(6);
+  const [month, setMonth] = useState(monthOptions[0]);
   const [submittedMsg, setSubmittedMsg] = useState("");
   const announce = useAnnounce();
   const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -112,7 +107,7 @@ export default function BeginningInventoryForm({ branches, products, beginnings,
               onChange={(e) => setMonth(e.target.value)}
               className="w-full pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chams-blue focus:border-chams-blue outline-none text-gray-800"
             >
-              {MONTH_OPTIONS.map((m) => (
+              {monthOptions.map((m) => (
                 <option key={m} value={m}>
                   {formatMonthLabel(m)}
                 </option>
