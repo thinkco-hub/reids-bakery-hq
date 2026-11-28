@@ -27,6 +27,22 @@ function findRecord<T extends MonthRecord>(
   );
 }
 
+/** Updates the record for a (branch, product, month) key, or appends one. */
+export function upsertByPeriod<T extends MonthRecord & { id: string }>(
+  list: T[],
+  data: Omit<T, "id">,
+  idPrefix: string
+): T[] {
+  const existing = findRecord(list, data.branchId, data.productId, data.month);
+  if (existing) {
+    return list.map((r) => (r === existing ? { ...r, ...data } : r));
+  }
+  return [
+    ...list,
+    { id: `${idPrefix}-${String(list.length + 1).padStart(4, "0")}`, ...data } as T,
+  ];
+}
+
 function hasTrackedDataAtOrBefore(
   branchId: string,
   productId: string,
@@ -162,19 +178,6 @@ export function buildLedgerForMonth(
     });
   });
   return rows;
-}
-
-export function computeBranchRevenueForMonth(
-  branch: ChamsBranch,
-  products: ChamsProduct[],
-  month: MonthKey,
-  beginnings: ChamsBeginning[],
-  movements: ChamsMovement[],
-  counts: ChamsCount[]
-): number {
-  return products
-    .map((product) => buildLedgerRow(branch, product, month, beginnings, movements, counts))
-    .reduce((sum, row) => sum + row.revenue, 0);
 }
 
 export function getBranchProductMonths(

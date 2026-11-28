@@ -41,6 +41,11 @@ export function shiftMonthKey(key: MonthKey, delta: number): MonthKey {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
+/** The current month and the `count - 1` months before it, newest first. */
+export function recentMonthKeys(count: number, clock: Date = new Date()): MonthKey[] {
+  return Array.from({ length: count }, (_, i) => shiftMonthKey(monthKey(clock), -i));
+}
+
 // Weeks run Monday–Sunday (ISO).
 export function getWeekRange(anchorISO: ISODate): DateRange {
   const date = parseISODate(anchorISO);
