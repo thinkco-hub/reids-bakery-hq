@@ -4,12 +4,11 @@ import OrderStatusBadge from "../orders/OrderStatusBadge";
 import StatCard from "../common/StatCard";
 import EmptyState from "../common/EmptyState";
 import {
-  AlertTriangleIcon,
-  CalendarIcon,
-  CheckCircleIcon,
+  Alert02Icon,
+  Calendar03Icon,
   CheckIcon,
-  ClockIcon,
-  MoneyIcon,
+  Clock01Icon,
+  PhilippinePesoIcon,
 } from "../icons";
 import { orderPath } from "../../routes";
 import { addDaysISO, formatDate, toISODate } from "../../utils/dates";
@@ -70,7 +69,7 @@ export default function DashboardView({
           </p>
         </div>
         <div className="self-center md:self-auto bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm flex items-center text-sm font-medium text-gray-600">
-          <CalendarIcon className="w-4 h-4 mr-2 text-brand-strong" />
+          <Calendar03Icon className="w-4 h-4 mr-2 text-brand-strong" />
           {todayLabel}
         </div>
       </header>
@@ -79,7 +78,7 @@ export default function DashboardView({
         <StatCard
           label="Today's Revenue"
           value={formatMoney(todayRevenue)}
-          icon={<MoneyIcon className="w-6 h-6" />}
+          icon={<PhilippinePesoIcon className="w-6 h-6" />}
           iconClassName="bg-orange-50 text-brand-strong"
           flag={
             revenueChangePercent !== null ? (
@@ -102,13 +101,13 @@ export default function DashboardView({
         <StatCard
           label="Pending Orders"
           value={pendingOrdersCount}
-          icon={<ClockIcon className="w-6 h-6" />}
+          icon={<Clock01Icon className="w-6 h-6" />}
           iconClassName="bg-blue-50 text-blue-700"
         />
         <StatCard
           label="Low Stock Alerts"
           value={lowStockAlerts.length}
-          icon={<AlertTriangleIcon className="w-6 h-6" />}
+          icon={<Alert02Icon className="w-6 h-6" />}
           iconClassName="bg-red-50 text-red-700"
           flag={
             lowStockAlerts.length > 0 ? (
@@ -198,7 +197,7 @@ export default function DashboardView({
           >
             {lowStockAlerts.length === 0 ? (
               <EmptyState
-                icon={<CheckCircleIcon className="h-6 w-6 text-green-700" />}
+                icon={<CheckIcon className="h-6 w-6 text-green-700" />}
                 title="All stock levels are optimal."
                 hint="Items below their reorder threshold will appear here."
               />

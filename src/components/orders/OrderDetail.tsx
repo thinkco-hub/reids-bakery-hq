@@ -7,8 +7,16 @@ import EditHistoryList from "../common/EditHistoryList";
 import SelectField from "../common/SelectField";
 import Button from "../common/Button";
 import Table from "../common/Table";
-import { ArrowLeftIcon, CalendarIcon, CheckIcon, ClockIcon, DocumentIcon, GridIcon, InfoIcon, UserIcon } from "../icons";
-import { MONEY_SYMBOL, formatMoney } from "../../utils/money";
+import {
+  ArrowLeft02Icon,
+  Calendar03Icon,
+  CheckIcon,
+  Clock01Icon,
+  MinusIcon,
+  PhilippinePesoIcon,
+  User02Icon,
+} from "../icons";
+import { formatMoney } from "../../utils/money";
 import {
   computeAmountDue,
   computeOrderTotal,
@@ -278,7 +286,7 @@ export default function OrderDetail({
             aria-label="Back to orders"
             className="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-300 rounded-lg transition-colors text-gray-700 flex-shrink-0"
           >
-            <ArrowLeftIcon className="w-5 h-5" />
+            <ArrowLeft02Icon className="w-5 h-5" />
           </button>
           <div className="flex flex-col gap-2">
             <h2 className="text-[1.625rem] md:text-[2rem] font-bold text-ink leading-none">Order {order.id}</h2>
@@ -357,7 +365,7 @@ export default function OrderDetail({
           <p className="text-xs font-bold text-gray-800 mb-4 tracking-wide">Client</p>
           <div className="flex items-center">
             <div className="w-12 h-12 rounded-full bg-amber-disc text-espresso flex items-center justify-center mr-4">
-              <UserIcon className="w-6 h-6" />
+              <User02Icon className="w-6 h-6" />
             </div>
             <div>
               <p className="text-base font-bold text-ink">{client ? client.name : order.customerName || "—"}</p>
@@ -374,7 +382,7 @@ export default function OrderDetail({
             <p className="text-xs font-bold text-gray-800 mb-4 tracking-wide">Delivery</p>
             <div className="flex items-center">
               <div className="w-12 h-12 rounded-full bg-amber-disc text-espresso flex items-center justify-center mr-4">
-                <CalendarIcon className="w-6 h-6" />
+                <Calendar03Icon className="w-6 h-6" />
               </div>
               <div>
                 <p className="text-base font-bold text-ink">{order.deliveryDate || "Not scheduled"}</p>
@@ -388,7 +396,7 @@ export default function OrderDetail({
             <p className="text-xs font-bold text-gray-800 mb-4 tracking-wide">Total Amount</p>
             <div className="flex items-center">
               <div className="w-12 h-12 rounded-full bg-amber-disc text-espresso flex items-center justify-center mr-4">
-                <span className="text-2xl font-bold font-serif">{MONEY_SYMBOL}</span>
+                <PhilippinePesoIcon className="w-6 h-6" />
               </div>
               <div>
                 <p className="text-base font-bold text-ink tabular-nums">{formatMoney(total)}</p>
@@ -437,7 +445,6 @@ export default function OrderDetail({
 
         <div className="lg:col-span-1 bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
           <div className="flex items-center mb-8">
-            <GridIcon className="w-5 h-5 text-gray-500 mr-2" />
             <h3 className="text-base font-bold text-ink">Order Status Timeline</h3>
           </div>
           <div className="relative space-y-8 pl-1">
@@ -454,9 +461,9 @@ export default function OrderDetail({
                     }`}
                   >
                     {reached ? (
-                      <CheckIcon className="w-3.5 h-3.5 text-white" />
+                      <CheckIcon className="w-4 h-4 text-white" />
                     ) : (
-                      <div className="w-2 h-0.5 bg-white rounded-full"></div>
+                      <MinusIcon className="w-4 h-4 text-white" />
                     )}
                   </div>
                   <div className="pt-0.5">
@@ -475,7 +482,6 @@ export default function OrderDetail({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
           <div className="flex items-center mb-4">
-            <DocumentIcon className="w-5 h-5 text-orange-400 mr-2" />
             <h3 className="text-base font-bold text-ink">Order Notes</h3>
           </div>
           <div className="bg-orange-50 rounded-lg p-4 text-sm text-espresso font-medium">
@@ -485,7 +491,6 @@ export default function OrderDetail({
 
         <div className="lg:col-span-1 bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
           <div className="flex items-center mb-6">
-            <InfoIcon className="w-5 h-5 text-orange-400 mr-2" />
             <h3 className="text-base font-bold text-ink">Additional Information</h3>
           </div>
           <div className="space-y-4 text-sm">
@@ -522,7 +527,7 @@ export default function OrderDetail({
       {order.editHistory && order.editHistory.length > 0 && (
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
           <div className="flex items-center mb-4">
-            <ClockIcon className="w-5 h-5 text-orange-400 mr-2" />
+            <Clock01Icon className="w-5 h-5 text-orange-400 mr-2" />
             <h3 className="text-base font-bold text-ink">Edit History</h3>
           </div>
           <EditHistoryList entries={order.editHistory} />

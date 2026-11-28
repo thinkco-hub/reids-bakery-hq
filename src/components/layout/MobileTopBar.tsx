@@ -2,7 +2,7 @@ import React, { memo, useState } from "react";
 import type { RefObject } from "react";
 import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
 import { useAnnounce } from "../common/Announcer";
-import { CheckIcon, MenuIcon, TrashIcon, UserPlusIcon } from "../icons";
+import { CheckIcon, MenuIcon, TrashIcon, UserAdd01Icon } from "../icons";
 import type { TicketCustomer } from "../../types/domain";
 
 /** Ticket header shown in place of the app title while the POS tab is open. */
@@ -81,7 +81,7 @@ function MobileTopBar({ onOpenMobileNav, triggerRef, pos }: MobileTopBarProps) {
                   <CheckIcon className="w-4 h-4 flex-shrink-0" />
                 </>
               ) : (
-                <UserPlusIcon className="w-6 h-6" />
+                <UserAdd01Icon className="w-6 h-6" />
               )}
             </button>
 

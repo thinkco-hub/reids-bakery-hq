@@ -1,7 +1,7 @@
 import React, { useId } from "react";
 import Modal from "../common/Modal";
 import Button from "../common/Button";
-import { XIcon } from "../icons";
+import { Cancel01Icon } from "../icons";
 import { toContactDigits } from "../../utils/orders";
 import type { FormEvent } from "react";
 import type { TicketCustomer } from "../../types/domain";
@@ -107,7 +107,7 @@ export default function TicketCustomerInput({
           aria-label="Cancel and return to the ticket"
           className="min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center rounded-md bg-caramel/20 hover:bg-caramel/40 transition-colors"
         >
-          <XIcon className="w-6 h-6" />
+          <Cancel01Icon className="w-6 h-6" />
         </button>
         <h2 id={headingId} className="text-lg font-bold">Add customer to ticket</h2>
       </header>

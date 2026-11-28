@@ -3,7 +3,7 @@ import SelectField from "../common/SelectField";
 import TicketLineItem from "./TicketLineItem";
 import EmptyState from "../common/EmptyState";
 import { useAnnounce } from "../common/Announcer";
-import { ChevronLeftIcon, SearchIcon, XIcon } from "../icons";
+import { Cancel01Icon, ChevronLeftIcon, Search02Icon } from "../icons";
 import { POS_CATEGORIES } from "../../data/initialCatalogue";
 import { formatMoney } from "../../utils/money";
 import type {
@@ -114,7 +114,7 @@ export default function PosMobile({
                 aria-label={`Remove ${customer.name} from the ticket`}
                 className="flex-shrink-0 min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center rounded-lg text-gray-500 hover:text-red-500 hover:bg-gray-100 transition-colors"
               >
-                <XIcon className="w-5 h-5" />
+                <Cancel01Icon className="w-5 h-5" />
               </button>
             </div>
           )}
@@ -194,9 +194,9 @@ export default function PosMobile({
               }`}
             >
               {isSearchOpen ? (
-                <XIcon className="w-5 h-5" />
+                <Cancel01Icon className="w-5 h-5" />
               ) : (
-                <SearchIcon className="w-5 h-5" />
+                <Search02Icon className="w-5 h-5" />
               )}
             </button>
           </div>

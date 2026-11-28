@@ -8,7 +8,7 @@ import Table, { TableHead } from "../common/Table";
 import EmptyState from "../common/EmptyState";
 import Button from "../common/Button";
 import Badge from "../common/Badge";
-import { EyeIcon, XIcon } from "../icons";
+import { Cancel01Icon, ViewIcon } from "../icons";
 import { formatMoney } from "../../utils/money";
 import { computeOrderTotal, getPaymentStatus, hasShortfall, ORDER_STATUSES } from "../../utils/orders";
 import type { Client, MenuItemStock, Order, OrderStatus } from "../../types/domain";
@@ -99,7 +99,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
               className="text-gray-500 hover:text-red-700 p-1 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-strong"
               title="Clear Date Filter"
             >
-              <XIcon className="w-4 h-4" />
+              <Cancel01Icon className="w-4 h-4" />
             </button>
           )}
         </div>
@@ -193,7 +193,7 @@ export default function OrdersList({ orders, clients, menuInventory, onView }: O
                           className="text-gray-500 hover:text-brand-strong transition-colors p-2 rounded-md hover:bg-orange-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-strong"
                           title="View Order Details"
                         >
-                          <EyeIcon className="w-5 h-5" />
+                          <ViewIcon className="w-5 h-5" />
                         </button>
                       </td>
                     </tr>

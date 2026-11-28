@@ -6,7 +6,6 @@ import SearchField from "../common/SearchField";
 import Table, { TableHead } from "../common/Table";
 import EmptyState from "../common/EmptyState";
 import Button from "../common/Button";
-import { ShoppingCartIcon } from "../icons";
 import { formatMoney } from "../../utils/money";
 import { STOCK_STATUS_LABELS } from "../../utils/status";
 import { groupByStatus, getStockStatus } from "../../utils/stock";
@@ -254,8 +253,7 @@ export default function RawMaterialsTable({ ingredients, onRestock, onAdd, onUpd
           minWidth="min-w-[860px]"
           header={
             <div className="px-4 md:px-6 py-4 border-b border-gray-200 bg-gray-50/50">
-              <h2 id={headingId} className="text-base md:text-lg font-bold text-ink flex items-center gap-2">
-                <ShoppingCartIcon className="w-5 h-5 text-gray-500" />
+              <h2 id={headingId} className="text-base md:text-lg font-bold text-ink">
                 Raw Materials Stock
               </h2>
             </div>

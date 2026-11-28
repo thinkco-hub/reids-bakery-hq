@@ -4,7 +4,14 @@ import { useAnnounce } from "../common/Announcer";
 import PosMobile from "../pos/PosMobile";
 import SelectField from "../common/SelectField";
 import TicketLineItem from "../pos/TicketLineItem";
-import { ClipboardListIcon, SearchIcon, TrashIcon, UserPlusIcon, XIcon } from "../icons";
+import {
+  Cancel01Icon,
+  ClipboardListIcon,
+  Search02Icon,
+  ShoppingCart02Icon,
+  TrashIcon,
+  UserAdd01Icon,
+} from "../icons";
 import { POS_CATEGORIES } from "../../data/initialCatalogue";
 import { formatMoney } from "../../utils/money";
 import type {
@@ -119,7 +126,7 @@ export default function PosView({
                   aria-label="Search POS items"
                   className="pl-10 pr-4 py-2 bg-gray-100 border-none rounded-full text-sm focus:ring-2 focus:ring-brand-strong outline-none"
                 />
-                <SearchIcon className="w-5 h-5 text-gray-500 absolute left-3 top-2.5" />
+                <Search02Icon className="w-5 h-5 text-gray-500 absolute left-3 top-2.5" />
               </div>
             </div>
           </div>
@@ -201,7 +208,7 @@ export default function PosView({
                   aria-label={`Remove ${customer.name} from the ticket`}
                   className="flex-shrink-0 min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center rounded-lg text-gray-500 hover:text-red-500 hover:bg-gray-100 transition-colors"
                 >
-                  <XIcon className="w-[1.15em] h-[1.15em]" />
+                  <Cancel01Icon className="w-[1.15em] h-[1.15em]" />
                 </button>
               </div>
             ) : (
@@ -209,7 +216,7 @@ export default function PosView({
                 onClick={onAddCustomer}
                 className="w-full min-h-[2.75rem] px-2 rounded-lg border border-dashed border-gray-300 flex items-center justify-center gap-2 font-bold text-espresso hover:bg-gray-50 transition-colors"
               >
-                <UserPlusIcon className="w-[1.15em] h-[1.15em] flex-shrink-0" />
+                <UserAdd01Icon className="w-[1.15em] h-[1.15em] flex-shrink-0" />
                 Add customer
               </button>
             )}
@@ -218,13 +225,7 @@ export default function PosView({
           <div className="flex-1 overflow-y-auto bg-white min-h-[100px]">
             {cart.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-gray-500 text-center">
-                <svg
-                  className="w-[clamp(3.5rem,22cqw,5.5rem)] h-[clamp(3.5rem,22cqw,5.5rem)] mb-[clamp(0.6rem,2.5cqw,1.2rem)] opacity-20"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
-                </svg>
+                <ShoppingCart02Icon className="w-[clamp(3.5rem,22cqw,5.5rem)] h-[clamp(3.5rem,22cqw,5.5rem)] mb-[clamp(0.6rem,2.5cqw,1.2rem)] opacity-20" />
                 <p className="font-medium text-[length:var(--tk-title)] text-gray-500">
                   No items added
                 </p>

@@ -3,7 +3,7 @@ import Modal from "../common/Modal";
 import EditHistoryList from "../common/EditHistoryList";
 import SelectField from "../common/SelectField";
 import Button from "../common/Button";
-import { XIcon } from "../icons";
+import { Cancel01Icon } from "../icons";
 import type { FormEvent } from "react";
 import { formatMoney } from "../../utils/money";
 import { canSaveOrderEdit, isValidCustomerContact, toContactDigits } from "../../utils/orders";
@@ -180,7 +180,7 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
                     aria-label={`Remove item ${idx + 1}`}
                     className="text-gray-500 hover:text-red-500 p-1.5 transition-colors"
                   >
-                    <XIcon className="w-4 h-4" />
+                    <Cancel01Icon className="w-4 h-4" />
                   </button>
                 </div>
               ))}

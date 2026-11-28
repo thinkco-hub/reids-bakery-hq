@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowLeftIcon } from "../icons";
+import { ArrowLeft02Icon } from "../icons";
 
 interface RecordNotFoundProps {
   /** What the URL names, spelled as the screen spells it: "Order", "Client", "Recipe". */
@@ -20,7 +20,7 @@ export default function RecordNotFound({ kind, id, onBack }: RecordNotFoundProps
         onClick={onBack}
         className="inline-flex items-center gap-2 mb-4 text-sm font-semibold text-espresso/70 hover:text-espresso transition-colors"
       >
-        <ArrowLeftIcon className="w-4 h-4" />
+        <ArrowLeft02Icon className="w-4 h-4" />
         Back to list
       </button>
 
