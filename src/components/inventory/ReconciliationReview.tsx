@@ -5,12 +5,13 @@ import EmptyState from "../common/EmptyState";
 import StatCard from "../common/StatCard";
 import Badge from "../common/Badge";
 import Button from "../common/Button";
-import { discrepancyLabel } from "../../utils/counts";
+import { discrepancyLabel, flaggedPendingCounts } from "../../utils/counts";
 import {
   COUNT_RESOLUTION_LABELS,
   COUNT_STATUS_LABELS,
   COUNT_STATUS_TONES,
   TONE_TEXT,
+  discrepancyTone,
 } from "../../utils/status";
 import type {
   CountResolutionAction,
@@ -60,7 +61,7 @@ export default function ReconciliationReview({
     return list.find((i) => i.id === c.itemId)?.name || c.itemId;
   };
 
-  const flaggedPending = counts.filter((c) => c.discrepancy !== 0 && c.status === "pending");
+  const flaggedPending = flaggedPendingCounts(counts);
   const resolved = counts.filter((c) => c.status === "resolved");
 
   const confirmApplyAll = () => {
@@ -156,9 +157,7 @@ export default function ReconciliationReview({
                 <td className="px-6 py-4 text-right text-gray-600 tabular-nums">{c.systemQty}</td>
                 <td className="px-6 py-4 text-right text-gray-600 tabular-nums">{c.countedQty}</td>
                 <td
-                  className={`px-6 py-4 text-right font-bold tabular-nums ${
-                    c.discrepancy === 0 ? "text-gray-500" : c.discrepancy > 0 ? TONE_TEXT.success : TONE_TEXT.danger
-                  }`}
+                  className={`px-6 py-4 text-right font-bold tabular-nums ${TONE_TEXT[discrepancyTone(c.discrepancy)]}`}
                 >
                   {discrepancyLabel(c.discrepancy)}
                 </td>
@@ -174,7 +173,7 @@ export default function ReconciliationReview({
                   )}
                 </td>
                 <td className="px-4 py-4 text-center whitespace-nowrap">
-                  {c.status === "pending" && c.discrepancy !== 0 ? (
+                  {flaggedPending.includes(c) ? (
                     <>
                       <Button
                         size="sm"

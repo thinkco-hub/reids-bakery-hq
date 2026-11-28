@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { computeDiscrepancy } from "../utils/counts";
+import { computeDiscrepancy, flaggedPendingCounts } from "../utils/counts";
 import { isPayableAmount } from "../utils/orders";
 import { initialInventoryCounts } from "../data/initialInventory";
 import { recordAuditEvent } from "../utils/auditLog";
@@ -123,16 +123,15 @@ export function useClosing({
     };
 
     const applyAllPendingCounts = () => {
-      const pending = inventoryCounts.filter(
-        (c) => c.status === "pending" && c.discrepancy !== 0
-      );
+      const pending = flaggedPendingCounts(inventoryCounts);
       if (pending.length === 0) return;
 
       applyPendingCounts(pending);
 
+      const pendingIds = new Set(pending.map((c) => c.id));
       setInventoryCounts((prev) =>
         prev.map((c) =>
-          c.status === "pending" && c.discrepancy !== 0
+          pendingIds.has(c.id)
             ? { ...c, status: "resolved", resolution: "applied" }
             : c
         )
