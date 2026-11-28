@@ -6,8 +6,8 @@ import Badge from "../common/Badge";
 import Button from "../common/Button";
 import { DownloadIcon } from "../icons";
 import { downloadCSV } from "../../utils/sales";
-import { discrepancyLabel } from "../../utils/counts";
-import { TONE_TEXT, type StatusTone } from "../../utils/status";
+import { discrepancyLabel, flaggedPendingCounts } from "../../utils/counts";
+import { discrepancyTone, TONE_TEXT } from "../../utils/status";
 import {
   todayISO,
   getDayRange,
@@ -40,8 +40,7 @@ function DiscrepancyBadge({ row }: { row: ClosingInventoryRow }) {
   if (!row.periodCountCount) {
     return <span className="text-gray-500">—</span>;
   }
-  const tone: StatusTone =
-    row.discrepancyQty === 0 ? "success" : row.discrepancyQty > 0 ? "warning" : "danger";
+  const tone = discrepancyTone(row.discrepancyQty);
   return (
     <Badge family="stock" tone={tone}>
       {discrepancyLabel(row.discrepancyQty)}
@@ -193,9 +192,7 @@ export default function ClosingInventory({ menuInventory, ingredients, inventory
 
   // The count-log summary the Reconciliation screen shows (FR-3.4.7), over the
   // whole log — not scoped to the selected period.
-  const flaggedPending = inventoryCounts.filter(
-    (c) => c.discrepancy !== 0 && c.status === "pending"
-  );
+  const flaggedPending = flaggedPendingCounts(inventoryCounts);
   const resolved = inventoryCounts.filter((c) => c.status === "resolved");
 
   return (

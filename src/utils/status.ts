@@ -96,3 +96,9 @@ export const COUNT_RESOLUTION_LABELS: Record<CountResolution, string> = {
   applied: "Applied",
   dismissed: "Dismissed",
 };
+
+// A match is the absence of a discrepancy, not a success.
+export function discrepancyTone(qty: number): StatusTone {
+  if (qty === 0) return "neutral";
+  return qty > 0 ? "warning" : "danger";
+}
