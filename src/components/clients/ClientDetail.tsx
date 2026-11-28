@@ -23,7 +23,7 @@ export default function ClientDetail({ client, orders, onBack }: ClientDetailPro
   return (
     <div className="max-w-6xl mx-auto animate-fadeIn pb-10 w-full">
       <nav aria-label="Breadcrumb" className="mb-6">
-        <ol className="flex items-center text-[15px] text-gray-500 font-medium tracking-wide">
+        <ol className="flex items-center text-[0.9375rem] text-gray-500 font-medium tracking-wide">
           <li>
             <button
               onClick={onBack}
@@ -50,15 +50,15 @@ export default function ClientDetail({ client, orders, onBack }: ClientDetailPro
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm">
           <div>
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Contact</p>
-            <p className="text-gray-900 font-medium">{client.contact || "—"}</p>
+            <p className="text-ink font-medium">{client.contact || "—"}</p>
           </div>
           <div>
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Email</p>
-            <p className="text-gray-900 font-medium">{client.email || "—"}</p>
+            <p className="text-ink font-medium">{client.email || "—"}</p>
           </div>
           <div>
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Address</p>
-            <p className="text-gray-900 font-medium">{client.address || "—"}</p>
+            <p className="text-ink font-medium">{client.address || "—"}</p>
           </div>
         </div>
         {client.standingOrder && (
@@ -93,7 +93,7 @@ export default function ClientDetail({ client, orders, onBack }: ClientDetailPro
                   key={order.id}
                   className="hover:bg-gray-50/50 transition-colors"
                 >
-                  <th scope="row" className="px-5 py-4 text-left font-medium text-gray-900">
+                  <th scope="row" className="px-5 py-4 text-left font-medium text-ink">
                     <Link
                       to={orderPath(order.id)}
                       className="rounded hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-strong"
@@ -105,7 +105,7 @@ export default function ClientDetail({ client, orders, onBack }: ClientDetailPro
                   <td className="px-5 py-4">
                     <OrderStatusBadge status={order.status} />
                   </td>
-                  <td className="px-5 py-4 text-right font-medium text-gray-900 tabular-nums">
+                  <td className="px-5 py-4 text-right font-medium text-ink tabular-nums">
                     {formatMoney(computeOrderTotal(order))}
                   </td>
                 </tr>

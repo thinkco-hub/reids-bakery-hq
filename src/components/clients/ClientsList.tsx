@@ -92,7 +92,7 @@ export default function ClientsList({ clients, orders, onAdd, onUpdate, onView }
           ) : (
             filtered.map((client) => (
               <tr key={client.id} className="hover:bg-gray-50/50 transition-colors">
-                <th scope="row" className="px-6 py-4 text-left font-medium text-gray-900">{client.name}</th>
+                <th scope="row" className="px-6 py-4 text-left font-medium text-ink">{client.name}</th>
                 <td className="px-6 py-4 text-gray-600">
                   <div>{client.contact || "—"}</div>
                   {client.email && <div className="text-xs text-gray-500">{client.email}</div>}

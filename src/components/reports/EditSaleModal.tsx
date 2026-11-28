@@ -11,13 +11,16 @@ import { isValidCustomerContact, toContactDigits } from "../../utils/orders";
 import type { CartItem, EditSaleInput, PosProduct, Sale } from "../../types/domain";
 
 interface Line {
+  key: string;
   item: CartItem;
   qty: string;
 }
 
-const toLine = (item: CartItem): Line => ({ item, qty: String(item.qty) });
+let nextRowKey = 1;
+const toLine = (item: CartItem): Line => ({ key: `line-${nextRowKey++}`, item, qty: String(item.qty) });
 
 const emptyLine = (products: PosProduct[]): Line => ({
+  key: `line-${nextRowKey++}`,
   item: { ...products[0], qty: 1 },
   qty: "",
 });
@@ -121,7 +124,7 @@ export default function EditSaleModal({ sale, products, onClose, onSave }: EditS
             </div>
             <div className="space-y-2">
               {lines.map((line, idx) => (
-                <div key={idx} className="flex gap-2 items-center">
+                <div key={line.key} className="flex gap-2 items-center">
                   <SelectField
                     value={line.item.id}
                     onChange={(e) => changeItem(idx, e.target.value)}

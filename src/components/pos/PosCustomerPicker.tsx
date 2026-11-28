@@ -89,7 +89,7 @@ export default function PosCustomerPicker({
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search customers..."
             aria-label="Search customers"
-            className="block w-full min-h-[2.75rem] pl-10 pr-3 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-brand-strong outline-none"
+            className="block w-full min-h-[2.75rem] pl-10 pr-3 bg-gray-100 border border-gray-200 rounded-lg text-sm text-ink placeholder-gray-500 focus:ring-2 focus:ring-brand-strong outline-none"
           />
         </div>
       </div>

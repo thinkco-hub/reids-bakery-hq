@@ -1,9 +1,7 @@
 import React from "react";
 import { CalendarIcon } from "../icons";
 
-interface CalendarViewProps {}
-
-export default function CalendarView(_: CalendarViewProps) {
+export default function CalendarView() {
   return (
     <div className="max-w-6xl mx-auto h-[80vh] flex flex-col animate-fadeIn w-full">
       <header className="mb-6 md:mb-8">
@@ -11,7 +9,7 @@ export default function CalendarView(_: CalendarViewProps) {
           Delivery Scheduler
         </h2>
         <p className="text-espresso/70 mt-1 font-medium text-sm md:text-base">
-          Google Calendar Integration
+          Coming soon — Google Calendar integration
         </p>
       </header>
 
@@ -21,10 +19,10 @@ export default function CalendarView(_: CalendarViewProps) {
             <CalendarIcon className="w-8 h-8 md:w-10 md:h-10 text-brand-strong" />
           </div>
           <h3 className="text-lg md:text-xl font-bold text-espresso mb-2">
-            Calendar View Placeholder
+            Calendar view is coming soon
           </h3>
           <p className="text-espresso/70 max-w-sm md:max-w-md mx-auto text-sm md:text-base">
-            This space is reserved for the Google Calendar integration.
+            Delivery scheduling will appear here once the Google Calendar integration ships.
           </p>
         </div>
       </div>

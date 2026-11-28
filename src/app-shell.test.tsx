@@ -886,6 +886,11 @@ describe("view announcements", () => {
     await openTab(user, "Roles");
     await screen.findByRole("heading", { name: "Roles" });
     expect(document.title).toBe("Roles — Reid's Bakery HQ");
-    expect(screen.getByRole("status")).toHaveTextContent("Navigated to Roles.");
+    // The Roles view's own count line is also a status region; the announcement
+    // lives in the shell's polite live region.
+    const shellStatus = screen
+      .getAllByRole("status")
+      .find((el) => el.getAttribute("aria-live") === "polite");
+    expect(shellStatus).toHaveTextContent("Navigated to Roles.");
   });
 });

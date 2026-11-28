@@ -1,11 +1,13 @@
 {
-  "name": "react-typescript",
+  "name": "reids-bakery-hq",
   "version": "1.0.0",
-  "description": "React and TypeScript example starter project",
+  "description": "Reid's Bakery HQ — point of sale, orders, inventory and reports for the bakery.",
   "keywords": [
-    "typescript",
+    "bakery",
+    "point-of-sale",
+    "inventory",
     "react",
-    "starter"
+    "typescript"
   ],
   "main": "src/index.tsx",
   "dependencies": {

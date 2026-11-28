@@ -83,16 +83,18 @@ export default function DashboardView({
           iconClassName="bg-orange-50 text-brand-strong"
           flag={
             revenueChangePercent !== null ? (
-              <span
-                title="Versus yesterday"
-                className={`text-xs font-bold px-2 py-1 rounded-full tabular-nums ${
-                  revenueChangePercent >= 0
-                    ? "text-green-700 bg-green-50"
-                    : "text-red-700 bg-red-50"
-                }`}
-              >
-                {revenueChangePercent >= 0 ? "+" : ""}
-                {revenueChangePercent.toFixed(1)}%
+              <span className="flex items-center gap-2">
+                <span
+                  className={`text-xs font-bold px-2 py-1 rounded-full tabular-nums ${
+                    revenueChangePercent >= 0
+                      ? "text-green-700 bg-green-50"
+                      : "text-red-700 bg-red-50"
+                  }`}
+                >
+                  {revenueChangePercent >= 0 ? "+" : ""}
+                  {revenueChangePercent.toFixed(1)}%
+                </span>
+                <span className="text-xs font-medium text-gray-500">vs yesterday</span>
               </span>
             ) : undefined
           }
@@ -155,7 +157,7 @@ export default function DashboardView({
               <tbody className="divide-y divide-gray-100 text-sm">
                 {orders.slice(0, 4).map((order) => (
                   <tr key={order.id} className="hover:bg-orange-50/50 transition-colors">
-                    <th scope="row" className="px-5 py-4 text-left font-medium text-gray-900">
+                    <th scope="row" className="px-5 py-4 text-left font-medium text-ink">
                       <Link
                         to={orderPath(order.id)}
                         className="rounded hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-strong"
@@ -169,7 +171,7 @@ export default function DashboardView({
                     <td className="px-5 py-4">
                       <OrderStatusBadge status={order.status} />
                     </td>
-                    <td className="px-5 py-4 font-medium text-gray-900 text-right tabular-nums">
+                    <td className="px-5 py-4 font-medium text-ink text-right tabular-nums">
                       {formatMoney(computeOrderTotal(order))}
                     </td>
                   </tr>
@@ -208,7 +210,7 @@ export default function DashboardView({
                     className="p-5 flex justify-between items-center hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex flex-col">
-                      <span className="font-bold text-gray-900 text-sm">
+                      <span className="font-bold text-ink text-sm">
                         {item.name}
                       </span>
                       <span className="text-xs text-gray-500 mt-0.5">

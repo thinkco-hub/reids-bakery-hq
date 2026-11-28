@@ -26,16 +26,8 @@ export default function LoginPage({ onLogin, getLockedUntil }: LoginPageProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
   const emailRef = useRef<HTMLInputElement>(null);
-
-  // Ticks every second so an in-progress lockout (persisted in localStorage,
-  // read live below) keeps counting down correctly even right after a
-  // page refresh — not just after the next submit attempt.
-  useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   // Signing out lands here from a titled view; the sign-in screen is the
   // document's default, not whichever view the last user left.
@@ -55,6 +47,13 @@ export default function LoginPage({ onLogin, getLockedUntil }: LoginPageProps) {
   const lockedUntil = getLockedUntil(email);
   const secondsLeft = lockedUntil ? Math.max(0, Math.ceil((lockedUntil - now) / 1000)) : 0;
   const isLocked = secondsLeft > 0;
+
+  // Tick only while a lockout is counting down; an unlocked form runs no timer.
+  useEffect(() => {
+    if (!isLocked) return;
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, [isLocked]);
   // The alert text stays still while locked; the seconds tick in their own
   // timer region, so assistive tech is not interrupted once per second.
   const errorMessage = isLocked

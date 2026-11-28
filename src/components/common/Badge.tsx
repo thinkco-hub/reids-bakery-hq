@@ -27,11 +27,11 @@ export interface BadgeProps {
 
 export default function Badge({ tone, family = "status", size = "sm", className = "", children }: BadgeProps) {
   const toneClasses = family === "status" ? TONE_BORDERED[tone] : TONE_WASH[tone];
-  const sizeClasses = family === "micro" ? (size === "xs" ? "text-[10px]" : "text-xs") : "";
+  const sizeClasses = family === "micro" ? (size === "xs" ? "text-[0.625rem]" : "text-xs") : "";
   return (
     <span className={`${FAMILY[family]} ${sizeClasses} ${toneClasses} ${className}`}>
       {family === "status" && (
-        <span aria-hidden="true" className="text-[10px] leading-none">
+        <span aria-hidden="true" className="text-[0.625rem] leading-none">
           ●
         </span>
       )}

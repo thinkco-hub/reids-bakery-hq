@@ -88,7 +88,7 @@ function PaymentDonut({ data }: { data: RevenueByPaymentMethod[] }) {
               style={{ backgroundColor: METHOD_COLORS[s.method] }}
             />
             <span className="text-gray-600">{s.method}</span>
-            <span className="font-semibold text-gray-900 tabular-nums">
+            <span className="font-semibold text-ink tabular-nums">
               {Math.round(s.fraction * 100)}%
             </span>
           </li>
@@ -176,14 +176,21 @@ export default function ReportsDashboard({
           <h2 className="text-3xl font-bold text-ink">Sales Reports</h2>
           <p className="text-gray-500 mt-1">Revenue, best/worst sellers, and exportable sales logs.</p>
         </div>
-        <Button
-          onClick={handleExport}
-          disabled={filteredSales.length === 0}
-          title={filteredSales.length === 0 ? "No transactions in the selected range" : undefined}
-        >
-          <DownloadIcon className="w-4 h-4" />
-          Export CSV
-        </Button>
+        <div className="flex flex-col gap-1 md:items-end">
+          <Button
+            onClick={handleExport}
+            disabled={filteredSales.length === 0}
+            aria-describedby={filteredSales.length === 0 ? "export-empty-hint" : undefined}
+          >
+            <DownloadIcon className="w-4 h-4" />
+            Export CSV
+          </Button>
+          {filteredSales.length === 0 && (
+            <p id="export-empty-hint" className="text-xs text-gray-500">
+              No transactions in the selected range
+            </p>
+          )}
+        </div>
       </header>
 
       {/* Date range filter — one row, presets before custom */}
@@ -285,7 +292,7 @@ export default function ReportsDashboard({
               value={logSearch}
               onChange={(e) => setLogSearch(e.target.value)}
               aria-label="Search sales by sale number or customer"
-              className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-500 outline-none focus:ring-2 focus:ring-brand-strong focus:border-brand-strong"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm text-ink placeholder-gray-500 outline-none focus:ring-2 focus:ring-brand-strong focus:border-brand-strong"
               placeholder="Search sale # or customer..."
             />
           </div>
@@ -321,7 +328,7 @@ export default function ReportsDashboard({
             ) : (
               logRows.map((sale) => (
                 <tr key={sale.id} className="hover:bg-gray-50/50">
-                  <th scope="row" className="px-6 py-3 text-left font-medium text-gray-900">
+                  <th scope="row" className="px-6 py-3 text-left font-medium text-ink">
                     {sale.id}
                     {!!sale.editHistory?.length && (
                       <Badge
@@ -340,7 +347,7 @@ export default function ReportsDashboard({
                   <td className="px-6 py-3 text-gray-600">{sale.type}</td>
                   <td className="px-6 py-3 text-gray-800">{sale.customerName}</td>
                   <td className="px-6 py-3 text-gray-600">{sale.paymentMethod}</td>
-                  <td className="px-6 py-3 text-right font-semibold text-gray-900 tabular-nums">{formatMoney(sale.total)}</td>
+                  <td className="px-6 py-3 text-right font-semibold text-ink tabular-nums">{formatMoney(sale.total)}</td>
                   <td className="px-6 py-3 text-right">
                     {/* A linked sale's order is its only editor. */}
                     {!sale.orderId && (

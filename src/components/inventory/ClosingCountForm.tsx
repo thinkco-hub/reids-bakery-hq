@@ -42,7 +42,7 @@ function CountSection({
         {items.map((item) => (
           <li key={item.id}>
             <div className="flex items-baseline justify-between gap-2 mb-1.5">
-              <span className="text-sm font-medium text-gray-900">{item.name}</span>
+              <span className="text-sm font-medium text-ink">{item.name}</span>
               <span className="text-xs text-gray-500">{("unit" in item && item.unit) || "pcs"}</span>
             </div>
             <input
@@ -75,7 +75,7 @@ function CountSection({
           <tbody className="divide-y divide-gray-100 text-sm">
             {items.map((item) => (
               <tr key={item.id}>
-                <th scope="row" className="px-4 py-3 text-left font-medium text-gray-900">{item.name}</th>
+                <th scope="row" className="px-4 py-3 text-left font-medium text-ink">{item.name}</th>
                 <td className="px-4 py-3 text-gray-500">{("unit" in item && item.unit) || "pcs"}</td>
                 <td className="px-4 py-3 text-right">
                   <input

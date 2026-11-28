@@ -1,7 +1,7 @@
 {
   "short_name": "Reid's Bakery",
   "name": "Reid's Bakery HQ",
-  "icons": [],
   "start_url": ".",
-  "display": "standalone"
+  "theme_color": "#FDF9F3",
+  "background_color": "#FDF9F3"
 }

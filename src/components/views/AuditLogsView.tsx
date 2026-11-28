@@ -105,7 +105,7 @@ export default function AuditLogsView() {
         </div>
       </div>
 
-      <p className="text-sm text-gray-500 mb-3">
+      <p role="status" className="text-sm text-gray-500 mb-3">
         {filtered.length} {filtered.length === 1 ? "entry" : "entries"}
         {dateFilter ? ` on ${dateFilter}` : ""}
       </p>
@@ -149,7 +149,7 @@ export default function AuditLogsView() {
                   {formatTime(entry.timestamp)}
                 </td>
                 <td className="px-6 py-4">
-                  <div className="font-medium text-gray-900">{entry.userName}</div>
+                  <div className="font-medium text-ink">{entry.userName}</div>
                   {entry.userRole && (
                     <div className="text-xs text-gray-500">{roleLabel(entry.userRole)}</div>
                   )}

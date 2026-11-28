@@ -24,7 +24,7 @@ export default function SellerBarList({
           <li key={item.id}>
             <div className="flex justify-between items-baseline mb-1">
               <span className="text-sm font-semibold text-gray-800 truncate pr-2">{item.name}</span>
-              <span className="text-xs font-bold text-gray-900 whitespace-nowrap tabular-nums">
+              <span className="text-xs font-bold text-ink whitespace-nowrap tabular-nums">
                 {item.qty} sold · {formatMoney(item.revenue)}
               </span>
             </div>

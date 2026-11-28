@@ -245,7 +245,7 @@ export default function ProductionRunsList({
                 <tbody className="divide-y divide-gray-100 text-sm">
                   {group.entries.map(({ run, recipe, status }) => (
                     <tr key={run.id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-5 py-4 font-medium text-gray-900">{recipe ? recipe.name : "—"}</td>
+                      <td className="px-5 py-4 font-medium text-ink">{recipe ? recipe.name : "—"}</td>
                       <td className="px-5 py-4 text-gray-600 tabular-nums">
                         {run.plannedQty} {recipe ? recipe.yieldUnit : ""}
                       </td>

@@ -141,14 +141,14 @@ export default function LedgerView({ branches, products, beginnings, movements, 
                 key={`${r.branchId}-${r.productId}`}
                 className={`hover:bg-gray-50/50 transition-colors ${r.flagged ? "bg-red-50/40" : ""}`}
               >
-                <th scope="row" className="px-5 py-4 text-left font-medium text-gray-900">{r.branchName}</th>
+                <th scope="row" className="px-5 py-4 text-left font-medium text-ink">{r.branchName}</th>
                 <td className="px-5 py-4 text-gray-600">{r.productName}</td>
                 <td className="px-5 py-4 text-right text-gray-600 tabular-nums">{r.beginning}</td>
                 <td className="px-5 py-4 text-right text-gray-600 tabular-nums">{r.restocked}</td>
                 <td className="px-5 py-4 text-right text-gray-600 tabular-nums">{r.spoilage}</td>
                 <td className="px-5 py-4 text-right text-gray-600 tabular-nums">{r.sold}</td>
                 <td className="px-5 py-4 text-right text-green-700 font-medium tabular-nums">{formatMoney(r.revenue)}</td>
-                <td className="px-5 py-4 text-right font-semibold text-gray-900 tabular-nums">{r.remainingCalculated}</td>
+                <td className="px-5 py-4 text-right font-semibold text-ink tabular-nums">{r.remainingCalculated}</td>
                 <td className="px-5 py-4 text-right text-gray-600 tabular-nums">
                   {r.countSubmitted ? r.remainingReported : <span className="text-gray-500">—</span>}
                 </td>

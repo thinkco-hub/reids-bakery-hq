@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SelectField from "../common/SelectField";
 import TicketLineItem from "./TicketLineItem";
 import EmptyState from "../common/EmptyState";
+import { useAnnounce } from "../common/Announcer";
 import { ChevronLeftIcon, SearchIcon, XIcon } from "../icons";
 import { POS_CATEGORIES } from "../../data/initialCatalogue";
 import { formatMoney } from "../../utils/money";
@@ -57,6 +58,27 @@ export default function PosMobile({
   onConfirmOrder,
 }: PosMobileProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const announce = useAnnounce();
+  const backRef = useRef<HTMLButtonElement>(null);
+  const checkTicketRef = useRef<HTMLButtonElement>(null);
+  const wasTicketOpen = useRef(isTicketViewOpen);
+
+  // The ticket replaces the whole screen, so focus must move with it and the
+  // swap must be announced — otherwise a keyboard or screen-reader cashier
+  // lands on body and hears nothing.
+  useEffect(() => {
+    if (wasTicketOpen.current === isTicketViewOpen) return;
+    wasTicketOpen.current = isTicketViewOpen;
+    if (isTicketViewOpen) {
+      backRef.current?.focus();
+      announce(
+        `Ticket: ${cart.length} item${cart.length === 1 ? "" : "s"}, total ${formatMoney(cartTotal)}.`
+      );
+    } else {
+      checkTicketRef.current?.focus();
+      announce("Back to the item list.");
+    }
+  }, [isTicketViewOpen, cart.length, cartTotal, announce]);
 
   const closeSearch = () => {
     setIsSearchOpen(false);
@@ -71,6 +93,7 @@ export default function PosMobile({
       {isTicketViewOpen ? (
         <>
           <button
+            ref={backRef}
             onClick={closeTicketView}
             className="flex-shrink-0 flex items-center gap-2 min-h-[3rem] px-4 text-left font-bold text-espresso hover:bg-gray-200 active:bg-gray-300 transition-colors"
           >
@@ -140,6 +163,7 @@ export default function PosMobile({
               total={cartTotal}
               disabled={cart.length === 0}
               onClick={openTicketView}
+              buttonRef={checkTicketRef}
             />
           </div>
 
@@ -186,7 +210,7 @@ export default function PosMobile({
                 onChange={(e) => setPosSearch(e.target.value)}
                 placeholder="Search items..."
                 aria-label="Search items"
-                className="w-full min-h-[2.75rem] px-3 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-brand-strong outline-none"
+                className="w-full min-h-[2.75rem] px-3 bg-gray-100 border border-gray-200 rounded-lg text-sm text-ink placeholder-gray-500 focus:ring-2 focus:ring-brand-strong outline-none"
               />
             </div>
           )}
@@ -245,14 +269,17 @@ function TicketButton({
   total,
   disabled,
   onClick,
+  buttonRef,
 }: {
   label: string;
   total: number;
   disabled: boolean;
   onClick: () => void;
+  buttonRef?: React.Ref<HTMLButtonElement>;
 }) {
   return (
     <button
+      ref={buttonRef}
       disabled={disabled}
       onClick={onClick}
       className={`w-full min-h-[3.25rem] py-2.5 rounded-xl font-bold shadow-lg transition-all transform active:scale-[0.98] flex flex-col items-center justify-center leading-tight ${

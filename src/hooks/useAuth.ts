@@ -109,7 +109,8 @@ export function useAuth() {
 
     if (valid && user) {
       setAttempts((prev) => {
-        const { [key]: _removed, ...rest } = prev;
+        const rest = { ...prev };
+        delete rest[key];
         return rest;
       });
       setCurrentUser(user);

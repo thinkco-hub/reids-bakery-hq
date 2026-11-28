@@ -256,7 +256,7 @@ export default function OrderDetail({
       )}
 
       <nav aria-label="Breadcrumb" className="mb-6">
-        <ol className="flex items-center text-[15px] text-gray-500 font-medium tracking-wide">
+        <ol className="flex items-center text-[0.9375rem] text-gray-500 font-medium tracking-wide">
           <li>
             <button
               onClick={onBack}
@@ -280,8 +280,8 @@ export default function OrderDetail({
             <ArrowLeftIcon className="w-5 h-5" />
           </button>
           <div className="flex flex-col gap-2">
-            <h2 className="text-[26px] md:text-[32px] font-bold text-ink leading-none">Order {order.id}</h2>
-            <p className="text-gray-500 text-[15px] font-medium tracking-wide">
+            <h2 className="text-[1.625rem] md:text-[2rem] font-bold text-ink leading-none">Order {order.id}</h2>
+            <p className="text-gray-500 text-[0.9375rem] font-medium tracking-wide">
               Requested for {order.requestedDate}
             </p>
           </div>
@@ -413,14 +413,11 @@ export default function OrderDetail({
               {order.items.map((line, idx) => (
                 <tr key={idx}>
                   <th scope="row" className="py-4 text-left">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gray-200 rounded-md"></div>
-                      <span className="font-medium text-gray-800">{itemName(line)}</span>
-                    </div>
+                    <span className="font-medium text-gray-800">{itemName(line)}</span>
                   </th>
                   <td className="py-4 text-center text-gray-700">{line.qty}</td>
                   <td className="py-4 text-right text-gray-700 tabular-nums">{formatMoney(line.unitPrice)}</td>
-                  <td className="py-4 text-right font-semibold text-gray-900 tabular-nums">
+                  <td className="py-4 text-right font-semibold text-ink tabular-nums">
                     {formatMoney(line.qty * line.unitPrice)}
                   </td>
                 </tr>
@@ -431,7 +428,7 @@ export default function OrderDetail({
             <div className="w-64 space-y-3 text-sm">
               <div className="flex justify-between font-bold text-base pt-2">
                 <span className="text-gray-800">Total Amount</span>
-                <span className="text-gray-900 tabular-nums">{formatMoney(total)}</span>
+                <span className="text-ink tabular-nums">{formatMoney(total)}</span>
               </div>
             </div>
           </div>
@@ -462,9 +459,9 @@ export default function OrderDetail({
                     )}
                   </div>
                   <div className="pt-0.5">
-                    <h4 className="font-bold text-sm text-gray-900 leading-none">{status}</h4>
+                    <h4 className="font-bold text-sm text-ink leading-none">{status}</h4>
                     {status === "Delivered" && order.deliveredAt && (
-                      <p className="text-[10px] text-gray-500 mt-1.5 leading-none">{order.deliveredAt}</p>
+                      <p className="text-[0.625rem] text-gray-500 mt-1.5 leading-none">{order.deliveredAt}</p>
                     )}
                   </div>
                 </div>
@@ -493,29 +490,29 @@ export default function OrderDetail({
           <div className="space-y-4 text-sm">
             <div className="flex justify-between items-center border-b border-gray-100 pb-3">
               <span className="text-gray-500 font-medium">Order ID</span>
-              <span className="text-gray-900 font-medium">{order.id}</span>
+              <span className="text-ink font-medium">{order.id}</span>
             </div>
             <div className="flex justify-between items-center border-b border-gray-100 pb-3">
               <span className="text-gray-500 font-medium">Created At</span>
-              <span className="text-gray-900 font-medium text-xs text-right">{order.createdAt}</span>
+              <span className="text-ink font-medium text-xs text-right">{order.createdAt}</span>
             </div>
             {order.deliveredAt && (
               <div className="flex justify-between items-center border-b border-gray-100 pb-3">
                 <span className="text-gray-500 font-medium">Delivered At</span>
-                <span className="text-gray-900 font-medium text-xs text-right">{order.deliveredAt}</span>
+                <span className="text-ink font-medium text-xs text-right">{order.deliveredAt}</span>
               </div>
             )}
             <div className="flex justify-between items-center border-b border-gray-100 pb-3">
               <span className="text-gray-500 font-medium">Payment Method</span>
-              <span className="text-gray-900 font-medium text-xs text-right">{order.paymentMethod || "—"}</span>
+              <span className="text-ink font-medium text-xs text-right">{order.paymentMethod || "—"}</span>
             </div>
             <div className="flex justify-between items-center border-b border-gray-100 pb-3">
               <span className="text-gray-500 font-medium">Amount Paid</span>
-              <span className="text-gray-900 font-medium text-xs text-right tabular-nums">{formatMoney(order.amountPaid || 0)}</span>
+              <span className="text-ink font-medium text-xs text-right tabular-nums">{formatMoney(order.amountPaid || 0)}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-500 font-medium">Amount Due</span>
-              <span className="text-gray-900 font-medium text-xs text-right tabular-nums">{formatMoney(amountDue)}</span>
+              <span className="text-ink font-medium text-xs text-right tabular-nums">{formatMoney(amountDue)}</span>
             </div>
           </div>
         </div>

@@ -350,7 +350,7 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
               <span className="text-chams-navy font-bold text-xs text-center leading-tight">
                 CH
                 <br />
-                <span className="text-[6px]">CHAMS</span>
+                <span className="text-[0.375rem]">CHAMS</span>
               </span>
             </div>
             <span

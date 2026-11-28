@@ -91,7 +91,7 @@ export default function UserManagementView({
         </div>
       )}
 
-      <p className="text-sm text-gray-500 mb-3">
+      <p role="status" className="text-sm text-gray-500 mb-3">
         {query
           ? `${filteredUsers.length} of ${users.length} ${users.length === 1 ? "user" : "users"} shown`
           : `${activeUsers.length} active ${activeUsers.length === 1 ? "user" : "users"}`}
@@ -146,7 +146,7 @@ export default function UserManagementView({
               return (
                 <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
                   <th scope="row" className="px-6 py-4 text-left font-normal">
-                    <span className="font-medium text-gray-900">{user.name}</span>
+                    <span className="font-medium text-ink">{user.name}</span>
                     {user.id === currentUser.id && (
                       <Badge family="micro" tone="attention" className="ml-2">
                         You
@@ -160,11 +160,6 @@ export default function UserManagementView({
                       disabled={locked}
                       onChange={(e) => handleChange(user, e.target.value as UserRole)}
                       aria-label={`Role for ${user.name}`}
-                      title={
-                        locked
-                          ? "Only a Super Admin can change this user's role"
-                          : undefined
-                      }
                       className="pl-3 py-1.5 border border-gray-200 rounded-md bg-white text-sm text-gray-800 focus:ring-2 focus:ring-brand-strong focus:border-brand-strong outline-none disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed cursor-pointer"
                     >
                       {options.map(({ role, allowed }) => (
@@ -173,6 +168,11 @@ export default function UserManagementView({
                         </option>
                       ))}
                     </SelectField>
+                    {locked && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        Only a Super Admin can change this role
+                      </p>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     <Badge family="micro" tone={user.active ? "success" : "neutral"}>
@@ -190,16 +190,18 @@ export default function UserManagementView({
                       }
                       disabled={!mayManage || user.id === currentUser.id}
                       aria-label={`${user.active ? "Deactivate" : "Reactivate"} ${user.name}`}
-                      title={
-                        !mayManage
-                          ? "You don't have permission to change account status"
-                          : user.id === currentUser.id
-                            ? "You cannot deactivate your own account"
-                            : undefined
-                      }
                     >
                       {user.active ? "Deactivate" : "Reactivate"}
                     </Button>
+                    {!mayManage ? (
+                      <p className="text-xs text-gray-500 mt-1">
+                        You do not have permission to change account status
+                      </p>
+                    ) : user.id === currentUser.id ? (
+                      <p className="text-xs text-gray-500 mt-1">
+                        You cannot deactivate your own account
+                      </p>
+                    ) : null}
                   </td>
                 </tr>
               );

@@ -93,10 +93,10 @@ function ClosingSection({
           ) : (
             rows.map((row) => (
               <tr key={row.id} className="hover:bg-gray-50/50">
-                <th scope="row" className="px-6 py-3 text-left font-medium text-gray-900">{row.name}</th>
+                <th scope="row" className="px-6 py-3 text-left font-medium text-ink">{row.name}</th>
                 <td className="px-6 py-3 text-gray-500">{row.unit}</td>
                 <td className="px-6 py-3 text-right text-gray-500 tabular-nums">{row.systemQty}</td>
-                <td className="px-6 py-3 text-right font-semibold text-gray-900 tabular-nums">{row.closingQty}</td>
+                <td className="px-6 py-3 text-right font-semibold text-ink tabular-nums">{row.closingQty}</td>
                 <td className="px-6 py-3">
                   {row.closingSource === "counted" ? (
                     <Badge family="stock" tone="success" className="whitespace-nowrap">
@@ -109,7 +109,7 @@ function ClosingSection({
                   )}
                 </td>
                 <td className="px-6 py-3 text-right text-gray-600 tabular-nums">{formatMoney(row.unitValue)}</td>
-                <td className="px-6 py-3 text-right font-semibold text-gray-900 tabular-nums">
+                <td className="px-6 py-3 text-right font-semibold text-ink tabular-nums">
                   {formatMoney(row.closingValue)}
                 </td>
                 <td className="px-6 py-3">
