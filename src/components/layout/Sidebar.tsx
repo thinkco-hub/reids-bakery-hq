@@ -1,5 +1,20 @@
 import { memo, useId, useRef, useState } from "react";
-import { ChevronDownIcon, DocumentIcon, XIcon } from "../icons";
+import {
+  Analytics01Icon,
+  Audit01Icon,
+  BoxIcon,
+  Calendar03Icon,
+  CalendarAdd01Icon,
+  Cancel01Icon,
+  Cashier02Icon,
+  ChevronDownIcon,
+  ContactIcon,
+  CookBookIcon,
+  DashboardCircleIcon,
+  LogOutIcon,
+  ShoppingBasket03Icon,
+  UserShield01Icon,
+} from "../icons";
 import { NavLink, useLocation, useNavigate } from "react-router";
 import type { User } from "../../types/domain";
 import type { Dispatch, RefObject, SetStateAction } from "react";
@@ -215,7 +230,7 @@ function Sidebar({
               // 44px target; the negative margins keep the 24px icon where it was.
               className="p-2.5 -my-0.5 -mr-1.5 text-cream/60 hover:text-white"
             >
-              <XIcon className="w-6 h-6" />
+              <Cancel01Icon className="w-6 h-6" />
             </button>
           )}
         </div>
@@ -230,19 +245,7 @@ function Sidebar({
               className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                  />
-                </svg>
+                <DashboardCircleIcon className="w-6 h-6" />
               </div>
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Dashboard
@@ -258,9 +261,7 @@ function Sidebar({
               className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
-                </svg>
+                <Cashier02Icon className="w-6 h-6" />
               </div>
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Point of Sale
@@ -275,9 +276,7 @@ function Sidebar({
               className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19 6h-2c0-2.8-2.2-5-5-5S7 3.2 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.7 0 3 1.3 3 3H9c0-1.7 1.3-3 3-3zm7 17H5V8h14v12zm-7-8c-1.7 0-3-1.3-3-3H7c0 2.8 2.2 5 5 5s5-2.2 5-5h-2c0 1.7-1.3 3-3 3z" />
-                </svg>
+                <ShoppingBasket03Icon className="w-6 h-6" />
               </div>
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Orders
@@ -292,14 +291,7 @@ function Sidebar({
               className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-5.13a4 4 0 10-8 0 4 4 0 008 0zm6 3a4 4 0 10-8 0 4 4 0 008 0z"
-                  />
-                </svg>
+                <ContactIcon className="w-6 h-6" />
               </div>
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Clients
@@ -326,13 +318,7 @@ function Sidebar({
                   }`}
                 >
                   <div className="flex items-center justify-center w-8 flex-shrink-0">
-                    <svg
-                      className="w-6 h-6"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18-.21 0-.41-.06-.57-.18l-7.9-4.44A.991.991 0 013 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18.21 0-.41-.06-.57.18l7.9 4.44c.32.17.53.5.53.88v9zM12 4.15L6.04 7.5 12 10.85l5.96-3.35L12 4.15zM5 15.91l6 3.38v-6.71L5 9.21v6.7zM19 15.91v-6.7l-6 3.37v6.71l6-3.38z" />
-                    </svg>
+                    <BoxIcon className="w-6 h-6" />
                   </div>
                   <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                     Inventory
@@ -384,7 +370,7 @@ function Sidebar({
               className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
-                <DocumentIcon className="w-6 h-6" />
+                <CookBookIcon className="w-6 h-6" />
               </div>
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Recipes
@@ -400,14 +386,7 @@ function Sidebar({
               className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 3v2m6-2v2M4 8h16M5 6h14a1 1 0 011 1v12a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1zm3 8l2.5 2.5L15 12"
-                  />
-                </svg>
+                <CalendarAdd01Icon className="w-6 h-6" />
               </div>
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Production Runs
@@ -423,9 +402,7 @@ function Sidebar({
               className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7v-5z" />
-                </svg>
+                <Calendar03Icon className="w-6 h-6" />
               </div>
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Calendar
@@ -443,14 +420,7 @@ function Sidebar({
               >
                 <div className="flex items-center">
                   <div className="flex items-center justify-center w-8 flex-shrink-0">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                      />
-                    </svg>
+                    <Analytics01Icon className="w-6 h-6" />
                   </div>
                   <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                     Reports
@@ -504,7 +474,7 @@ function Sidebar({
               className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
-                <DocumentIcon className="w-6 h-6" />
+                <Audit01Icon className="w-6 h-6" />
               </div>
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Audit Logs
@@ -520,14 +490,7 @@ function Sidebar({
               className={({ isActive }) => itemCls(isActive)}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                  />
-                </svg>
+                <UserShield01Icon className="w-6 h-6" />
               </div>
               <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
                 Roles
@@ -549,19 +512,7 @@ function Sidebar({
             className="w-full flex items-center p-3 rounded-lg font-bold text-cream/60 hover:text-white hover:bg-caramel/10 transition-colors whitespace-nowrap overflow-hidden"
           >
             <div className="flex items-center justify-center w-8 flex-shrink-0">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
+              <LogOutIcon className="w-6 h-6" />
             </div>
             <span className={`ml-3 ${sidebarLabelCls} transition-opacity duration-300`}>
               Log Out

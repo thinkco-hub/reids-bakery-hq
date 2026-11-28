@@ -4,7 +4,7 @@ import EmptyState from "../common/EmptyState";
 import StatCard from "../common/StatCard";
 import Badge from "../common/Badge";
 import Button from "../common/Button";
-import { DownloadIcon } from "../icons";
+import { Download01Icon } from "../icons";
 import { downloadCSV } from "../../utils/sales";
 import { discrepancyLabel, flaggedPendingCounts } from "../../utils/counts";
 import { discrepancyTone, TONE_TEXT } from "../../utils/status";
@@ -209,7 +209,7 @@ export default function ClosingInventory({ menuInventory, ingredients, inventory
           disabled={result.rows.length === 0}
           title={result.rows.length === 0 ? "No stock rows in the selected period" : undefined}
         >
-          <DownloadIcon className="w-4 h-4" />
+          <Download01Icon className="w-4 h-4" />
           Export CSV
         </Button>
       </header>

@@ -1,7 +1,7 @@
 import React, { useId, useRef } from "react";
 import Modal from "./Modal";
 import Button from "./Button";
-import { TrashIcon } from "../icons";
+import { Alert02Icon } from "../icons";
 
 interface DeleteConfirmDialogProps {
   title: string;
@@ -29,7 +29,7 @@ export default function DeleteConfirmDialog({ title, message, confirmLabel, onCo
     >
       <div className="flex items-start gap-4">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-700">
-          <TrashIcon className="h-5 w-5" />
+          <Alert02Icon className="h-5 w-5" />
         </span>
         <div className="min-w-0">
           <h2 id={headingId} className="text-xl font-bold text-ink">{title}</h2>

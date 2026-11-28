@@ -1,5 +1,5 @@
 import React from "react";
-import { SearchIcon } from "../icons";
+import { Search02Icon } from "../icons";
 
 interface SearchFieldProps {
   value: string;
@@ -19,7 +19,7 @@ export default function SearchField({ value, onChange, placeholder, ariaLabel }:
         aria-hidden="true"
         className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
       >
-        <SearchIcon className="h-5 w-5 text-gray-500" />
+        <Search02Icon className="h-5 w-5 text-gray-500" />
       </div>
       <input
         type="text"

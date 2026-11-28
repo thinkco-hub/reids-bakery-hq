@@ -1,6 +1,6 @@
 import React from "react";
 import StatCard from "../common/StatCard";
-import { AlertTriangleIcon, CheckIcon, GridIcon, XIcon } from "../icons";
+import { Alert02Icon, Cancel01Icon, CheckIcon, DashboardCircleIcon } from "../icons";
 import { STOCK_STATUS_LABELS } from "../../utils/status";
 import { getStockStatus } from "../../utils/stock";
 import type { StockItem, StockStatus } from "../../types/domain";
@@ -8,7 +8,7 @@ import type { StockItem, StockStatus } from "../../types/domain";
 const CARD_STYLES = {
   all: {
     label: "Total Items",
-    icon: <GridIcon className="w-5 h-5" />,
+    icon: <DashboardCircleIcon className="w-5 h-5" />,
     iconBg: "bg-gray-100 text-gray-500",
   },
   ok: {
@@ -16,11 +16,11 @@ const CARD_STYLES = {
     iconBg: "bg-green-50 text-green-700",
   },
   low: {
-    icon: <AlertTriangleIcon className="w-5 h-5" />,
+    icon: <Alert02Icon className="w-5 h-5" />,
     iconBg: "bg-brand/10 text-brand-strong",
   },
   out: {
-    icon: <XIcon className="w-5 h-5" />,
+    icon: <Cancel01Icon className="w-5 h-5" />,
     iconBg: "bg-red-50 text-red-700",
   },
 };

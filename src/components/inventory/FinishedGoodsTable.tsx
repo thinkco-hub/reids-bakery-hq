@@ -5,7 +5,6 @@ import SearchField from "../common/SearchField";
 import Table, { TableHead } from "../common/Table";
 import EmptyState from "../common/EmptyState";
 import Button from "../common/Button";
-import { BoxIcon } from "../icons";
 import { STOCK_STATUS_LABELS } from "../../utils/status";
 import { groupByStatus, getStockStatus } from "../../utils/stock";
 import type { MenuItemStock, StockStatus } from "../../types/domain";
@@ -58,8 +57,7 @@ export default function FinishedGoodsTable({ menuInventory, onRestock }: Finishe
           minWidth="min-w-[600px]"
           header={
             <div className="px-4 md:px-6 py-4 border-b border-gray-200 bg-gray-50/50">
-              <h2 id={headingId} className="text-base md:text-lg font-bold text-ink flex items-center gap-2">
-                <BoxIcon className="w-5 h-5 text-gray-500" />
+              <h2 id={headingId} className="text-base md:text-lg font-bold text-ink">
                 Finished Goods Stock
               </h2>
             </div>

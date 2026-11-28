@@ -1,7 +1,7 @@
 import React, { useId, useState } from "react";
 import SelectField from "../common/SelectField";
 import Button from "../common/Button";
-import { XIcon } from "../icons";
+import { Cancel01Icon } from "../icons";
 import { formatMoney } from "../../utils/money";
 import { computeRecipeCost, suggestedPrice } from "../../utils/pricing";
 import type { FormEvent } from "react";
@@ -407,7 +407,7 @@ export default function RecipeEditor({
                         title="Remove"
                         aria-label={`Remove ingredient ${idx + 1}`}
                       >
-                        <XIcon className="w-5 h-5" />
+                        <Cancel01Icon className="w-5 h-5" />
                       </button>
                     </div>
                   );

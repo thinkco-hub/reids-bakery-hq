@@ -6,35 +6,44 @@ import RemainingCountForm from "./RemainingCountForm";
 import LedgerHistory from "./LedgerHistory";
 import { useCanUseSidebarRail } from "../../utils/responsive";
 import { useDrawerA11y } from "../../hooks/useDrawerA11y";
-import { ArrowLeftIcon, MenuIcon, XIcon } from "../icons";
+import {
+  AlertCircleIcon,
+  ArrowLeft02Icon,
+  BookOpenTextIcon,
+  Cancel01Icon,
+  ClipboardCheckIcon,
+  HistoryIcon,
+  MenuIcon,
+  PlusIcon,
+} from "../icons";
 import { INITIAL_BRANCHES, SIOPAO_PRODUCTS } from "../../data/initialChams";
 import { useChamsLedger } from "../../hooks/useChamsLedger";
 
-const NAV_ITEMS: Array<{ key: ChamsTabId; label: string; path: string }> = [
+const NAV_ITEMS: Array<{ key: ChamsTabId; label: string; icon: React.ReactNode }> = [
   {
     key: "ledger",
     label: "Ledger",
-    path: "M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2",
+    icon: <BookOpenTextIcon className="w-6 h-6" />,
   },
   {
     key: "beginning",
     label: "Beginning Inventory",
-    path: "M12 4.5v15m7.5-7.5h-15",
+    icon: <PlusIcon className="w-6 h-6" />,
   },
   {
     key: "movement-entry",
     label: "Spoilage / Sold Logging",
-    path: "M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z",
+    icon: <AlertCircleIcon className="w-6 h-6" />,
   },
   {
     key: "count-entry",
     label: "Remaining Count Entry",
-    path: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4",
+    icon: <ClipboardCheckIcon className="w-6 h-6" />,
   },
   {
     key: "history",
     label: "Ledger History",
-    path: "M3 3v18h18M7 15l4-4 4 4 5-6",
+    icon: <HistoryIcon className="w-6 h-6" />,
   },
 ];
 
@@ -202,7 +211,7 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
               aria-label="Close navigation"
               className="p-1 text-chams-blue-wash/60 hover:text-white"
             >
-              <XIcon className="w-6 h-6" />
+              <Cancel01Icon className="w-6 h-6" />
             </button>
           )}
         </div>
@@ -219,9 +228,7 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
               }`}
             >
               <div className="flex items-center justify-center w-8 flex-shrink-0">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.path} />
-                </svg>
+                {item.icon}
               </div>
               <span
                 className={`ml-3 truncate ${sidebarLabelCls} transition-opacity duration-300 text-left`}
@@ -238,7 +245,7 @@ export default function ChamsStockLedger({ onSwitchView }: ChamsStockLedgerProps
             className="w-full flex items-center p-3 rounded-lg font-bold text-chams-blue-wash/60 hover:bg-chams-blue/10 hover:text-white transition-colors whitespace-nowrap overflow-hidden"
           >
             <div className="flex items-center justify-center w-8 flex-shrink-0">
-              <ArrowLeftIcon className="w-6 h-6" />
+              <ArrowLeft02Icon className="w-6 h-6" />
             </div>
             <span className={`ml-3 truncate ${sidebarLabelCls} transition-opacity duration-300`}>
               Back to Bakery HQ

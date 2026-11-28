@@ -35,6 +35,28 @@
   --color-brand: #f17d0c;
   --color-brand-strong: #b45309;
   --color-brand-strong-hover: #9a3412;
+
+  /* Fonts: Inter carries the interface; Poppins the literal h1–h6 headings.
+     700 is loaded for both because the system renders 700 (see DESIGN.md). */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", "Noto Sans", Arial, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-heading: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+/* Headings change family only: their weight still comes from the font-bold /
+   font-semibold utilities on each element, so the hierarchy does not move. */
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+  }
 }
 
 /* Restores the fade-in entrance animation that was lost when the project

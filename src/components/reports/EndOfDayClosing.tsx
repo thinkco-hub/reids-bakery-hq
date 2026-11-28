@@ -5,7 +5,7 @@ import EmptyState from "../common/EmptyState";
 import StatCard from "../common/StatCard";
 import Button from "../common/Button";
 import Table, { TableHead } from "../common/Table";
-import { CheckIcon, XIcon } from "../icons";
+import { Cancel01Icon, CheckIcon } from "../icons";
 import { TONE_TEXT } from "../../utils/status";
 import { computeDailyClosing } from "../../utils/closing";
 import { formatTime, todayISO } from "../../utils/dates";
@@ -207,7 +207,7 @@ export default function EndOfDayClosing({
                       title="Remove expense"
                       aria-label={`Remove expense ${exp.description}`}
                     >
-                      <XIcon className="w-4 h-4" />
+                      <Cancel01Icon className="w-4 h-4" />
                     </button>
                   )}
                 </div>

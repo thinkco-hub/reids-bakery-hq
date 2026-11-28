@@ -1,5 +1,5 @@
 import React from "react";
-import { CalendarIcon } from "../icons";
+import { Calendar03Icon } from "../icons";
 
 export default function CalendarView() {
   return (
@@ -16,7 +16,7 @@ export default function CalendarView() {
       <div className="flex-1 bg-white rounded-lg shadow-sm border border-caramel flex items-center justify-center p-4 md:p-8">
         <div className="text-center">
           <div className="w-16 h-16 md:w-20 md:h-20 bg-caramel/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CalendarIcon className="w-8 h-8 md:w-10 md:h-10 text-brand-strong" />
+            <Calendar03Icon className="w-8 h-8 md:w-10 md:h-10 text-brand-strong" />
           </div>
           <h3 className="text-lg md:text-xl font-bold text-espresso mb-2">
             Calendar view is coming soon

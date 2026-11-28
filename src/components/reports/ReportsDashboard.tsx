@@ -7,7 +7,12 @@ import EmptyState from "../common/EmptyState";
 import StatCard from "../common/StatCard";
 import Badge from "../common/Badge";
 import Button from "../common/Button";
-import { DownloadIcon, PencilIcon, PrinterIcon, SearchIcon } from "../icons";
+import {
+  Download01Icon,
+  PencilEdit02Icon,
+  PrinterIcon,
+  Search02Icon,
+} from "../icons";
 import { linkedSaleView } from "../../utils/checkout";
 import { formatDateTime } from "../../utils/dates";
 import { formatMoney } from "../../utils/money";
@@ -182,7 +187,7 @@ export default function ReportsDashboard({
             disabled={filteredSales.length === 0}
             aria-describedby={filteredSales.length === 0 ? "export-empty-hint" : undefined}
           >
-            <DownloadIcon className="w-4 h-4" />
+            <Download01Icon className="w-4 h-4" />
             Export CSV
           </Button>
           {filteredSales.length === 0 && (
@@ -285,7 +290,7 @@ export default function ReportsDashboard({
           <h3 id={salesLogHeadingId} className="text-lg font-bold text-ink">Sales Log</h3>
           <div className="relative sm:w-72">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchIcon className="h-5 w-5 text-gray-500" />
+              <Search02Icon className="h-5 w-5 text-gray-500" />
             </div>
             <input
               type="text"
@@ -357,7 +362,7 @@ export default function ReportsDashboard({
                         aria-label={`Edit sale ${sale.id}`}
                         className="p-2 rounded-lg text-gray-500 hover:text-espresso hover:bg-orange-50 transition-colors"
                       >
-                        <PencilIcon className="w-4 h-4" />
+                        <PencilEdit02Icon className="w-4 h-4" />
                       </button>
                     )}
                   </td>

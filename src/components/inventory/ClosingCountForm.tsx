@@ -1,9 +1,8 @@
 import React, { useEffect, useId, useRef, useState } from "react";
 import { useAnnounce } from "../common/Announcer";
 import Button from "../common/Button";
-import { ArrowLeftIcon, BoxIcon, ShoppingCartIcon } from "../icons";
+import { ArrowLeft02Icon } from "../icons";
 import { todayISO } from "../../utils/dates";
-import type { ReactNode } from "react";
 import type { FormEvent } from "react";
 import type {
   ClosingCountEntry,
@@ -17,13 +16,11 @@ type CountMap = Record<string, string>;
 
 function CountSection({
   title,
-  icon,
   items,
   counts,
   onUpdate,
 }: {
   title: string;
-  icon: ReactNode;
   items: (MenuItemStock | IngredientStock)[];
   counts: CountMap;
   onUpdate: (id: string, value: string) => void;
@@ -36,7 +33,7 @@ function CountSection({
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
       <h3 id={headingId} className="text-base font-bold text-ink mb-4">
-        {icon} {title}
+        {title}
       </h3>
       <ul className="md:hidden space-y-4">
         {items.map((item) => (
@@ -162,7 +159,7 @@ export default function ClosingCountForm({ menuInventory, ingredients, onSubmit,
         onClick={onBack}
         className="inline-flex items-center gap-2 -mt-2 mb-2 py-2 text-sm font-semibold text-espresso/70 hover:text-espresso transition-colors"
       >
-        <ArrowLeftIcon className="w-4 h-4" />
+        <ArrowLeft02Icon className="w-4 h-4" />
         Back to Inventory
       </button>
 
@@ -197,7 +194,6 @@ export default function ClosingCountForm({ menuInventory, ingredients, onSubmit,
 
         <CountSection
           title="Menu Items"
-          icon={<BoxIcon className="w-5 h-5 text-gray-500" />}
           items={menuInventory}
           counts={menuCounts}
           onUpdate={updateMenuCount}
@@ -207,7 +203,6 @@ export default function ClosingCountForm({ menuInventory, ingredients, onSubmit,
         {ingredients.length > 0 && (
           <CountSection
             title="Raw Materials"
-            icon={<ShoppingCartIcon className="w-5 h-5 text-gray-500" />}
             items={ingredients}
             counts={ingredientCounts}
             onUpdate={updateIngredientCount}

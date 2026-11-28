@@ -2,7 +2,7 @@ import React, { useId, useRef, useState } from "react";
 import Modal from "../common/Modal";
 import ClientFormModal from "../clients/ClientFormModal";
 import EmptyState from "../common/EmptyState";
-import { CheckIcon, SearchIcon, XIcon } from "../icons";
+import { Cancel01Icon, CheckIcon, Search02Icon } from "../icons";
 import type {
   Client,
   ClientFormData,
@@ -71,7 +71,7 @@ export default function PosCustomerPicker({
           aria-label="Cancel and return to the ticket"
           className="min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center rounded-md bg-caramel/20 hover:bg-caramel/40 transition-colors"
         >
-          <XIcon className="w-6 h-6" />
+          <Cancel01Icon className="w-6 h-6" />
         </button>
         <h2 id={headingId} className="text-lg font-bold">Add customer to ticket</h2>
       </header>
@@ -79,7 +79,7 @@ export default function PosCustomerPicker({
       <div className="flex-shrink-0 bg-white border-b border-gray-200 p-3">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <SearchIcon className="h-5 w-5 text-gray-500" />
+            <Search02Icon className="h-5 w-5 text-gray-500" />
           </div>
           <input
             ref={searchRef}
