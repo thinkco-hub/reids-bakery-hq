@@ -5,10 +5,10 @@ import { buildOrderFromSale } from "../utils/checkout";
 import { todayISO } from "../utils/dates";
 import { buildEditHistoryEntry, diffField, diffLines } from "../utils/editHistory";
 import {
+  canSaveOrderEdit,
   computeAmountDue,
   computeOrderTotal,
   isPayableAmount,
-  isValidCustomerContact,
 } from "../utils/orders";
 import type {
   AuditActionType,
@@ -107,12 +107,14 @@ export function useOrders({
      */
     const editOrder = (id: OrderId, input: EditOrderInput) => {
       const order = orders.find((o) => o.id === id);
-      // Guardrail: never edit a delivered order (also disabled in OrderDetail).
-      if (!order || order.status === "Delivered") return;
+      if (!order) return;
+      const canSave = canSaveOrderEdit(order, {
+        customerName: input.customerName,
+        customerContact: input.customerContact,
+        itemCount: input.items.length,
+      });
+      if (!canSave) return;
       const isClientOrder = order.clientId !== null;
-      // Contact is only editable on walk-in/POS orders; client records own their
-      // own contact details.
-      if (!isClientOrder && !isValidCustomerContact(input.customerContact)) return;
 
       const changes: FieldEdit[] = [];
       if (!isClientOrder) {

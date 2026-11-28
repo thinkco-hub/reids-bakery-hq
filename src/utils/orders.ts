@@ -74,6 +74,22 @@ export function isValidCustomerContact(value: string): boolean {
   return value.length === CUSTOMER_CONTACT_DIGITS && /^\d+$/.test(value);
 }
 
+/** Whether an order edit is submittable; the edit modal's disabled state and
+ *  useOrders.editOrder read the same rule. A client order owns its customer
+ *  details, so only a walk-in's name and contact are checked. */
+export function canSaveOrderEdit(
+  order: Order,
+  {
+    customerName,
+    customerContact,
+    itemCount,
+  }: { customerName: string; customerContact: string; itemCount: number }
+): boolean {
+  if (order.status === "Delivered" || itemCount === 0) return false;
+  if (order.clientId !== null) return true;
+  return !!customerName.trim() && isValidCustomerContact(customerContact);
+}
+
 export function computeAmountDue(order: Order): number {
   return Math.max(0, computeOrderTotal(order) - (order.amountPaid || 0));
 }

@@ -6,7 +6,7 @@ import Button from "../common/Button";
 import { XIcon } from "../icons";
 import type { FormEvent } from "react";
 import { formatMoney } from "../../utils/money";
-import { isValidCustomerContact, toContactDigits } from "../../utils/orders";
+import { canSaveOrderEdit, isValidCustomerContact, toContactDigits } from "../../utils/orders";
 import type { Client, EditOrderInput, MenuItemStock, Order, OrderItem } from "../../types/domain";
 
 interface Line {
@@ -64,9 +64,12 @@ export default function EditOrderModal({ order, client, menuInventory, onClose, 
   const removeLine = (idx: number) => setLines((prev) => prev.filter((_, i) => i !== idx));
 
   const cleanLines = lines.filter((l) => l.menuItemId && (parseFloat(l.qty) || 0) >= 1);
-  const contactOk = isClientOrder || isValidCustomerContact(customerContact);
-  const canSave =
-    contactOk && cleanLines.length > 0 && (isClientOrder || customerName.trim().length > 0);
+  const contactOk = isValidCustomerContact(customerContact);
+  const canSave = canSaveOrderEdit(order, {
+    customerName,
+    customerContact,
+    itemCount: cleanLines.length,
+  });
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();

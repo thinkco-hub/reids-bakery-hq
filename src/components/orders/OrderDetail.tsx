@@ -14,6 +14,7 @@ import {
   computeOrderTotal,
   getOrderShortfalls,
   getPaymentStatus,
+  isPayableAmount,
   nextStatus,
   ORDER_STATUSES,
   PAYMENT_METHODS,
@@ -127,7 +128,7 @@ function RecordPaymentModal({
     const parsed = parseFloat(amount);
     // Presentation only, so the form cannot offer a figure the mutation will
     // refuse; useOrders.recordOrderPayment holds the invariant.
-    if (!method || !Number.isFinite(parsed) || parsed <= 0 || parsed > amountDue) return;
+    if (!method || !isPayableAmount(parsed, amountDue)) return;
     onRecord({ method, amount: parsed });
     onClose();
   };
